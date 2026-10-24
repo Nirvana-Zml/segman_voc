@@ -31,3 +31,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0039 — Fix VOC palette-mask loading](steps/0039-fix-voc-palette-mask-loading.md) — Passed, 2026-10-24T23:17:40+08:00
 - [0040 — Fail first CUDA smoke step recording](steps/0040-fail-first-cuda-smoke-step-recording.md) — Failed, 2026-10-24T23:18:08+08:00
 - [0041 — Pass DeepLabV3+ CUDA smoke](steps/0041-pass-deeplabv3-cuda-smoke.md) — Passed, 2026-10-24T23:18:13+08:00
+- [0042 — Commit DeepLabV3+ smoke pipeline](steps/0042-commit-deeplabv3-smoke-pipeline.md) — Passed, 2026-10-24T23:20:52+08:00

@@ -89,3 +89,6 @@ until the saved loss curve proves the tiny subset can be learned.
   loss=3.037793, finite gradient norm=225.873306, peak allocated memory
   1,065,757,696 bytes, elapsed=1.149 seconds. The saved artifact is explicitly
   diagnostic-only and used no pretrained weights.
+- CNN baseline interfaces, regression tests, failure corrections, and the
+  diagnostic CUDA smoke pipeline were committed as `e502bcd`
+  (`feat: add DeepLabV3+ baseline smoke pipeline`).
