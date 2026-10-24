@@ -71,3 +71,6 @@ starting a reportable CNN baseline run.
 - Final in-container regression suite: 7 tests passed in 2.099 seconds.
 - Project status check reports `data_audit_and_sbd=complete`, highest verified
   stage `data_audit_and_sbd`, and next stage `cnn_baseline`.
+- Standalone-project reset and completed data foundation were committed as
+  `bdc48de` (`chore: replace SegMAN with standalone VOC project`). Runtime
+  datasets and generated artifacts remained ignored.

@@ -23,3 +23,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0031 — Interrupt slow bind-mount SBD conversion](steps/0031-interrupt-slow-bind-mount-sbd-conversion.md) — In progress, 2026-10-24T19:53:11+08:00
 - [0032 — Complete leak-free SBD trainaug conversion](steps/0032-complete-leak-free-sbd-trainaug-conversion.md) — Passed, 2026-10-24T19:53:15+08:00
 - [0033 — Verify completed data stage](steps/0033-verify-completed-data-stage.md) — Passed, 2026-10-24T19:54:00+08:00
+- [0034 — Commit standalone project and data foundation](steps/0034-commit-standalone-project-and-data-foundation.md) — Passed, 2026-10-24T19:58:50+08:00
