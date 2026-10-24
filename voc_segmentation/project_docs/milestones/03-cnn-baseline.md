@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
 - State: **In progress — formal trainer verified; reportable run pending**
-- Last updated: 2026-10-25 00:13 +08:00
+- Last updated: 2026-10-25 00:18 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,11 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+The formal trainer, evaluator, regression tests, accepted v4 diagnostic
+evidence, and all preceding failure records were committed as `b4201fc`
+(`feat: add formal DeepLabV3+ trainer`). Runtime weights and logs remained
+gitignored.
 
 The first attempt to commit the verified formal trainer was blocked before
 staging because the managed sandbox denied creation of `.git/index.lock`.

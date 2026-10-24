@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 00:13 +08:00
+- Last updated: 2026-10-25 00:18 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -134,3 +134,6 @@ remain ineligible.
   explicit 40-character host commit plus a host-clean assertion. The v4 result
   also records Python/CUDA/cuDNN versions and SHA-256 for official train/val
   split files; diagnostic mode correctly records no clean-worktree assertion.
+- The verified formal trainer, evaluator, tests, diagnostics ledger, and usage
+  documentation were committed as `b4201fc`
+  (`feat: add formal DeepLabV3+ trainer`).
