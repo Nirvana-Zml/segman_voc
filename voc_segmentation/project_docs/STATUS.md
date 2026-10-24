@@ -110,3 +110,6 @@ before any reportable baseline launch. Diagnostic weights remain ineligible.
   `11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`,
   320 tensors, strict ResNet-50 load and finite-tensor checks passed. The local
   file also produced finite `[1,21,64,80]` DeepLabV3+ CUDA logits.
+- Provenance-checked acquisition, explicit local encoder loading, contracts,
+  and verification records were committed as `ef7ca23`
+  (`feat: add verified ResNet-50 pretrained weights`).
