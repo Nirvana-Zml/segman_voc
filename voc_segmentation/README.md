@@ -94,6 +94,19 @@ additional SBD labels, and rejects any official validation overlap.
 The verified outputs are under `artifacts/sbd/`: 10,582 trainaug entries,
 9,118 converted extra masks, provenance hashes, and the conversion audit.
 
+## CNN baseline diagnostics
+
+Run the one-step DeepLabV3+ CUDA smoke inside the persistent container:
+
+```powershell
+docker exec voc2012-gcb python tools/smoke_deeplabv3plus.py
+```
+
+This diagnostic uses the official VOC train split, 384×384 crops, batch size 2,
+AMP, CE loss, and one optimizer step. It deliberately disables pretrained
+weight download and writes a diagnostic-only result to
+`artifacts/cnn_baseline/smoke.json`; it is not a reportable checkpoint.
+
 ## Project layout
 
 ```text

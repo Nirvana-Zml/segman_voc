@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-24 20:05 +08:00
+- Last updated: 2026-10-24 23:17 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -15,7 +15,7 @@
 | 00 | Project reset | Passed | New driver valid; ledger and standalone root created |
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
-| 03 | CNN baseline | Not started | DeepLabV3+ smoke, overfit, formal validation |
+| 03 | CNN baseline | In progress | Interfaces and CUDA smoke passed; overfit and formal validation pending |
 | 04 | Transformer baseline | Not started | Comparable SegFormer validation |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Implement the shared VOC/trainaug dataset and DeepLabV3+ baseline interfaces,
-then pass focused tests, a smoke run, and a tiny-set overfit diagnostic before
-starting a reportable CNN baseline run.
+Implement checkpoint/TensorBoard evaluation support and run a deterministic
+two-sample DeepLabV3+ overfit diagnostic. Do not start reportable training
+until the saved loss curve proves the tiny subset can be learned.
 
 ## Latest checks
 
@@ -74,3 +74,18 @@ starting a reportable CNN baseline run.
 - Standalone-project reset and completed data foundation were committed as
   `bdc48de` (`chore: replace SegMAN with standalone VOC project`). Runtime
   datasets and generated artifacts remained ignored.
+- DeepLabV3+ dataset/model/metric interfaces passed all 11 in-container tests
+  in 3.200 seconds; no pretrained weight was downloaded by these tests.
+- The first DeepLabV3+ CUDA smoke failed before model execution because the
+  loader rejected official VOC palette-mode (`P`) masks; no smoke artifact or
+  checkpoint was accepted from this attempt.
+- The first synthetic `P`-mode regression fixture remapped index 20 to 1 on
+  PNG save because it lacked an explicit palette; real VOC indices were read
+  correctly. This test failure requires a corrected fixture before rerunning.
+- The next CUDA smoke reached loss/backward but produced `gradient_norm=NaN`;
+  its mistakenly written `ok=true` artifact is rejected and must be
+  overwritten after enforcing finite gradients and a safer AMP initial scale.
+- Corrected DeepLabV3+ CUDA smoke passed one optimizer step at 384×384, batch 2:
+  loss=3.037793, finite gradient norm=225.873306, peak allocated memory
+  1,065,757,696 bytes, elapsed=1.149 seconds. The saved artifact is explicitly
+  diagnostic-only and used no pretrained weights.

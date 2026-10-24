@@ -10,11 +10,19 @@ data:
   train_split: train
   val_split: val
   crop_size: [384, 384]
+  scale_range: [0.5, 2.0]
+  horizontal_flip_probability: 0.5
   ignore_index: 255
   reduce_zero_label: false
 training:
   physical_batch_size: 2
   effective_batch_size: 8
+  gradient_accumulation_steps: 4
+  optimizer: sgd
+  base_lr: 0.01
+  momentum: 0.9
+  weight_decay: 0.0001
+  gradient_clip_norm: 1.0
   amp: true
   seed: 42
   save_best_metric: miou
