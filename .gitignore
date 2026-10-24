@@ -1,0 +1,70 @@
+# --- datasets & runtime mounts ---
+data/
+**/VOCdevkit/
+**/JPEGImages/
+**/SegmentationClass/
+**/SegmentationClassAug/
+**/test400/
+
+# --- training outputs / weights ---
+work_dirs/
+**/work_dirs/
+outputs/
+runs/
+wandb/
+predictions/
+**/predictions/
+*.pth
+*.pt
+*.ckpt
+*.pkl
+*.pkl.json
+*.log.json
+*.npy
+*.npz
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- SegMAN-main ---
+SegMAN-main/segmentation/mmseg/.mim/
+SegMAN-main/kernels/**/build/
+
+# --- Docker / local junk ---
+-v
+segman*v1
+segman:v1
+*.tar
+*.tar.gz
+
+# --- IDE / agent / OS ---
+.opencode/
+.codeartsdoer/
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- large binaries (keep docs as .md) ---
+*.pdf
+*.zip
+*.7z
+*.rar
+.opencode
