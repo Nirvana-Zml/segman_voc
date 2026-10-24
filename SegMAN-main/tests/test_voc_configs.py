@@ -22,6 +22,8 @@ class VocConfigTest(unittest.TestCase):
                 self.assertTrue(
                     config.model.decode_head.loss_decode.avg_non_ignore)
                 self.assertEqual(config.data.samples_per_gpu, 2)
+                self.assertEqual(config.data.workers_per_gpu, 1)
+                self.assertEqual(config.data.val_dataloader.workers_per_gpu, 1)
                 self.assertFalse(config.data.train.reduce_zero_label)
                 self.assertEqual(config.evaluation.interval, 732)
                 self.assertEqual(config.evaluation.save_best, 'mIoU')

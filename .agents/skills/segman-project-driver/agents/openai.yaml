@@ -1,0 +1,4 @@
+interface:
+  display_name: "SegMAN Project Driver"
+  short_description: "Drive the VOC2012 SegMAN project to verified completion"
+  default_prompt: "Use $segman-project-driver to inspect the current project state and complete the next verified milestone."

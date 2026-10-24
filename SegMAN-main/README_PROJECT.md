@@ -60,6 +60,9 @@ iterations）、AdamW、CE、
 MMSeg 会把 SyncBN 转为普通 BN；不要把训练 batch size 降为 1，因为解码器
 的 1×1 全局池化分支无法用单样本更新 BN 统计。
 
+当前 `segman_v2` 的 `/dev/shm` 为 64 MiB，因此正式配置将训练和验证
+DataLoader worker 固定为 1，避免多 worker 预取触发共享内存耗尽。
+
 启动长时间训练前可复现一次真实数据单步冒烟：
 
 ```powershell

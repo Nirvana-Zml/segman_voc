@@ -61,7 +61,7 @@ model = dict(
 
 data = dict(
     samples_per_gpu=samples_per_gpu,
-    workers_per_gpu=4,
+    workers_per_gpu=1,
     train=dict(data_root=data_root, reduce_zero_label=False),
     val=dict(
         data_root=data_root,
@@ -71,7 +71,7 @@ data = dict(
         data_root=data_root,
         reduce_zero_label=False,
         pipeline=test_pipeline),
-    val_dataloader=dict(samples_per_gpu=1, workers_per_gpu=2))
+    val_dataloader=dict(samples_per_gpu=1, workers_per_gpu=1))
 
 optimizer = dict(
     _delete_=True,
