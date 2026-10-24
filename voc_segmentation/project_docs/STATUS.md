@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-24 23:27 +08:00
+- Last updated: 2026-10-24 23:50 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Acquire and provenance-record the official torchvision ResNet-50 ImageNet
-weights, then implement the formal trainer and official-val evaluator with
-best-mIoU checkpoint selection. Diagnostic weights remain ineligible.
+Implement the formal DeepLabV3+ trainer and full-resolution official-val
+evaluator with best-21-class-mIoU selection, then run a short pretrained smoke
+before any reportable baseline launch. Diagnostic weights remain ineligible.
 
 ## Latest checks
 
@@ -102,3 +102,11 @@ best-mIoU checkpoint selection. Diagnostic weights remain ineligible.
 - Checkpoint/TensorBoard infrastructure and the verified two-sample overfit
   gate were committed as `8b68095`
   (`feat: add checkpointing and overfit diagnostics`).
+- Explicit local ResNet-50 weight loading, the fixed torchvision V2 URL/path
+  contract, and all existing behavior passed 15 container tests in 4.519
+  seconds; the acquisition tool passed an AST syntax check before download.
+- Official torchvision ResNet-50 ImageNet-1K V2 weights were downloaded and
+  verified: 102,540,417 bytes, SHA-256
+  `11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`,
+  320 tensors, strict ResNet-50 load and finite-tensor checks passed. The local
+  file also produced finite `[1,21,64,80]` DeepLabV3+ CUDA logits.

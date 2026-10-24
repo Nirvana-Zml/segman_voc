@@ -31,6 +31,15 @@ class ConfigContractTest(unittest.TestCase):
         config = yaml.safe_load(path.read_text(encoding="utf-8"))
         self.assertTrue(config["experiment"]["requires_memory_profile"])
 
+    def test_deeplab_uses_explicit_provenance_weight_path(self) -> None:
+        path = CONFIG_DIR / "deeplabv3plus_r50.yaml"
+        config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        self.assertEqual(config["model"]["encoder_pretrained"], "imagenet1k_v2")
+        self.assertEqual(
+            config["model"]["encoder_weights_path"],
+            "artifacts/weights/resnet50_imagenet1k_v2/resnet50-11ad3fa6.pth",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

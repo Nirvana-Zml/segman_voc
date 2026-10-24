@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from pathlib import Path
 
 import torch
 from torch import Tensor, nn
@@ -73,13 +74,25 @@ class ASPP(nn.Module):
 
 
 class DeepLabV3Plus(nn.Module):
-    def __init__(self, num_classes: int = 21, encoder_pretrained: bool = False) -> None:
+    def __init__(
+        self,
+        num_classes: int = 21,
+        encoder_pretrained: bool = False,
+        encoder_weights_path: Path | str | None = None,
+    ) -> None:
         super().__init__()
+        if encoder_pretrained and encoder_weights_path is not None:
+            raise ValueError(
+                "choose either torchvision-managed weights or encoder_weights_path"
+            )
         weights = ResNet50_Weights.IMAGENET1K_V2 if encoder_pretrained else None
         encoder = resnet50(
             weights=weights,
             replace_stride_with_dilation=[False, True, True],
         )
+        if encoder_weights_path is not None:
+            state_dict = torch.load(Path(encoder_weights_path), map_location="cpu")
+            encoder.load_state_dict(state_dict, strict=True)
         self.stem = nn.Sequential(
             encoder.conv1,
             encoder.bn1,
@@ -118,8 +131,12 @@ class DeepLabV3Plus(nn.Module):
 
 
 def build_deeplabv3plus(
-    num_classes: int = 21, encoder_pretrained: bool = False
+    num_classes: int = 21,
+    encoder_pretrained: bool = False,
+    encoder_weights_path: Path | str | None = None,
 ) -> DeepLabV3Plus:
     return DeepLabV3Plus(
-        num_classes=num_classes, encoder_pretrained=encoder_pretrained
+        num_classes=num_classes,
+        encoder_pretrained=encoder_pretrained,
+        encoder_weights_path=encoder_weights_path,
     )

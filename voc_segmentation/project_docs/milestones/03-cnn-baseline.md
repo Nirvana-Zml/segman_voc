@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — smoke and two-sample overfit passed**
-- Last updated: 2026-10-24 23:27 +08:00
+- State: **In progress — pretrained weights verified; formal run pending**
+- Last updated: 2026-10-24 23:50 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -81,6 +81,42 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Acquire the official torchvision ResNet-50 ImageNet weights with source,
-license, and SHA-256 provenance; then implement the formal trainer and
-full-resolution official-val evaluator with best-mIoU checkpoint selection.
+Implement the formal trainer and full-resolution official-val evaluator with
+best-21-class-mIoU checkpoint selection, resolved-config capture, TensorBoard,
+and restart support. Run a short pretrained-weight smoke before launching a
+reportable baseline.
+
+## ResNet-50 ImageNet-1K V2 provenance
+
+- Weight ID: `ResNet50_Weights.IMAGENET1K_V2`
+- Fixed environment: torch 2.1.2, torchvision 0.16.2
+- Official source:
+  `https://download.pytorch.org/models/resnet50-11ad3fa6.pth`
+- Torchvision 0.16 documentation:
+  `https://docs.pytorch.org/vision/0.16/models/generated/torchvision.models.resnet50.html`
+- Torchvision recipe:
+  `https://github.com/pytorch/vision/issues/3995#issuecomment-1013906621`
+- Local artifact:
+  `artifacts/weights/resnet50_imagenet1k_v2/resnet50-11ad3fa6.pth`
+- Bytes: 102,540,417
+- Full SHA-256:
+  `11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`
+- Published filename hash prefix `11ad3fa6` matches the computed digest
+- Validation: 320 tensors, strict torchvision ResNet-50 state-dict load passed,
+  every floating tensor finite
+- Project integration: local-file DeepLabV3+ CUDA forward produced finite
+  logits with shape `[1,21,64,80]`
+- Scope: ImageNet-1K classification initialization for the DeepLabV3+
+  ResNet-50 encoder; not segmentation or VOC pretraining
+- License boundary: torchvision 0.16.2 source is BSD-3-Clause. Torchvision
+  explicitly warns that pretrained-model permissions may derive from the
+  training dataset and are the user's responsibility. ImageNet describes
+  access for non-commercial research/education under its conditions. This
+  course project uses the weights only for educational initialization and
+  asserts no broader rights.
+- License sources:
+  `https://github.com/pytorch/vision/blob/v0.16.2/LICENSE`,
+  `https://github.com/pytorch/vision#pre-trained-model-license`, and
+  `https://www.image-net.org/download-images.php`
+- Machine-readable evidence:
+  `artifacts/weights/resnet50_imagenet1k_v2/provenance.json`

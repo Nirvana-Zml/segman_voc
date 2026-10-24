@@ -35,3 +35,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0043 — Implement checkpoint and two-sample overfit tooling](steps/0043-implement-checkpoint-and-two-sample-overfit-tooling.md) — Passed, 2026-10-24T23:26:05+08:00
 - [0044 — Pass DeepLabV3+ two-sample overfit](steps/0044-pass-deeplabv3-two-sample-overfit.md) — Passed, 2026-10-24T23:28:05+08:00
 - [0045 — Commit checkpoint and overfit diagnostics](steps/0045-commit-checkpoint-and-overfit-diagnostics.md) — Passed, 2026-10-24T23:30:05+08:00
+- [0046 — Implement provenance-checked ResNet-50 weight acquisition](steps/0046-implement-provenance-checked-resnet-50-weight-acquisition.md) — Passed, 2026-10-24T23:34:28+08:00
+- [0047 — Acquire and verify ResNet-50 ImageNet weights](steps/0047-acquire-and-verify-resnet-50-imagenet-weights.md) — Passed, 2026-10-24T23:50:44+08:00

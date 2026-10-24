@@ -4,7 +4,8 @@ experiment:
 model:
   name: deeplabv3plus
   encoder: resnet50
-  encoder_pretrained: imagenet1k
+  encoder_pretrained: imagenet1k_v2
+  encoder_weights_path: artifacts/weights/resnet50_imagenet1k_v2/resnet50-11ad3fa6.pth
   num_classes: 21
 data:
   train_split: train

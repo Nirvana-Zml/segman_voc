@@ -15,6 +15,14 @@ from models.baselines import build_deeplabv3plus  # noqa: E402
 
 
 class DeepLabV3PlusTest(unittest.TestCase):
+    def test_rejects_two_pretrained_weight_sources(self) -> None:
+        with self.assertRaisesRegex(ValueError, "choose either"):
+            build_deeplabv3plus(
+                num_classes=21,
+                encoder_pretrained=True,
+                encoder_weights_path="weights.pth",
+            )
+
     def test_forward_preserves_spatial_shape_and_class_count(self) -> None:
         model = build_deeplabv3plus(num_classes=21, encoder_pretrained=False)
         model.eval()

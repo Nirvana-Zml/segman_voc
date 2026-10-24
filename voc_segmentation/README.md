@@ -118,6 +118,18 @@ and writes a diagnostic checkpoint, loss history, TensorBoard event file, and
 validated result under `artifacts/cnn_baseline/overfit_two_samples/`. These
 diagnostic weights must never be used for validation or submission.
 
+Acquire the exact torchvision 0.16.2 ResNet-50 ImageNet-1K V2 encoder weights:
+
+```powershell
+docker exec voc2012-gcb python tools/acquire_resnet50_weights.py
+```
+
+The command downloads from `download.pytorch.org`, validates the published
+SHA-256 prefix, strictly loads the state dict into torchvision ResNet-50,
+checks all floating tensors for finiteness, and records source, scope, license
+notes, byte size, and full SHA-256 under `artifacts/weights/`. Training must use
+the explicit local path in `configs/deeplabv3plus_r50.yaml`.
+
 ## Project layout
 
 ```text
