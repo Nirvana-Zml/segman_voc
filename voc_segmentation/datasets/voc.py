@@ -95,6 +95,25 @@ class SegmentationEvalTransform:
         return _normalize_image(image, self.mean, self.std), F.pil_to_tensor(mask).squeeze(0).long()
 
 
+class SegmentationFixedResizeTransform:
+    """Deterministic diagnostic transform with nearest-neighbor mask resize."""
+
+    def __init__(
+        self,
+        size: tuple[int, int],
+        mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
+        std: tuple[float, float, float] = (0.229, 0.224, 0.225),
+    ) -> None:
+        self.size = size
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, image: Image.Image, mask: Image.Image) -> tuple[Tensor, Tensor]:
+        image = F.resize(image, list(self.size), InterpolationMode.BILINEAR)
+        mask = F.resize(mask, list(self.size), InterpolationMode.NEAREST)
+        return _normalize_image(image, self.mean, self.std), F.pil_to_tensor(mask).squeeze(0).long()
+
+
 class VOCSegmentationDataset(Dataset[dict[str, Tensor | str | tuple[int, int]]]):
     """Official VOC train/val or a provenance-audited trainaug manifest."""
 

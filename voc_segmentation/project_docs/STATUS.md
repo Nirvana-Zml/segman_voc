@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-24 23:17 +08:00
+- Last updated: 2026-10-24 23:27 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -15,7 +15,7 @@
 | 00 | Project reset | Passed | New driver valid; ledger and standalone root created |
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
-| 03 | CNN baseline | In progress | Interfaces and CUDA smoke passed; overfit and formal validation pending |
+| 03 | CNN baseline | In progress | Smoke and two-sample overfit passed; formal training/validation pending |
 | 04 | Transformer baseline | Not started | Comparable SegFormer validation |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Implement checkpoint/TensorBoard evaluation support and run a deterministic
-two-sample DeepLabV3+ overfit diagnostic. Do not start reportable training
-until the saved loss curve proves the tiny subset can be learned.
+Acquire and provenance-record the official torchvision ResNet-50 ImageNet
+weights, then implement the formal trainer and official-val evaluator with
+best-mIoU checkpoint selection. Diagnostic weights remain ineligible.
 
 ## Latest checks
 
@@ -92,3 +92,10 @@ until the saved loss curve proves the tiny subset can be learned.
 - CNN baseline interfaces, regression tests, failure corrections, and the
   diagnostic CUDA smoke pipeline were committed as `e502bcd`
   (`feat: add DeepLabV3+ baseline smoke pipeline`).
+- Checkpoint round-trip, fixed-resize label preservation, and all prior
+  contracts passed 13 in-container tests in 4.269 seconds; the two-sample
+  overfit tool also passed an AST syntax check and is ready to run.
+- Two-sample CUDA overfit passed: evaluation CE decreased from 3.002533 to
+  0.017127 (ratio 0.005704 versus required maximum 0.5) over 100 steps. The
+  100-point history, TensorBoard event, and step-100 diagnostic checkpoint were
+  independently hash- and metadata-verified; no official val sample was used.

@@ -16,10 +16,28 @@ if str(APP_ROOT) not in sys.path:
 TEST_TMP_ROOT = APP_ROOT / ".test_tmp"
 TEST_TMP_ROOT.mkdir(exist_ok=True)
 
-from datasets.voc import SegmentationTrainTransform, VOCSegmentationDataset  # noqa: E402
+from datasets.voc import (  # noqa: E402
+    SegmentationFixedResizeTransform,
+    SegmentationTrainTransform,
+    VOCSegmentationDataset,
+)
 
 
 class VocDatasetTest(unittest.TestCase):
+    def test_fixed_resize_preserves_discrete_mask_labels(self) -> None:
+        image = Image.fromarray(np.full((3, 4, 3), 127, dtype=np.uint8), mode="RGB")
+        mask = Image.fromarray(
+            np.array([[0, 0, 20, 20], [0, 255, 20, 20], [3, 3, 4, 4]], dtype=np.uint8),
+            mode="L",
+        )
+        transform = SegmentationFixedResizeTransform((12, 16))
+
+        image_tensor, mask_tensor = transform(image, mask)
+
+        self.assertEqual(tuple(image_tensor.shape), (3, 12, 16))
+        self.assertEqual(tuple(mask_tensor.shape), (12, 16))
+        self.assertEqual(set(mask_tensor.unique().tolist()), {0, 3, 4, 20, 255})
+
     def test_transform_preserves_labels_and_uses_ignore_padding(self) -> None:
         image = Image.fromarray(np.full((2, 3, 3), 127, dtype=np.uint8), mode="RGB")
         mask = Image.fromarray(

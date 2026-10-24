@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — interfaces and CUDA smoke passed**
-- Last updated: 2026-10-24 23:17 +08:00
+- State: **In progress — smoke and two-sample overfit passed**
+- Last updated: 2026-10-24 23:27 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -57,8 +57,30 @@ initial scale before accepting an optimizer step.
 - Encoder pretraining was disabled, so this is pipeline evidence only and not
   a reportable performance result or submission checkpoint.
 
+## Two-sample overfit evidence
+
+- Command: `docker exec voc2012-gcb python tools/overfit_deeplabv3plus.py`
+- Result: `artifacts/cnn_baseline/overfit_two_samples/result.json`,
+  `ok=true`, `diagnostic_only=true`
+- Fixed official-train IDs: `2008_005679`, `2008_002175`; val was not read
+- Input: `[2,3,128,128]`; 100 AdamW steps at learning rate 0.001
+- Initial/final evaluation CE: 3.002533 / 0.017127
+- Loss ratio: 0.005704; required maximum: 0.5
+- Diagnostic pixel accuracy: 0.994826 on the same two training samples
+- Peak allocated CUDA memory: 891,774,464 bytes; elapsed: 6.455 seconds
+- History: 100 JSONL entries, SHA-256
+  `12d5acfc7b4d0928c49b1e77ef59f009eb7061a5c18a1d0899f55a1b03d5600b`
+- Checkpoint: 484,746,098 bytes, step 100, `diagnostic_only=true`,
+  SHA-256 `925a94a271ee13682f5d49477602355b210ce2cb3107838dc663b58ee5215e5b`
+- TensorBoard event SHA-256:
+  `532faf99fdc41d90b6fd39204b972a94e6292655e8d3ca518d4e0b95dc72e38a`
+- TensorBoard tags `Loss/train_ce`, `System/gradient_norm`, and
+  `LearningRate/decoder` each contain exactly 100 scalar points.
+- These same-sample metrics demonstrate learnability only; they are not
+  validation performance and the checkpoint is forbidden for submission.
+
 ## Next action
 
-Implement checkpoint and TensorBoard logging plus a deterministic two-sample
-overfit diagnostic. Require a clear saved loss decrease before any formal CNN
-baseline training or ImageNet-weight acquisition.
+Acquire the official torchvision ResNet-50 ImageNet weights with source,
+license, and SHA-256 provenance; then implement the formal trainer and
+full-resolution official-val evaluator with best-mIoU checkpoint selection.

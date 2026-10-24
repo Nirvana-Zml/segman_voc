@@ -107,6 +107,17 @@ AMP, CE loss, and one optimizer step. It deliberately disables pretrained
 weight download and writes a diagnostic-only result to
 `artifacts/cnn_baseline/smoke.json`; it is not a reportable checkpoint.
 
+Run the deterministic two-sample overfit gate:
+
+```powershell
+docker exec voc2012-gcb python tools/overfit_deeplabv3plus.py
+```
+
+It uses two fixed official-train samples only, disables pretrained weights,
+and writes a diagnostic checkpoint, loss history, TensorBoard event file, and
+validated result under `artifacts/cnn_baseline/overfit_two_samples/`. These
+diagnostic weights must never be used for validation or submission.
+
 ## Project layout
 
 ```text
