@@ -99,3 +99,6 @@ best-mIoU checkpoint selection. Diagnostic weights remain ineligible.
   0.017127 (ratio 0.005704 versus required maximum 0.5) over 100 steps. The
   100-point history, TensorBoard event, and step-100 diagnostic checkpoint were
   independently hash- and metadata-verified; no official val sample was used.
+- Checkpoint/TensorBoard infrastructure and the verified two-sample overfit
+  gate were committed as `8b68095`
+  (`feat: add checkpointing and overfit diagnostics`).
