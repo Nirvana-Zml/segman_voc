@@ -1,0 +1,4 @@
+interface:
+  display_name: "VOC2012 Project Driver"
+  short_description: "Drive the standalone VOC2012 project to verified completion"
+  default_prompt: "Use $voc-segmentation-project-driver to inspect the current evidence and complete the next verified milestone."

@@ -1,4 +1,4 @@
 interface:
-  display_name: "SegMAN Project Driver"
-  short_description: "Drive the VOC2012 SegMAN project to verified completion"
-  default_prompt: "Use $segman-project-driver to inspect the current project state and complete the next verified milestone."
+  display_name: "Legacy SegMAN Alias"
+  short_description: "Route legacy requests to the standalone VOC2012 driver"
+  default_prompt: "Use $voc-segmentation-project-driver to inspect the standalone VOC2012 project and continue its next verified milestone."

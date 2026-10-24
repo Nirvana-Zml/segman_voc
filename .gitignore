@@ -41,9 +41,13 @@ venv/
 .ruff_cache/
 .ipynb_checkpoints/
 
-# --- SegMAN-main ---
-SegMAN-main/segmentation/mmseg/.mim/
-SegMAN-main/kernels/**/build/
+# --- standalone VOC project ---
+voc_segmentation/artifacts/
+voc_segmentation/checkpoints/
+voc_segmentation/outputs/
+voc_segmentation/predictions/
+voc_segmentation/runs/
+voc_segmentation/.test_tmp/
 
 # --- Docker / local junk ---
 -v

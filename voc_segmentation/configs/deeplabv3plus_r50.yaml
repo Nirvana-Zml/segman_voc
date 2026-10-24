@@ -1,0 +1,20 @@
+experiment:
+  name: deeplabv3plus_r50_voc_train
+  stage: cnn_baseline
+model:
+  name: deeplabv3plus
+  encoder: resnet50
+  encoder_pretrained: imagenet1k
+  num_classes: 21
+data:
+  train_split: train
+  val_split: val
+  crop_size: [384, 384]
+  ignore_index: 255
+  reduce_zero_label: false
+training:
+  physical_batch_size: 2
+  effective_batch_size: 8
+  amp: true
+  seed: 42
+  save_best_metric: miou

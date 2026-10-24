@@ -1,9 +1,20 @@
 ---
 name: segman-project-driver
-description: Drive and document this repository's Pascal VOC2012 SegMAN course project from its current evidence-backed state through implementation, training, evaluation, test400 inference, reporting, and submission packaging. Use for project status, continuing or finishing the project, running experiments, selecting checkpoints, generating predictions, or preparing final deliverables. Do not use for generic segmentation questions or unrelated upstream SegMAN edits.
+description: Compatibility alias for the retired SegMAN project driver. Use only when an older request explicitly names this skill; route all current VOC2012 project work to $voc-segmentation-project-driver.
 ---
 
-# SegMAN Project Driver
+# Retired compatibility alias
+
+The SegMAN application tree has been deleted by the user. For any current
+project request, read and follow
+`../voc-segmentation-project-driver/SKILL.md` completely. Its application root,
+ledger, milestones, and completion contract supersede every path and workflow
+below. Do not restore `SegMAN-main/` unless the user explicitly requests it.
+
+The remaining text is retained only as legacy context and must not drive new
+work.
+
+# Legacy SegMAN Project Driver
 
 Work from the repository root and treat `SegMAN-main/` as the application root.
 
