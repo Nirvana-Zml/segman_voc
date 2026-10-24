@@ -130,6 +130,35 @@ checks all floating tensors for finiteness, and records source, scope, license
 notes, byte size, and full SHA-256 under `artifacts/weights/`. Training must use
 the explicit local path in `configs/deeplabv3plus_r50.yaml`.
 
+Run the short pretrained trainer diagnostic:
+
+```powershell
+$vocCommit = git rev-parse HEAD
+docker exec voc2012-gcb python tools/train_deeplabv3plus.py --diagnostic-only --git-commit $vocCommit --output-dir artifacts/cnn_baseline/pretrained_formal_smoke_v4 --max-iterations 1 --validate-every 1 --validation-limit 2
+```
+
+The validation limit is accepted only in diagnostic mode. Its metrics are not
+reportable. The formal VOC-train baseline uses the versioned defaults and the
+entire official validation split. From PowerShell, require a clean host
+worktree and inject its full commit because the container intentionally does
+not mount `.git`:
+
+```powershell
+if (git status --porcelain) { throw "Commit the worktree before formal training." }
+$vocCommit = git rev-parse HEAD
+docker exec voc2012-gcb python tools/train_deeplabv3plus.py --git-commit $vocCommit --git-worktree-clean
+```
+
+The trainer writes the resolved configuration, JSONL history, full-resolution
+validation records, TensorBoard events, and validation-mIoU-selected
+checkpoints under `runs/deeplabv3plus_r50_voc_train/`. To continue an
+interrupted run, pass the checkpoint with the greatest saved step (normally
+`best.pt` or `last.pt`) and the same output directory:
+
+```powershell
+docker exec voc2012-gcb python tools/train_deeplabv3plus.py --resume runs/deeplabv3plus_r50_voc_train/last.pt --git-commit $vocCommit --git-worktree-clean
+```
+
 ## Project layout
 
 ```text

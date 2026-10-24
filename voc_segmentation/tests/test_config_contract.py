@@ -39,6 +39,14 @@ class ConfigContractTest(unittest.TestCase):
             config["model"]["encoder_weights_path"],
             "artifacts/weights/resnet50_imagenet1k_v2/resnet50-11ad3fa6.pth",
         )
+        training = config["training"]
+        self.assertGreater(training["max_iterations"], 0)
+        self.assertGreater(training["validate_every"], 0)
+        self.assertLess(training["warmup_iterations"], training["max_iterations"])
+        self.assertGreater(training["poly_power"], 0)
+        self.assertLess(
+            training["encoder_lr_multiplier"], training["decoder_lr_multiplier"]
+        )
 
 
 if __name__ == "__main__":

@@ -38,3 +38,10 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0046 — Implement provenance-checked ResNet-50 weight acquisition](steps/0046-implement-provenance-checked-resnet-50-weight-acquisition.md) — Passed, 2026-10-24T23:34:28+08:00
 - [0047 — Acquire and verify ResNet-50 ImageNet weights](steps/0047-acquire-and-verify-resnet-50-imagenet-weights.md) — Passed, 2026-10-24T23:50:44+08:00
 - [0048 — Commit verified ResNet-50 weight acquisition](steps/0048-commit-verified-resnet-50-weight-acquisition.md) — Passed, 2026-10-24T23:52:46+08:00
+- [0049 — Fail first formal-trainer container regression invocation](steps/0049-fail-first-formal-trainer-container-regression-invocation.md) — Failed, 2026-10-24T23:59:19+08:00
+- [0050 — Reject zero-learning-rate pretrained trainer smoke](steps/0050-reject-zero-learning-rate-pretrained-trainer-smoke.md) — Failed, 2026-10-25T00:01:12+08:00
+- [0051 — Fail first pretrained smoke artifact verification command](steps/0051-fail-first-pretrained-smoke-artifact-verification-command.md) — Failed, 2026-10-25T00:03:14+08:00
+- [0052 — Fail first Git-provenance-gated trainer smoke](steps/0052-fail-first-git-provenance-gated-trainer-smoke.md) — Failed, 2026-10-25T00:08:56+08:00
+- [0053 — Partially fail container mount inspection](steps/0053-partially-fail-container-mount-inspection.md) — Failed, 2026-10-25T00:10:12+08:00
+- [0054 — Implement and verify formal DeepLabV3+ trainer](steps/0054-implement-and-verify-formal-deeplabv3-trainer.md) — Passed, 2026-10-25T00:13:54+08:00
+- [0055 — Fail first formal trainer commit on Git lock permission](steps/0055-fail-first-formal-trainer-commit-on-git-lock-permission.md) — Failed, 2026-10-25T00:17:05+08:00

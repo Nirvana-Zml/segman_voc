@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-24 23:50 +08:00
+- Last updated: 2026-10-25 00:13 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Implement the formal DeepLabV3+ trainer and full-resolution official-val
-evaluator with best-21-class-mIoU selection, then run a short pretrained smoke
-before any reportable baseline launch. Diagnostic weights remain ineligible.
+Launch the reportable DeepLabV3+ VOC-train baseline with the verified formal
+trainer and evaluate all 1,449 official validation images. Diagnostic weights
+remain ineligible.
 
 ## Latest checks
 
@@ -113,3 +113,24 @@ before any reportable baseline launch. Diagnostic weights remain ineligible.
 - Provenance-checked acquisition, explicit local encoder loading, contracts,
   and verification records were committed as `ef7ca23`
   (`feat: add verified ResNet-50 pretrained weights`).
+- The formal DeepLabV3+ trainer now provides gradient accumulation, AMP,
+  encoder/decoder learning-rate groups, warmup-poly scheduling, finite-value
+  gates, native-resolution global-confusion validation, validation-mIoU best
+  selection, resolved configs, JSONL/TensorBoard logs, and checkpoint restart.
+- The first expanded-suite invocation was denied access to Docker Desktop from
+  the managed shell; the approved retry passed all 20 tests. A first one-step
+  diagnostic was rejected because endpoint poly decay made its learning rate
+  zero; the schedule now preserves the base rates for a one-step smoke.
+- Final pretrained v4 diagnostic passed one effective-batch-8 optimizer step:
+  train CE 2.973795, finite gradient norm 7.913279, encoder/decoder learning
+  rates 0.001/0.01, and peak allocated CUDA memory 1,262,054,912 bytes.
+- The v4 diagnostic evaluated two native-size official-val images only, so its
+  mIoU 0.002043 is explicitly non-reportable. Its diagnostic checkpoint is
+  323,230,158 bytes with SHA-256
+  `ee43b5f640535fef43a89d233b7b4c2a60cb9d4c582df9dee11c85436a12a9b6`;
+  checkpoint metadata, both optimizer groups, event hash, and seven one-point
+  TensorBoard scalar series were independently verified.
+- Because `.git` is not mounted into the container, reportable runs require an
+  explicit 40-character host commit plus a host-clean assertion. The v4 result
+  also records Python/CUDA/cuDNN versions and SHA-256 for official train/val
+  split files; diagnostic mode correctly records no clean-worktree assertion.
