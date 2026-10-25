@@ -46,3 +46,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0054 — Implement and verify formal DeepLabV3+ trainer](steps/0054-implement-and-verify-formal-deeplabv3-trainer.md) — Passed, 2026-10-25T00:13:54+08:00
 - [0055 — Fail first formal trainer commit on Git lock permission](steps/0055-fail-first-formal-trainer-commit-on-git-lock-permission.md) — Failed, 2026-10-25T00:17:05+08:00
 - [0056 — Commit formal DeepLabV3+ trainer](steps/0056-commit-formal-deeplabv3-trainer.md) — Passed, 2026-10-25T00:18:31+08:00
+- [0057 — Fail first reportable CNN run preflight with Docker stopped](steps/0057-fail-first-reportable-cnn-run-preflight-with-docker-stopped.md) — Failed, 2026-10-25T07:48:08+08:00
+- [0058 — Launch reportable DeepLabV3+ VOC-train run](steps/0058-launch-reportable-deeplabv3-voc-train-run.md) — In progress, 2026-10-25T07:52:22+08:00
+- [0059 — Terminate formal CNN run on unhandled AMP overflow](steps/0059-terminate-formal-cnn-run-on-unhandled-amp-overflow.md) — Failed, 2026-10-25T12:38:18+08:00
+- [0060 — Implement and verify bounded AMP overflow recovery](steps/0060-implement-and-verify-bounded-amp-overflow-recovery.md) — Passed, 2026-10-25T12:47:54+08:00

@@ -36,6 +36,7 @@ from datasets import (  # noqa: E402
 from engine import (  # noqa: E402
     evaluate_segmentation,
     file_sha256,
+    is_recoverable_amp_overflow,
     load_checkpoint,
     poly_lr_factor,
     save_checkpoint,
@@ -70,6 +71,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--git-commit")
     parser.add_argument("--git-worktree-clean", action="store_true")
     parser.add_argument("--diagnostic-only", action="store_true")
+    parser.add_argument("--diagnostic-force-amp-overflow-once", action="store_true")
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     return parser.parse_args()
 
@@ -121,6 +123,10 @@ def main() -> int:
         raise ValueError("--validation-limit is allowed only with --diagnostic-only")
     if args.validation_limit is not None and args.validation_limit <= 0:
         raise ValueError("--validation-limit must be positive")
+    if args.diagnostic_force_amp_overflow_once and not args.diagnostic_only:
+        raise ValueError(
+            "--diagnostic-force-amp-overflow-once requires --diagnostic-only"
+        )
 
     config_path = resolve_app_path(args.config)
     config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
@@ -143,6 +149,16 @@ def main() -> int:
         raise ValueError("batch size and accumulation steps must be positive")
     if physical_batch_size * accumulation_steps != int(training["effective_batch_size"]):
         raise ValueError("configured effective batch size is inconsistent")
+    max_consecutive_amp_overflows = int(
+        training["max_consecutive_amp_overflows"]
+    )
+    max_total_amp_overflows = int(training["max_total_amp_overflows"])
+    if max_consecutive_amp_overflows <= 0:
+        raise ValueError("max_consecutive_amp_overflows must be positive")
+    if max_total_amp_overflows < max_consecutive_amp_overflows:
+        raise ValueError(
+            "max_total_amp_overflows must be at least max_consecutive_amp_overflows"
+        )
     if args.git_commit is not None and not re.fullmatch(
         r"[0-9a-fA-F]{40}", args.git_commit
     ):
@@ -182,6 +198,9 @@ def main() -> int:
         "validate_every": validate_every,
         "validation_limit": args.validation_limit,
         "diagnostic_only": args.diagnostic_only,
+        "diagnostic_force_amp_overflow_once": (
+            args.diagnostic_force_amp_overflow_once
+        ),
         "device": args.device,
     }
     resolved_config_path.write_text(
@@ -287,6 +306,7 @@ def main() -> int:
     start_step = 0
     best_miou = float("-inf")
     best_step = 0
+    total_amp_overflows = 0
     resume_info: dict[str, Any] | None = None
     if args.resume is not None:
         resume_path = resolve_app_path(args.resume)
@@ -301,8 +321,10 @@ def main() -> int:
             raise ValueError("resume checkpoint diagnostic status does not match this run")
         start_step = int(payload["step"])
         selection = payload.get("metrics", {}).get("selection", {})
+        training_state = payload.get("metrics", {}).get("training_state", {})
         best_miou = float(selection.get("best_miou", payload["metrics"].get("miou", -math.inf)))
         best_step = int(selection.get("best_step", start_step))
+        total_amp_overflows = int(training_state.get("amp_overflow_count", 0))
         resume_info = {
             "path": str(resume_path),
             "sha256": file_sha256(resume_path),
@@ -318,6 +340,8 @@ def main() -> int:
     latest_validation: dict[str, Any] | None = None
     best_checkpoint: dict[str, Any] | None = None
     latest_checkpoint: dict[str, Any] | None = None
+    consecutive_amp_overflows = 0
+    forced_amp_overflow_injected = False
     model.train()
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
@@ -333,33 +357,99 @@ def main() -> int:
                 power=float(training["poly_power"]),
             )
             learning_rates = set_learning_rate(optimizer, factor)
-            optimizer.zero_grad(set_to_none=True)
-            accumulated_loss = 0.0
-            for _ in range(accumulation_steps):
-                try:
-                    batch = next(train_iterator)
-                except StopIteration:
-                    train_iterator = iter(train_loader)
-                    batch = next(train_iterator)
-                images = batch["image"].to(device, non_blocking=True)
-                masks = batch["mask"].to(device, non_blocking=True)
-                with torch.cuda.amp.autocast(enabled=amp_enabled):
-                    logits = model(images)
-                    micro_loss = criterion(logits, masks)
-                    backward_loss = micro_loss / accumulation_steps
-                if not torch.isfinite(micro_loss):
-                    raise RuntimeError(f"non-finite train loss at iteration {step}")
-                accumulated_loss += float(micro_loss.detach())
-                scaler.scale(backward_loss).backward()
-            scaler.unscale_(optimizer)
-            gradient_norm = torch.nn.utils.clip_grad_norm_(
-                model.parameters(), float(training["gradient_clip_norm"])
-            )
-            gradient_norm_value = float(gradient_norm)
-            if not math.isfinite(gradient_norm_value):
-                raise RuntimeError(f"non-finite gradient norm at iteration {step}")
-            scaler.step(optimizer)
-            scaler.update()
+            attempt = 0
+            while True:
+                attempt += 1
+                optimizer.zero_grad(set_to_none=True)
+                accumulated_loss = 0.0
+                for _ in range(accumulation_steps):
+                    try:
+                        batch = next(train_iterator)
+                    except StopIteration:
+                        train_iterator = iter(train_loader)
+                        batch = next(train_iterator)
+                    images = batch["image"].to(device, non_blocking=True)
+                    masks = batch["mask"].to(device, non_blocking=True)
+                    with torch.cuda.amp.autocast(enabled=amp_enabled):
+                        logits = model(images)
+                        micro_loss = criterion(logits, masks)
+                        backward_loss = micro_loss / accumulation_steps
+                    if not torch.isfinite(micro_loss):
+                        raise RuntimeError(f"non-finite train loss at iteration {step}")
+                    accumulated_loss += float(micro_loss.detach())
+                    scaler.scale(backward_loss).backward()
+
+                if (
+                    args.diagnostic_force_amp_overflow_once
+                    and not forced_amp_overflow_injected
+                ):
+                    for parameter in model.parameters():
+                        if parameter.grad is not None:
+                            with torch.no_grad():
+                                parameter.grad.reshape(-1)[0] = float("inf")
+                            forced_amp_overflow_injected = True
+                            break
+                    if not forced_amp_overflow_injected:
+                        raise RuntimeError("could not inject diagnostic AMP overflow")
+
+                amp_scale_before = float(scaler.get_scale())
+                scaler.unscale_(optimizer)
+                gradient_norm = torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), float(training["gradient_clip_norm"])
+                )
+                gradient_norm_value = float(gradient_norm)
+                if not math.isfinite(gradient_norm_value) and not amp_enabled:
+                    raise RuntimeError(
+                        f"non-finite gradient norm without AMP at iteration {step}"
+                    )
+                scaler.step(optimizer)
+                scaler.update()
+                amp_scale_after = float(scaler.get_scale())
+                recovered_overflow = is_recoverable_amp_overflow(
+                    gradient_norm_value,
+                    amp_enabled=amp_enabled,
+                    scale_before=amp_scale_before,
+                    scale_after=amp_scale_after,
+                )
+                if not recovered_overflow:
+                    consecutive_amp_overflows = 0
+                    break
+
+                total_amp_overflows += 1
+                consecutive_amp_overflows += 1
+                overflow_entry = {
+                    "type": "amp_overflow",
+                    "step": step,
+                    "attempt": attempt,
+                    "loss": accumulated_loss / accumulation_steps,
+                    "gradient_norm": None,
+                    "amp_scale_before": amp_scale_before,
+                    "amp_scale_after": amp_scale_after,
+                    "learning_rates": learning_rates,
+                    "total_amp_overflows": total_amp_overflows,
+                    "consecutive_amp_overflows": consecutive_amp_overflows,
+                }
+                stream.write(json.dumps(overflow_entry) + "\n")
+                stream.flush()
+                writer.add_scalar("System/amp_overflow", 1.0, step)
+                writer.add_scalar("AMP/scale", amp_scale_after, step)
+                print(
+                    f"amp_overflow iteration={step} attempt={attempt} "
+                    f"scale={amp_scale_before:.1f}->{amp_scale_after:.1f} "
+                    "action=retry",
+                    flush=True,
+                )
+                if consecutive_amp_overflows > max_consecutive_amp_overflows:
+                    raise RuntimeError(
+                        "consecutive AMP overflow limit exceeded at iteration "
+                        f"{step}: {consecutive_amp_overflows} > "
+                        f"{max_consecutive_amp_overflows}"
+                    )
+                if total_amp_overflows > max_total_amp_overflows:
+                    raise RuntimeError(
+                        "total AMP overflow limit exceeded: "
+                        f"{total_amp_overflows} > {max_total_amp_overflows}"
+                    )
 
             train_loss = accumulated_loss / accumulation_steps
             train_entry = {
@@ -367,13 +457,16 @@ def main() -> int:
                 "step": step,
                 "loss": train_loss,
                 "gradient_norm": gradient_norm_value,
-                "amp_scale": float(scaler.get_scale()),
+                "amp_scale": amp_scale_after,
                 "learning_rates": learning_rates,
+                "attempt": attempt,
             }
             stream.write(json.dumps(train_entry) + "\n")
             stream.flush()
             writer.add_scalar("Loss/train_ce", train_loss, step)
             writer.add_scalar("System/gradient_norm", gradient_norm_value, step)
+            writer.add_scalar("System/amp_overflow", 0.0, step)
+            writer.add_scalar("AMP/scale", amp_scale_after, step)
             writer.add_scalar("LearningRate/encoder", learning_rates[0], step)
             writer.add_scalar("LearningRate/decoder", learning_rates[1], step)
             print(
@@ -422,6 +515,9 @@ def main() -> int:
             checkpoint_metrics = {
                 **latest_validation,
                 "selection": {"best_miou": best_miou, "best_step": best_step},
+                "training_state": {
+                    "amp_overflow_count": total_amp_overflows,
+                },
             }
             checkpoint_name = "best.pt" if improved else "last.pt"
             latest_checkpoint = save_checkpoint(
@@ -508,6 +604,12 @@ def main() -> int:
         "gradient_accumulation_steps": accumulation_steps,
         "effective_batch_size": physical_batch_size * accumulation_steps,
         "amp": amp_enabled,
+        "amp_overflow_count": total_amp_overflows,
+        "max_consecutive_amp_overflows": max_consecutive_amp_overflows,
+        "max_total_amp_overflows": max_total_amp_overflows,
+        "diagnostic_force_amp_overflow_once": (
+            args.diagnostic_force_amp_overflow_once
+        ),
         "pretrained_weight": {
             "path": str(weight_path),
             "sha256": file_sha256(weight_path),

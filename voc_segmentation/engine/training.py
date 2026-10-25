@@ -44,3 +44,27 @@ def set_learning_rate(optimizer: Optimizer, factor: float) -> list[float]:
         group["lr"] = initial_lr * factor
         values.append(float(group["lr"]))
     return values
+
+
+def is_recoverable_amp_overflow(
+    gradient_norm: float,
+    *,
+    amp_enabled: bool,
+    scale_before: float,
+    scale_after: float,
+) -> bool:
+    """Classify a non-finite gradient as a verified GradScaler backoff event."""
+
+    if math.isfinite(gradient_norm):
+        return False
+    if not amp_enabled:
+        raise RuntimeError("non-finite gradient without AMP")
+    if not math.isfinite(scale_before) or not math.isfinite(scale_after):
+        raise RuntimeError("AMP scale is non-finite")
+    if scale_before <= 0 or scale_after <= 0:
+        raise RuntimeError("AMP scale must remain positive")
+    if scale_after >= scale_before:
+        raise RuntimeError(
+            "non-finite gradient was not accompanied by GradScaler backoff"
+        )
+    return True

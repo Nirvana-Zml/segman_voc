@@ -4,7 +4,7 @@ import unittest
 
 import torch
 
-from engine import poly_lr_factor, set_learning_rate
+from engine import is_recoverable_amp_overflow, poly_lr_factor, set_learning_rate
 
 
 class TrainingHelpersTest(unittest.TestCase):
@@ -25,6 +25,35 @@ class TrainingHelpersTest(unittest.TestCase):
             poly_lr_factor(0, 10)
         with self.assertRaises(ValueError):
             poly_lr_factor(1, 10, warmup_steps=10)
+
+    def test_amp_overflow_requires_verified_scale_backoff(self) -> None:
+        self.assertFalse(
+            is_recoverable_amp_overflow(
+                2.0, amp_enabled=True, scale_before=1024.0, scale_after=2048.0
+            )
+        )
+        self.assertTrue(
+            is_recoverable_amp_overflow(
+                float("inf"),
+                amp_enabled=True,
+                scale_before=16384.0,
+                scale_after=8192.0,
+            )
+        )
+        with self.assertRaises(RuntimeError):
+            is_recoverable_amp_overflow(
+                float("nan"),
+                amp_enabled=False,
+                scale_before=1.0,
+                scale_after=1.0,
+            )
+        with self.assertRaises(RuntimeError):
+            is_recoverable_amp_overflow(
+                float("inf"),
+                amp_enabled=True,
+                scale_before=16384.0,
+                scale_after=16384.0,
+            )
 
 
 if __name__ == "__main__":

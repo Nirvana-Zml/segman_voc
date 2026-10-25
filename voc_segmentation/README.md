@@ -159,6 +159,13 @@ interrupted run, pass the checkpoint with the greatest saved step (normally
 docker exec voc2012-gcb python tools/train_deeplabv3plus.py --resume runs/deeplabv3plus_r50_voc_train/last.pt --git-commit $vocCommit --git-worktree-clean
 ```
 
+With AMP enabled, a verified GradScaler overflow safely skips the unsafe
+optimizer update, reduces the scale, records an `amp_overflow` JSONL event,
+and retries the same logical iteration. The trainer still stops on non-AMP
+non-finite gradients, missing scale backoff, more than four consecutive
+overflows, or more than 32 total overflows. The injection flag
+`--diagnostic-force-amp-overflow-once` is accepted only in diagnostic mode.
+
 ## Project layout
 
 ```text

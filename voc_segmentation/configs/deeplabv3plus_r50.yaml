@@ -27,6 +27,8 @@ training:
   weight_decay: 0.0001
   gradient_clip_norm: 1.0
   amp: true
+  max_consecutive_amp_overflows: 4
+  max_total_amp_overflows: 32
   seed: 42
   max_iterations: 20000
   validate_every: 1000

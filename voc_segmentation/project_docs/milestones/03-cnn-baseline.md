@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — formal trainer verified; reportable run pending**
-- Last updated: 2026-10-25 00:18 +08:00
+- State: **In progress — AMP recovery verified; step-8,000 resume pending**
+- Last updated: 2026-10-25 12:47 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,49 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+Bounded AMP-overflow recovery is now verified. Non-finite gradients are
+recoverable only when AMP is enabled and GradScaler demonstrably lowers its
+positive finite scale; the unsafe optimizer update is skipped and the same
+logical iteration is retried. More than four consecutive or 32 total events
+remain fatal. The complete 21-test suite passed in 3.762 seconds. A forced CUDA
+overflow diagnostic produced history types `amp_overflow`, `train`, and
+`validation`: attempt 1 reduced scale 1,024→512, attempt 2 completed step 1,
+and the checkpoint preserved scale 512, one overflow, 188 optimizer-state
+entries, and matching SHA-256
+`35ea803109d352ae1a9e1f10f0162b9dbec670353078f9531e6e640071414bfc`.
+The diagnostic is pipeline evidence only.
+
+The formal run terminated with exit code 1 at attempted iteration 8,039 after
+a finite loss but non-finite post-unscale gradient norm. Saved history shows
+AMP scale 8,192 through step 7,999, automatic growth to 16,384 at step 8,000,
+and the overflow 39 attempts later. This is a dynamic-loss-scale event that
+GradScaler should handle by skipping the unsafe optimizer update and reducing
+the scale; the trainer's unconditional finite-gradient hard gate instead made
+it fatal. No `result.json` exists and the run is not complete.
+
+Eight complete official-val evaluations are valid intermediate evidence:
+mIoU was 0.371282, 0.498233, 0.536044, 0.540136, 0.554666, 0.543075,
+0.555056, and 0.519397 at steps 1,000 through 8,000. The best checkpoint is
+step 7,000 (SHA-256
+`b271ebb2682450c69d21ee3cc5339c59e1d9fd2c826d3567811952ccc2dd9dea`);
+the last restart checkpoint is step 8,000 (SHA-256
+`57fcb009202f2c9ff9c073c3e512e4e9eec356d6828447ab1a22c6c85d3c8d67`).
+Both are non-diagnostic, 323,230,542-byte checkpoints with verified metadata.
+
+After the user restarted Docker Desktop, the repeated preflight passed: the
+container and RTX 4060 were available, 96 GB remained on the workspace volume,
+and no competing trainer process existed. The formal 20,000-iteration run then
+launched at 2026-10-25 07:50:42 +08:00 from clean commit
+`b7ed0f50860ee4c28911b4f841e8a1f7dc90c882`. PID 28 remained active after 35
+finite iterations; GPU usage was about 1,671 MiB and no exit-code file existed.
+This is launch evidence only: no validation result or formal checkpoint has yet
+been accepted.
+
+The first reportable-run preflight on 2026-10-25 failed before its in-container
+GPU, disk, and process checks because Docker Desktop's Linux Engine pipe did
+not exist. No training process or run directory was created. Restart Docker
+Desktop and repeat the entire preflight before launch.
 
 The formal trainer, evaluator, regression tests, accepted v4 diagnostic
 evidence, and all preceding failure records were committed as `b4201fc`
@@ -123,9 +166,10 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Launch the reportable VOC-train run, evaluate all 1,449 official validation
-images at each configured interval, and independently verify the selected best
-checkpoint and complete metrics before advancing to the transformer baseline.
+Commit the recovery under a clean revision, resume from the verified step-8,000
+checkpoint, and monitor the appended history through terminal exit. Do not
+accept the CNN gate until the result and best checkpoint are independently
+verified.
 
 ## Formal trainer and pretrained diagnostic evidence
 

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 00:18 +08:00
+- Last updated: 2026-10-25 12:47 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -15,7 +15,7 @@
 | 00 | Project reset | Passed | New driver valid; ledger and standalone root created |
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
-| 03 | CNN baseline | In progress | Smoke and two-sample overfit passed; formal training/validation pending |
+| 03 | CNN baseline | In progress | Run interrupted at 8,039 by AMP overflow handling; recovery pending |
 | 04 | Transformer baseline | Not started | Comparable SegFormer validation |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
@@ -24,8 +24,8 @@
 
 ## Current facts and blockers
 
-- The user deleted `SegMAN-main/`; 438 tracked files are intentionally pending
-  deletion and must not be restored implicitly.
+- The user deleted `SegMAN-main/`; that deletion is committed in `bdc48de` and
+  the tree must not be restored implicitly.
 - The former SegMAN source, docs, and tracked evidence remain recoverable from
   Git commit `111f8a0`. Gitignored runtime checkpoints/logs are not active
   evidence for the standalone model.
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Launch the reportable DeepLabV3+ VOC-train baseline with the verified formal
-trainer and evaluate all 1,449 official validation images. Diagnostic weights
-remain ineligible.
+Commit the verified bounded AMP-overflow recovery, then resume the reportable
+run from the verified step-8,000 `last.pt` checkpoint under the new clean
+source revision. Diagnostic weights remain ineligible.
 
 ## Latest checks
 
@@ -137,3 +137,36 @@ remain ineligible.
 - The verified formal trainer, evaluator, tests, diagnostics ledger, and usage
   documentation were committed as `b4201fc`
   (`feat: add formal DeepLabV3+ trainer`).
+- The first formal-run preflight on 2026-10-25 could not connect to
+  `dockerDesktopLinuxEngine` because Docker Desktop was not running. GPU,
+  disk, and process checks did not execute, and no training process started.
+- After Docker Desktop restarted, the full preflight passed: container
+  `voc2012-gcb` was running, RTX 4060 GPU usage was initially 0 MiB/0%, the
+  workspace volume had 96 GB available, and no prior trainer process existed.
+- The reportable VOC-train run launched at 2026-10-25 07:50:42 +08:00 from
+  clean commit `b7ed0f50860ee4c28911b4f841e8a1f7dc90c882`. At the first observation,
+  PID 28 was active, 35 finite training records existed, no exit-code file was
+  present, and GPU usage was about 1,671 MiB. The latest observed step 35 had
+  CE 2.829548, gradient norm 8.267307, encoder LR 0.00007000, and decoder LR
+  0.00070000. No validation metric or accepted checkpoint exists yet.
+- The run exited with code 1 at attempted iteration 8,039. Training loss was
+  finite, but the gradient norm was non-finite after AMP unscale. The scaler
+  had grown from 8,192 at step 7,999 to 16,384 at step 8,000, identifying a
+  dynamic-loss-scale overflow that the current hard gate mishandled as fatal.
+- Eight full 1,449-image validations completed. mIoU progressed 0.3713, 0.4982,
+  0.5360, 0.5401, 0.5547, 0.5431, 0.5551, then 0.5194. The verified best is
+  step 7,000 at mIoU 0.555056; step 8,000 is the latest restart point.
+- `best.pt`: step 7,000, 323,230,542 bytes, non-diagnostic, SHA-256
+  `b271ebb2682450c69d21ee3cc5339c59e1d9fd2c826d3567811952ccc2dd9dea`.
+  `last.pt`: step 8,000, 323,230,542 bytes, non-diagnostic, SHA-256
+  `57fcb009202f2c9ff9c073c3e512e4e9eec356d6828447ab1a22c6c85d3c8d67`.
+  No terminal `result.json` exists, so the CNN baseline gate remains open.
+- AMP recovery now accepts only a non-finite gradient accompanied by verified
+  GradScaler scale reduction, skips the unsafe optimizer update, records the
+  event, and retries the same logical iteration. It aborts after more than four
+  consecutive or 32 total overflows; non-AMP non-finite gradients remain fatal.
+- All 21 in-container tests passed in 3.762 seconds. A forced CUDA overflow
+  diagnostic passed: attempt 1 skipped with scale 1,024→512, attempt 2 completed
+  step 1, and checkpoint/result metadata recorded exactly one overflow. The
+  diagnostic checkpoint SHA-256 is
+  `35ea803109d352ae1a9e1f10f0162b9dbec670353078f9531e6e640071414bfc`.

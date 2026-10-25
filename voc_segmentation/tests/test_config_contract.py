@@ -44,6 +44,11 @@ class ConfigContractTest(unittest.TestCase):
         self.assertGreater(training["validate_every"], 0)
         self.assertLess(training["warmup_iterations"], training["max_iterations"])
         self.assertGreater(training["poly_power"], 0)
+        self.assertGreater(training["max_consecutive_amp_overflows"], 0)
+        self.assertGreaterEqual(
+            training["max_total_amp_overflows"],
+            training["max_consecutive_amp_overflows"],
+        )
         self.assertLess(
             training["encoder_lr_multiplier"], training["decoder_lr_multiplier"]
         )
