@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 23:56 +08:00
+- Last updated: 2026-10-26 00:01 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -16,7 +16,7 @@
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
-| 04 | Transformer baseline | Not started | Comparable SegFormer validation |
+| 04 | Transformer baseline | In progress | Native MiT-B1/SegFormer interfaces pass; pretrained weight and CUDA diagnostics pending |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Implement and verify the SegFormer baseline with the same official train/val
-split, native-resolution evaluator, and validation-mIoU selection contract.
-Keep diagnostic weights ineligible for submission.
+Acquire and provenance-verify a compatible MiT-B1 ImageNet checkpoint, then
+run a 384×384 CUDA optimizer-step smoke before adding overfit and formal
+training tooling. Keep diagnostic weights ineligible for submission.
 
 ## Latest checks
 
@@ -296,3 +296,27 @@ Keep diagnostic weights ineligible for submission.
   `cnn_baseline=complete`, `highest_verified_stage=cnn_baseline`, and
   `next_stage=transformer_baseline`. The updated driver skill passed
   `quick_validate.py`.
+- The first SegFormer dependency probe failed before model creation: installed
+  `timm==0.9.16` exposes no `mit_b1` model and raises `RuntimeError: Unknown
+  model (mit_b1)`. No source or runtime artifact was modified by the probe.
+- A native PyTorch MiT-B1 encoder now implements overlapping patch embedding,
+  spatial-reduction self-attention, Mix-FFN depthwise convolution, stochastic
+  depth, and four feature stages at reductions 4/8/16/32 with channels
+  64/128/320/512. Official-style module names are retained for explicit local
+  checkpoint conversion/loading.
+- The SegFormer baseline adds four linear feature projections, bilinear
+  alignment, 1×1 fusion, dropout, and a 21-class classifier restored to input
+  resolution. It has 13,682,645 parameters: 13,151,424 encoder and 531,221
+  decoder parameters.
+- The resource-safe config fixes MiT-B1, 384×384 crops, physical batch 2,
+  effective batch 8, and an explicit future weight path under
+  `artifacts/weights/mit_b1_imagenet1k/`. No pretrained artifact has yet been
+  acquired or accepted.
+- Focused SegFormer/config tests passed 8/8 in 1.254 seconds. The complete
+  in-container regression suite passed all 28 tests in 4.766 seconds,
+  including four-scale shapes, finite 21-class original-size logits, strict
+  local encoder checkpoint round-trip, and rejection of non-MiT-B1 profiles.
+- The first attempt to record the Transformer probe and implementation used a
+  nested quoted `python -c` command in a PowerShell argument and failed with a
+  parser error before `record_step.py` ran. No file changed. The failure and
+  both substantive steps were then recorded separately with safe quoting.

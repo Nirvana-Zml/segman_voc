@@ -53,6 +53,17 @@ class ConfigContractTest(unittest.TestCase):
             training["encoder_lr_multiplier"], training["decoder_lr_multiplier"]
         )
 
+    def test_segformer_uses_resource_safe_profile_and_explicit_weight_path(self) -> None:
+        path = CONFIG_DIR / "segformer_b1.yaml"
+        config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        self.assertEqual(config["model"]["encoder"], "mit_b1")
+        self.assertEqual(
+            config["model"]["encoder_weights_path"],
+            "artifacts/weights/mit_b1_imagenet1k/mit_b1.pth",
+        )
+        self.assertEqual(config["data"]["crop_size"], [384, 384])
+        self.assertEqual(config["training"]["effective_batch_size"], 8)
+
 
 if __name__ == "__main__":
     unittest.main()

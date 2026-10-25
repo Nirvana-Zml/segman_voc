@@ -5,6 +5,9 @@ model:
   name: segformer
   encoder: mit_b1
   encoder_pretrained: imagenet1k
+  encoder_weights_path: artifacts/weights/mit_b1_imagenet1k/mit_b1.pth
+  decoder_channels: 256
+  dropout: 0.1
   num_classes: 21
 data:
   train_split: train
