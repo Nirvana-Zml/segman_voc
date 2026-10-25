@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
 - State: **In progress — history reconciliation verified; recommit pending**
-- Last updated: 2026-10-25 13:01 +08:00
+- Last updated: 2026-10-25 13:05 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,10 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+The tested resume-history reconciliation and first-resume interruption record
+were committed as `6fab976`
+(`fix: reconcile history before training resume`).
 
 Automatic resume-history reconciliation is implemented and passed all 23
 container tests in 2.712 seconds. Before append mode, it parses every record,

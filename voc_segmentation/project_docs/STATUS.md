@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 13:01 +08:00
+- Last updated: 2026-10-25 13:05 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -184,3 +184,6 @@ active-history boundary. Diagnostic weights remain ineligible.
   or duplicate completed records at/before the checkpoint, archives the full
   pre-resume history, and atomically retains only records through the checkpoint
   step before append mode starts. All 23 container tests passed in 2.712 seconds.
+- The reconciliation implementation, tests, and first-resume interruption
+  evidence were committed as `6fab976`
+  (`fix: reconcile history before training resume`).
