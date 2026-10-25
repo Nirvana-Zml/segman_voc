@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 23:52 +08:00
+- Last updated: 2026-10-25 23:56 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,11 +41,9 @@
 
 ## Next action
 
-Align the project-status helper's stale CNN result path with the verified
-`runs/deeplabv3plus_r50_voc_train/result.json`, then implement and verify the
-SegFormer baseline with the same official train/val split, native-resolution
-evaluator, and validation-mIoU selection contract. Keep diagnostic weights
-ineligible for submission.
+Implement and verify the SegFormer baseline with the same official train/val
+split, native-resolution evaluator, and validation-mIoU selection contract.
+Keep diagnostic weights ineligible for submission.
 
 ## Latest checks
 
@@ -293,9 +291,8 @@ ineligible for submission.
   scale keys for overflow records). Both failed read-only without changing
   artifacts. The corrected assertion found zero non-finite completed train or
   validation records and valid scale backoff for all six overflow events.
-- The current `project_status.py` summary still reports `cnn_baseline=pending`
-  because its stage registry hard-codes `runs/deeplabv3plus/result.json`, while
-  the configured and verified run is
-  `runs/deeplabv3plus_r50_voc_train/result.json`. This is a reporting-path
-  mismatch, not missing training evidence; no driver-skill code was changed in
-  this verification step.
+- The project-status helper now reads CNN evidence from the configured
+  `runs/deeplabv3plus_r50_voc_train/result.json`. Its summary correctly reports
+  `cnn_baseline=complete`, `highest_verified_stage=cnn_baseline`, and
+  `next_stage=transformer_baseline`. The updated driver skill passed
+  `quick_validate.py`.

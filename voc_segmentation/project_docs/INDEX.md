@@ -63,3 +63,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0071 — Resume formal CNN run from step 18000](steps/0071-resume-formal-cnn-run-from-step-18000.md) — In progress, 2026-10-25T21:20:57+08:00
 - [0072 — Verify completed formal DeepLabV3+ run](steps/0072-verify-completed-formal-deeplabv3-run.md) — Passed, 2026-10-25T23:52:38+08:00
 - [0073 — Identify stale CNN evidence path in status helper](steps/0073-identify-stale-cnn-evidence-path-in-status-helper.md) — Information, 2026-10-25T23:53:41+08:00
+- [0074 — Align CNN evidence path in project status helper](steps/0074-align-cnn-evidence-path-in-project-status-helper.md) — Passed, 2026-10-25T23:56:18+08:00

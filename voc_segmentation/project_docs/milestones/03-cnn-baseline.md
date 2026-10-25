@@ -56,12 +56,10 @@ history field names: first top-level learning-rate keys, then a non-null
 overflow gradient and unprefixed scale keys. Inspection established the true
 schema, and the corrected assertions passed without any artifact mutation.
 
-The project-status helper currently hard-codes CNN evidence at
-`runs/deeplabv3plus/result.json`, so its JSON summary still reports this gate
-as pending even though the configured reportable run and verified terminal
-result are under `runs/deeplabv3plus_r50_voc_train/`. This helper-path mismatch
-does not invalidate the completion evidence above and should be aligned before
-the next status handoff.
+The project-status helper was aligned with the configured reportable run at
+`runs/deeplabv3plus_r50_voc_train/result.json`. Its JSON summary now reports
+this gate complete, the highest verified stage as `cnn_baseline`, and the next
+stage as `transformer_baseline`. The updated skill passed `quick_validate.py`.
 
 Formal training resumed at 2026-10-25 21:18:13 +08:00 from the verified
 step-18,000 `last.pt` under clean source commit
@@ -305,9 +303,8 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Align the helper's stale CNN result path, then proceed to the SegFormer
-baseline using the same official train/validation split, evaluator, and
-validation-mIoU checkpoint-selection contract.
+Proceed to the SegFormer baseline using the same official train/validation
+split, evaluator, and validation-mIoU checkpoint-selection contract.
 
 ## Formal trainer and pretrained diagnostic evidence
 

@@ -125,7 +125,7 @@ def build_status(repo: Path) -> dict[str, Any]:
     }
 
     stage_files = {
-        "cnn_baseline": runs / "deeplabv3plus/result.json",
+        "cnn_baseline": runs / "deeplabv3plus_r50_voc_train/result.json",
         "transformer_baseline": runs / "segformer/result.json",
         "gcb_diagnostics_and_ablations": artifacts / "gcb_diagnostics.json",
         "formal_training_and_selection": artifacts / "model_selection.json",
