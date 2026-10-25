@@ -56,3 +56,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0064 — Commit resume history reconciliation](steps/0064-commit-resume-history-reconciliation.md) — Passed, 2026-10-25T13:06:04+08:00
 - [0065 — Launch reconciled formal run recovery from step 8000](steps/0065-launch-reconciled-formal-run-recovery-from-step-8000.md) — In progress, 2026-10-25T13:11:23+08:00
 - [0066 — Stop and save formal CNN run at step 10000](steps/0066-stop-and-save-formal-cnn-run-at-step-10000.md) — Information, 2026-10-25T14:33:28+08:00
+- [0067 — Commit saved CNN interruption ledger](steps/0067-commit-saved-cnn-interruption-ledger.md) — Passed, 2026-10-25T16:03:57+08:00
+- [0068 — Resume formal CNN run from step 10000](steps/0068-resume-formal-cnn-run-from-step-10000.md) — In progress, 2026-10-25T16:03:57+08:00
+- [0069 — Pause and save formal CNN run at step 18000](steps/0069-pause-and-save-formal-cnn-run-at-step-18000.md) — Information, 2026-10-25T19:48:26+08:00

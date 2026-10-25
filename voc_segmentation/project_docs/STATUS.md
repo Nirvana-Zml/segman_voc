@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 14:32 +08:00
+- Last updated: 2026-10-25 19:48 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -15,7 +15,7 @@
 | 00 | Project reset | Passed | New driver valid; ledger and standalone root created |
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
-| 03 | CNN baseline | In progress | User stopped at 10,047; verified step-10,000 restart saved |
+| 03 | CNN baseline | In progress | User-paused; verified step-18,000 restart saved |
 | 04 | Transformer baseline | Not started | Comparable SegFormer validation |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
@@ -41,9 +41,10 @@
 
 ## Next action
 
-No training process is active. If the user elects to continue, resume from the
-verified step-10,000 `last.pt` and train to terminal completion; otherwise the
-CNN formal-run gate remains incomplete. Diagnostic weights remain ineligible.
+No training process is active. Resume from the verified step-18,000 `last.pt`
+when requested, then train to terminal completion and verify `result.json`,
+the complete history, and the validation-selected checkpoint. Diagnostic
+weights remain ineligible.
 
 ## Latest checks
 
@@ -214,3 +215,41 @@ CNN formal-run gate remains incomplete. Diagnostic weights remain ineligible.
 - Machine-readable stop manifest:
   `runs/deeplabv3plus_r50_voc_train/user_stop_20261025T142718+0800.json`;
   all seven recorded artifact hashes were independently matched.
+- The saved interruption ledger was committed as `270f733`
+  (`docs: record saved CNN training interruption`), restoring a clean source
+  revision for reportable continuation.
+- Formal training resumed from the verified step-10,000 `last.pt` at
+  2026-10-25 16:01:32 +08:00 under clean commit
+  `270f7331552b93250e5c979b6c2d345e57384c5b`. The previous exit code 143 was
+  preserved as `exit_code.user_stop_step_010000.txt` before launch.
+- PID 66 is active. The trainer retained all 10,011 history records through
+  step 10,000, dropped none, and continued at step 10,001. At the independent
+  check it had reached step 10,044 with 10,044 unique train records, ten full
+  validations, one recovered AMP overflow, zero duplicate train steps, and no
+  new exit-code file. GPU use was about 1,929 MiB at 67% during the first
+  observation.
+- Two monitoring snippets were corrected without affecting training: a shell
+  `$(cat ...)` was prematurely expanded by PowerShell, and the first JSONL
+  query used nonexistent key `iteration` instead of `step`. The corrected
+  history query passed.
+- At the user's pause request, exact PID 66 was sent SIGTERM. The trainer
+  finished through attempted step 18,098, the wrapper saved exit code 143, the
+  GPU returned to 0 MiB / 0%, and no `result.json` was created.
+- Step 18,000 is the latest complete restart point. Its full 1,449-image
+  validation has mIoU 0.499866, foreground mIoU 0.486016, pixel accuracy
+  0.805109, and loss 0.690280. The non-diagnostic `last.pt` SHA-256 is
+  `0af35cef20f83c5f0ac6eebde113f778edfc574befd5933adb3cf553e7127b67`.
+- The validation-selected best remains step 9,000 at mIoU 0.562094 with
+  SHA-256
+  `07e2364f7b34490f1d42515580dd73c9c54db79143967db943e5de0f1dca311f`.
+- All 18,121 pre-pause history records were preserved in
+  `history_archive/user_pause_step_018000_20261025T194532+0800.jsonl`
+  (SHA-256
+  `468aa16e818aa7ed5709d929368442dc1929a2a1317ca930fafabb51dab9dcfa`).
+  The active history was reconciled to 18,023 records through step 18,000:
+  18,000 unique train records, 18 validations, five recovered AMP overflows,
+  and zero duplicate train steps (SHA-256
+  `baada161f3fc4832d413d276f40302da840ea797263e52c752f34b37eaae71bf`).
+- Machine-readable pause manifest:
+  `runs/deeplabv3plus_r50_voc_train/user_pause_20261025T194635+0800.json`;
+  all seven recorded artifact hashes independently matched.

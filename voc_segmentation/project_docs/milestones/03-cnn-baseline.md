@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — user-stopped; step-10,000 restart saved**
-- Last updated: 2026-10-25 14:32 +08:00
+- State: **In progress — user-paused; step-18,000 restart saved**
+- Last updated: 2026-10-25 19:48 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,43 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+At the user's pause request, exact PID 66 was terminated with SIGTERM after
+the console reached step 18,098. The wrapper recorded exit code 143, no
+`result.json` exists, and GPU use returned to 0 MiB / 0%. Step 18,000 had
+already completed a full 1,449-image validation and checkpoint. Its validation
+mIoU is 0.499866, foreground mIoU 0.486016, pixel accuracy 0.805109, and loss
+0.690280. The non-diagnostic `last.pt` is 323,230,734 bytes with SHA-256
+`0af35cef20f83c5f0ac6eebde113f778edfc574befd5933adb3cf553e7127b67`,
+AMP scale 8,192, and five recorded recovered overflows.
+
+All 18,121 pre-pause history records were archived at
+`history_archive/user_pause_step_018000_20261025T194532+0800.jsonl` (SHA-256
+`468aa16e818aa7ed5709d929368442dc1929a2a1317ca930fafabb51dab9dcfa`).
+The active history was reconciled to 18,023 records through step 18,000:
+18,000 unique train records, 18 validations, five overflow records, and zero
+duplicate train steps (SHA-256
+`baada161f3fc4832d413d276f40302da840ea797263e52c752f34b37eaae71bf`).
+The validation-selected best remains step 9,000 at mIoU 0.562094 and SHA-256
+`07e2364f7b34490f1d42515580dd73c9c54db79143967db943e5de0f1dca311f`.
+All seven hashes in `user_pause_20261025T194635+0800.json` independently
+matched. This is a saved interruption, not a completed CNN baseline.
+
+Formal training resumed at 2026-10-25 16:01:32 +08:00 from the verified
+step-10,000 `last.pt` under clean source commit
+`270f7331552b93250e5c979b6c2d345e57384c5b`. The previous user-stop exit code
+143 was preserved as `exit_code.user_stop_step_010000.txt`. PID 66 is active,
+the new exit-code file is absent, and the trainer reported
+`history_reconciliation kept=10011 dropped=0 archive=None` before continuing
+at step 10,001. An independent check at step 10,044 found 10,044 unique train
+records, ten validation records through step 10,000, one recovered AMP
+overflow, and zero duplicate train steps. Initial observed GPU use was about
+1,929 MiB at 67%. This is active-run evidence only.
+
+The first monitoring command allowed PowerShell to expand a shell `$(cat ...)`
+expression locally, and the first JSONL verification queried nonexistent key
+`iteration`; both checks were corrected without modifying or interrupting the
+training process.
 
 At the user's request, exact training PID 422 was terminated with SIGTERM after
 the console reached step 10,047; the wrapper recorded exit code 143. Step
@@ -218,9 +255,10 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Await user direction. A future continuation must resume from verified
-step-10,000 `last.pt`, reconcile history automatically, and reach terminal
-success before the CNN gate can pass.
+Await user direction. A future continuation must resume from the verified
+step-18,000 `last.pt`, reach terminal success, and independently verify
+`result.json`, history continuity, and the best/final checkpoints before the
+CNN baseline gate can pass.
 
 ## Formal trainer and pretrained diagnostic evidence
 
