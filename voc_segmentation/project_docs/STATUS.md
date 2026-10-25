@@ -1,11 +1,11 @@
 # Project status
 
-- Last updated: 2026-10-25 19:48 +08:00
+- Last updated: 2026-10-25 23:52 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
-- Highest verified active milestone: **02 — VOC audit and SBD**
-- Next milestone: **03 — CNN baseline**
+- Highest verified active milestone: **03 — CNN baseline**
+- Next milestone: **04 — Transformer baseline**
 - First hardware-safe model profile: MiT-B1, 384×384, batch 2, effective batch 8
 
 ## Milestone summary
@@ -15,7 +15,7 @@
 | 00 | Project reset | Passed | New driver valid; ledger and standalone root created |
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
-| 03 | CNN baseline | In progress | User-paused; verified step-18,000 restart saved |
+| 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Not started | Comparable SegFormer validation |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
@@ -41,10 +41,11 @@
 
 ## Next action
 
-No training process is active. Resume from the verified step-18,000 `last.pt`
-when requested, then train to terminal completion and verify `result.json`,
-the complete history, and the validation-selected checkpoint. Diagnostic
-weights remain ineligible.
+Align the project-status helper's stale CNN result path with the verified
+`runs/deeplabv3plus_r50_voc_train/result.json`, then implement and verify the
+SegFormer baseline with the same official train/val split, native-resolution
+evaluator, and validation-mIoU selection contract. Keep diagnostic weights
+ineligible for submission.
 
 ## Latest checks
 
@@ -253,3 +254,48 @@ weights remain ineligible.
 - Machine-readable pause manifest:
   `runs/deeplabv3plus_r50_voc_train/user_pause_20261025T194635+0800.json`;
   all seven recorded artifact hashes independently matched.
+- The step-10,000 resume and step-18,000 pause ledger was committed as
+  `05048a5` (`docs: record CNN resume and pause at step 18000`), restoring a
+  clean provenance revision for continuation.
+- Formal training resumed at 2026-10-25 21:18:13 +08:00 from the verified
+  step-18,000 `last.pt` under clean commit
+  `05048a5f57636cd0f17553779d5a7fb4ee33e1c3`. The previous exit code 143 was
+  preserved as `exit_code.user_pause_step_018000.txt` before launch.
+- PID 68 is active. The trainer retained all 18,023 active records through
+  step 18,000, dropped none, and continued at step 18,001. At independent
+  verification it had reached step 18,033 with 18,033 unique train records,
+  18 full validations, five recovered AMP overflows, zero duplicate train
+  steps, and no new exit-code file. GPU use was about 1,929 MiB at 86%.
+- The formal DeepLabV3+ run completed at 2026-10-25 22:10:35 +08:00 with exit
+  code 0 and `result.json` reporting `ok=true`, `diagnostic_only=false`, and a
+  complete 1,449-image official validation. No trainer process remains.
+- Active history contains exactly 20,000 unique completed train records for
+  steps 1–20,000, zero missing or duplicate steps, 20 validations at every
+  1,000 steps, and six valid isolated AMP backoffs. Every completed train and
+  validation numeric value is finite.
+- Validation selection was independently reproduced from history. The best is
+  step 9,000 at mIoU 0.562094, foreground mIoU 0.547951, pixel accuracy
+  0.860711, and validation loss 0.408478. The non-diagnostic `best.pt`
+  SHA-256 is
+  `07e2364f7b34490f1d42515580dd73c9c54db79143967db943e5de0f1dca311f`.
+- The terminal step-20,000 validation has mIoU 0.521702, foreground mIoU
+  0.507856, pixel accuracy 0.823339, and loss 0.633271. The non-diagnostic
+  `last.pt` SHA-256 is
+  `653dcb628aa6231631b2594b6075f6c9720fc9ac0802bfb0d3bfc5172739ec38`.
+- The final result, history, configs, checkpoints, validation JSON,
+  TensorBoard event, console, and exit-code hashes all matched the
+  machine-readable completion manifest
+  `runs/deeplabv3plus_r50_voc_train/formal_completion_20261025T235047+0800.json`.
+  The terminal resume segment used clean commit `05048a5`, seed 42, effective
+  batch 8, 1,588,047,360 peak CUDA bytes, and 3,175.253 seconds.
+- Two initial numeric-history assertions used incorrect field assumptions
+  (`encoder_lr` at top level, then non-null `gradient_norm` and unprefixed
+  scale keys for overflow records). Both failed read-only without changing
+  artifacts. The corrected assertion found zero non-finite completed train or
+  validation records and valid scale backoff for all six overflow events.
+- The current `project_status.py` summary still reports `cnn_baseline=pending`
+  because its stage registry hard-codes `runs/deeplabv3plus/result.json`, while
+  the configured and verified run is
+  `runs/deeplabv3plus_r50_voc_train/result.json`. This is a reporting-path
+  mismatch, not missing training evidence; no driver-skill code was changed in
+  this verification step.

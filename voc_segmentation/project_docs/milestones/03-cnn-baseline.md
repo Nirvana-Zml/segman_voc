@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — user-paused; step-18,000 restart saved**
-- Last updated: 2026-10-25 19:48 +08:00
+- State: **Passed**
+- Last updated: 2026-10-25 23:52 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,56 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+The reportable DeepLabV3+ run completed at 2026-10-25 22:10:35 +08:00 with
+exit code 0. Its `result.json` reports `ok=true`, `diagnostic_only=false`,
+source commit `05048a5f57636cd0f17553779d5a7fb4ee33e1c3`, and full official
+1,449-image validation. The complete history has 20,026 records: exactly
+20,000 unique train steps 1–20,000, 20 validations at steps 1,000–20,000, and
+six isolated recovered AMP overflows. No completed train or validation value
+is non-finite, no train step is missing or duplicated, and every overflow
+record proves a lower AMP scale on retry.
+
+Independent history selection agrees with the saved checkpoint. The best is
+step 9,000 at mIoU 0.562094, foreground mIoU 0.547951, pixel accuracy 0.860711,
+and validation loss 0.408478. `best.pt` is non-diagnostic, 323,230,734 bytes,
+and has SHA-256
+`07e2364f7b34490f1d42515580dd73c9c54db79143967db943e5de0f1dca311f`.
+The terminal step-20,000 full validation has mIoU 0.521702, foreground mIoU
+0.507856, pixel accuracy 0.823339, and loss 0.633271. `last.pt` is likewise
+non-diagnostic and has SHA-256
+`653dcb628aa6231631b2594b6075f6c9720fc9ac0802bfb0d3bfc5172739ec38`.
+
+The terminal segment's TensorBoard event contains 2,000 train points, two
+validation points, and all nine expected scalar tags. Its event hash is
+`9abdc3f4641321f331888a3809521e0d1114dd0232e66c44eda9b727c5be8cde`.
+The result records seed 42, physical batch 2, four-way accumulation, effective
+batch 8, peak CUDA memory 1,588,047,360 bytes, and 3,175.253 seconds for the
+terminal resume segment. All ten artifact sizes and hashes in
+`formal_completion_20261025T235047+0800.json` independently matched.
+
+Two read-only numeric checks initially failed because they assumed incorrect
+history field names: first top-level learning-rate keys, then a non-null
+overflow gradient and unprefixed scale keys. Inspection established the true
+schema, and the corrected assertions passed without any artifact mutation.
+
+The project-status helper currently hard-codes CNN evidence at
+`runs/deeplabv3plus/result.json`, so its JSON summary still reports this gate
+as pending even though the configured reportable run and verified terminal
+result are under `runs/deeplabv3plus_r50_voc_train/`. This helper-path mismatch
+does not invalidate the completion evidence above and should be aligned before
+the next status handoff.
+
+Formal training resumed at 2026-10-25 21:18:13 +08:00 from the verified
+step-18,000 `last.pt` under clean source commit
+`05048a5f57636cd0f17553779d5a7fb4ee33e1c3`. The previous pause exit code 143
+was preserved as `exit_code.user_pause_step_018000.txt`. PID 68 is active, the
+new exit-code file is absent, and the trainer reported
+`history_reconciliation kept=18023 dropped=0 archive=None` before continuing
+at step 18,001. An independent check at step 18,033 found 18,033 unique train
+records, 18 validations through step 18,000, five recovered AMP overflows, and
+zero duplicate train steps. Observed GPU use was about 1,929 MiB at 86%. This
+is active-run evidence only.
 
 At the user's pause request, exact PID 66 was terminated with SIGTERM after
 the console reached step 18,098. The wrapper recorded exit code 143, no
@@ -255,10 +305,9 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Await user direction. A future continuation must resume from the verified
-step-18,000 `last.pt`, reach terminal success, and independently verify
-`result.json`, history continuity, and the best/final checkpoints before the
-CNN baseline gate can pass.
+Align the helper's stale CNN result path, then proceed to the SegFormer
+baseline using the same official train/validation split, evaluator, and
+validation-mIoU checkpoint-selection contract.
 
 ## Formal trainer and pretrained diagnostic evidence
 
