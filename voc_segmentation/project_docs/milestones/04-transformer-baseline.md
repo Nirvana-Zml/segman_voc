@@ -1,7 +1,7 @@
 # Milestone 04: SegFormer baseline
 
-- State: **In progress — pretrained MiT-B1, CUDA smoke, and overfit verified**
-- Last updated: 2026-10-26 00:17 +08:00
+- State: **In progress — formal trainer verified; reportable run pending**
+- Last updated: 2026-10-26 00:26 +08:00
 
 Train and evaluate an 8 GB-safe SegFormer baseline with the same split,
 evaluator, seed policy, and artifact contract used by the CNN baseline.
@@ -115,8 +115,47 @@ evaluator, seed policy, and artifact contract used by the CNN baseline.
   host finiteness audit used unavailable `[double]::IsFinite`. The corrected
   container-Python audit verified all 100 loss and gradient values as finite.
 
+## Formal trainer diagnostic evidence
+
+- `tools/train_segformer.py` reuses the CNN baseline's evaluator, warmup-poly
+  scheduling, gradient accumulation, bounded AMP-overflow recovery,
+  validation-mIoU checkpoint selection, resolved configuration, JSONL and
+  TensorBoard logging, explicit clean-Git provenance, checkpoint resume, and
+  history reconciliation contracts. Model construction, MiT provenance, and
+  AdamW encoder/decoder groups are SegFormer-specific.
+- `tests/test_segformer_trainer.py` verifies named, disjoint, exhaustive AdamW
+  groups at configured learning rates and rejects provenance that lacks the
+  converted-checkpoint hash. Focused tests passed 2/2 in 0.116 seconds; the
+  complete target-container suite passed 31/31 in 5.918 seconds.
+- The one-step diagnostic used 384×384 crops, physical batch 2, gradient
+  accumulation 4, and effective batch 8. Train CE was 3.000786, finite
+  pre-clip gradient norm was 10.172207, and encoder/decoder learning rates were
+  0.00006/0.0006. Peak allocated CUDA memory was 702,257,152 bytes.
+- Its two-image validation is intentionally non-reportable. The 164,425,924-
+  byte diagnostic checkpoint SHA-256 is
+  `9f30fb5be0af6ab2184baee36c26bbcda387e3868d71c03b547d53d907308183`;
+  independently verified `result.json` SHA-256 is
+  `bffc944d1a59f25f278756050695654646bbb72cef8b7e47bdde31def61d5ffb`.
+- Forced overflow diagnostic: step 1 attempt 1 changed AMP scale from 1,024 to
+  512 and retried without accepting the unsafe update. The successful attempt
+  and checkpoint recorded exactly one overflow.
+- Resume diagnostic loaded the step-1 checkpoint, retained three valid history
+  records with zero dropped records, and completed unique train and validation
+  steps 1, 2, and 3. The final checkpoint retains optimizer groups `encoder`
+  and `decoder`, one overflow, `diagnostic_only=true`, and SHA-256
+  `b1d503bbb509ced4ff6985cfcb85d6458e2b1dc88b73e7585143e0b52430033a`.
+  The resumed result, checkpoint, current TensorBoard event, unique step lists,
+  and finite history values were independently checked; `result.json` SHA-256
+  is `c20ad19c695c868ca3fd5fa5ce8648dce72067ea0b51fc960d44284dc18d1179`.
+- A reportable invocation without `--git-commit` and
+  `--git-worktree-clean` stopped at the provenance guard before creating an
+  output directory. Formal runs cannot use `--validation-limit`.
+- All saved trainer artifacts above are diagnostic only. Their limited-set
+  validation metrics and weights cannot be cited as baseline results or used
+  for model selection/submission.
+
 ## Next action
 
-Implement and verify the formal SegFormer trainer with official VOC train,
-independent full validation, safe AMP-overflow handling, resumable unambiguous
-history, and best-checkpoint selection by validation mIoU.
+Commit the trainer and launch the reportable 20,000-step official-train run
+from the resulting clean revision. Evaluate the complete 1,449-image official
+validation split every 1,000 steps and select `best.pt` only by saved mIoU.

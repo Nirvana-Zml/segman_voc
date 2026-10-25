@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 00:17 +08:00
+- Last updated: 2026-10-26 00:26 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -16,7 +16,7 @@
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
-| 04 | Transformer baseline | In progress | Pretrained MiT-B1 weight, CUDA smoke, and two-sample overfit verified; formal trainer pending |
+| 04 | Transformer baseline | In progress | Formal trainer diagnostics verified; 20,000-step official-train run pending |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Implement and verify the formal SegFormer trainer with the same official-train,
-independent full-validation, AMP-overflow, resume-history, checkpoint, and
-validation-mIoU selection contracts as the CNN baseline. Keep smoke and
-two-sample-overfit weights ineligible for validation or submission.
+Commit the verified SegFormer trainer, then launch its reportable 20,000-step
+official-train run from that clean commit. Use the complete 1,449-image
+official validation split every 1,000 steps and select only by validation
+mIoU; do not treat any diagnostic metric or checkpoint as reportable.
 
 ## Latest checks
 
@@ -364,3 +364,31 @@ two-sample-overfit weights ineligible for validation or submission.
   `[double]::IsFinite` on the installed PowerShell/.NET runtime. The corrected
   container-Python audit confirmed all 100 losses and gradient norms finite.
   Neither failed command changed artifacts.
+- `tools/train_segformer.py` now mirrors the proven CNN formal-training
+  contract while using the native MiT-B1/SegFormer model and disjoint AdamW
+  encoder/decoder groups. It enforces the converted checkpoint hash, effective
+  batch 8, warmup-poly scheduling, finite-value gates, bounded AMP recovery,
+  native-resolution global-confusion validation, validation-mIoU selection,
+  atomic checkpoints, resolved configs, JSONL/TensorBoard evidence, explicit
+  host Git provenance, and history-safe resume.
+- Trainer syntax and two focused optimizer/provenance tests passed. The full
+  target-container suite passed 31/31 in 5.918 seconds.
+- The one-step effective-batch-8 diagnostic passed with train CE 3.000786,
+  gradient norm 10.172207, encoder/decoder learning rates 0.00006/0.0006,
+  two non-reportable validation samples, 702,257,152 peak CUDA bytes, and a
+  diagnostic checkpoint SHA-256
+  `9f30fb5be0af6ab2184baee36c26bbcda387e3868d71c03b547d53d907308183`.
+  Its independently verified `result.json` SHA-256 is
+  `bffc944d1a59f25f278756050695654646bbb72cef8b7e47bdde31def61d5ffb`.
+- Forced AMP recovery reduced scale 1,024 to 512, skipped the unsafe update,
+  and retried step 1. A subsequent resume loaded that checkpoint, retained all
+  three pre-resume records, completed unique train and validation steps 1, 2,
+  and 3, and preserved the single overflow count. Final diagnostic checkpoint
+  SHA-256 is
+  `b1d503bbb509ced4ff6985cfcb85d6458e2b1dc88b73e7585143e0b52430033a`;
+  independently verified resumed `result.json` SHA-256 is
+  `c20ad19c695c868ca3fd5fa5ce8648dce72067ea0b51fc960d44284dc18d1179`.
+- A reportable-mode probe without an explicit 40-character commit and clean
+  worktree assertion was rejected before any output directory was created, as
+  required. All trainer diagnostic metrics and checkpoints remain ineligible
+  for comparison, model selection, or submission.

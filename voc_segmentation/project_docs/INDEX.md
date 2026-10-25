@@ -78,3 +78,10 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0086 — Pass pretrained SegFormer two-sample overfit gate](steps/0086-pass-pretrained-segformer-two-sample-overfit-gate.md) — Passed, 2026-10-26T00:19:43+08:00
 - [0087 — Correct unsupported host finiteness check for SegFormer artifacts](steps/0087-correct-unsupported-host-finiteness-check-segformer-artifacts.md) — Failed, 2026-10-26T00:19:47+08:00
 - [0088 — Verify SegFormer overfit artifacts independently](steps/0088-verify-segformer-overfit-artifacts-independently.md) — Passed, 2026-10-26T00:19:51+08:00
+- [0089 — Implement formal SegFormer trainer](steps/0089-implement-formal-segformer-trainer.md) — Passed, 2026-10-26T00:27:42+08:00
+- [0090 — Pass SegFormer trainer regression tests](steps/0090-pass-segformer-trainer-regression-tests.md) — Passed, 2026-10-26T00:27:46+08:00
+- [0091 — Pass one-step SegFormer formal-trainer diagnostic](steps/0091-pass-one-step-segformer-formal-trainer-diagnostic.md) — Passed, 2026-10-26T00:27:51+08:00
+- [0092 — Pass forced AMP recovery in SegFormer trainer](steps/0092-pass-forced-amp-recovery-segformer-trainer.md) — Passed, 2026-10-26T00:27:55+08:00
+- [0093 — Pass SegFormer trainer checkpoint resume](steps/0093-pass-segformer-trainer-checkpoint-resume.md) — Passed, 2026-10-26T00:27:59+08:00
+- [0094 — Verify SegFormer trainer diagnostic artifacts](steps/0094-verify-segformer-trainer-diagnostic-artifacts.md) — Passed, 2026-10-26T00:28:03+08:00
+- [0095 — Verify SegFormer reportable-run provenance guard](steps/0095-verify-segformer-reportable-run-provenance-guard.md) — Passed, 2026-10-26T00:28:08+08:00

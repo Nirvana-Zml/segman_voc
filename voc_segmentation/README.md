@@ -214,6 +214,35 @@ checkpoint, JSONL history, TensorBoard event, and `result.json` under
 `artifacts/transformer_baseline/overfit_two_samples/`; none are eligible for
 validation, model selection, or submission.
 
+Run a bounded formal-trainer diagnostic:
+
+```powershell
+docker exec voc2012-gcb python tools/train_segformer.py --diagnostic-only --output-dir artifacts/transformer_baseline/pretrained_formal_smoke_v1 --max-iterations 1 --validate-every 1 --validation-limit 2
+```
+
+`--validation-limit` and forced AMP-overflow injection are accepted only in
+diagnostic mode. For the reportable official-train baseline, first require a
+clean host worktree and inject its full commit because `.git` is intentionally
+not mounted into the container:
+
+```powershell
+if (git status --porcelain) { throw "Commit the worktree before formal training." }
+$vocCommit = git rev-parse HEAD
+docker exec voc2012-gcb python tools/train_segformer.py --git-commit $vocCommit --git-worktree-clean
+```
+
+The trainer uses the full official validation split every 1,000 steps and
+selects `best.pt` only by validation mIoU. Resume from the greatest completed
+validation checkpoint in the same output directory:
+
+```powershell
+docker exec voc2012-gcb python tools/train_segformer.py --resume runs/segformer_b1_voc_train/last.pt --git-commit $vocCommit --git-worktree-clean
+```
+
+If the latest completed step is held by `best.pt`, use that path instead. A
+resume archives and reconciles JSONL history before appending, and verified AMP
+overflows retry the same logical iteration within configured limits.
+
 ## Project layout
 
 ```text
