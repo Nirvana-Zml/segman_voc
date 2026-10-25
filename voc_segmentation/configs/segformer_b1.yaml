@@ -13,11 +13,26 @@ data:
   train_split: train
   val_split: val
   crop_size: [384, 384]
+  scale_range: [0.5, 2.0]
+  horizontal_flip_probability: 0.5
   ignore_index: 255
   reduce_zero_label: false
 training:
   physical_batch_size: 2
   effective_batch_size: 8
+  gradient_accumulation_steps: 4
+  optimizer: adamw
+  encoder_lr: 0.00006
+  decoder_lr: 0.00060
+  weight_decay: 0.01
+  gradient_clip_norm: 1.0
   amp: true
+  max_consecutive_amp_overflows: 4
+  max_total_amp_overflows: 32
   seed: 42
+  max_iterations: 20000
+  validate_every: 1000
+  warmup_iterations: 1500
+  poly_power: 0.9
+  num_workers: 0
   save_best_metric: miou

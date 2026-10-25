@@ -63,6 +63,17 @@ class ConfigContractTest(unittest.TestCase):
         )
         self.assertEqual(config["data"]["crop_size"], [384, 384])
         self.assertEqual(config["training"]["effective_batch_size"], 8)
+        training = config["training"]
+        self.assertEqual(
+            training["gradient_accumulation_steps"]
+            * training["physical_batch_size"],
+            training["effective_batch_size"],
+        )
+        self.assertEqual(training["optimizer"], "adamw")
+        self.assertLess(training["encoder_lr"], training["decoder_lr"])
+        self.assertGreater(training["gradient_clip_norm"], 0)
+        self.assertLess(training["warmup_iterations"], training["max_iterations"])
+        self.assertGreater(training["max_total_amp_overflows"], 0)
 
 
 if __name__ == "__main__":

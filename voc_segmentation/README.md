@@ -171,6 +171,34 @@ non-finite gradients, missing scale backoff, more than four consecutive
 overflows, or more than 32 total overflows. The injection flag
 `--diagnostic-force-amp-overflow-once` is accepted only in diagnostic mode.
 
+## Transformer baseline diagnostics
+
+Acquire and convert the fixed NVIDIA MiT-B1 ImageNet-1K encoder checkpoint:
+
+```powershell
+docker exec voc2012-gcb python tools/acquire_mit_b1_weights.py
+```
+
+The tool pins NVIDIA model revision
+`13ddceec4e8bdf401e7cd7acf5aebc526222518c`, verifies the official LFS byte
+count and full SHA-256, removes only the ImageNet classifier, converts the
+Hugging Face encoder naming to the project's native MiT naming, strictly loads
+all 176 encoder tensors, checks finite values and a finite forward pass, and
+writes `artifacts/weights/mit_b1_imagenet1k/provenance.json`. The official
+SegFormer license limits use to non-commercial research or evaluation; this
+course project uses the weights only for educational evaluation.
+
+Run the pretrained 384×384 CUDA optimizer-step smoke:
+
+```powershell
+docker exec voc2012-gcb python tools/smoke_segformer.py
+```
+
+It uses two official VOC-train samples, batch size 2, AMP, AdamW encoder and
+decoder parameter groups, and the explicit hash-verified local checkpoint. It
+writes `artifacts/transformer_baseline/smoke.json` with
+`diagnostic_only=true`; its weights and metrics are never submission evidence.
+
 ## Project layout
 
 ```text

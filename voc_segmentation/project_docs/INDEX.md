@@ -67,3 +67,9 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0075 — Fail first Transformer step recording on PowerShell quoting](steps/0075-fail-first-transformer-step-recording-on-powershell-quoting.md) — Failed, 2026-10-26T00:01:48+08:00
 - [0076 — Fail SegFormer probe on unavailable timm MiT-B1](steps/0076-fail-segformer-probe-on-unavailable-timm-mit-b1.md) — Failed, 2026-10-26T00:01:53+08:00
 - [0077 — Implement and verify native MiT-B1 SegFormer interfaces](steps/0077-implement-and-verify-native-mit-b1-segformer-interfaces.md) — Passed, 2026-10-26T00:01:57+08:00
+- [0078 — Fail nested gitignore inspection during MiT acquisition planning](steps/0078-fail-nested-gitignore-inspection-during-mit-acquisition-planning.md) — Failed, 2026-10-26T00:12:05+08:00
+- [0079 — Correct first post-download MiT file verification](steps/0079-correct-first-post-download-mit-file-verification.md) — Failed, 2026-10-26T00:12:10+08:00
+- [0080 — Acquire and verify official MiT-B1 ImageNet weights](steps/0080-acquire-and-verify-official-mit-b1-imagenet-weights.md) — Passed, 2026-10-26T00:12:14+08:00
+- [0081 — Implement and test MiT acquisition and SegFormer smoke tooling](steps/0081-implement-and-test-mit-acquisition-and-segformer-smoke-tooling.md) — Passed, 2026-10-26T00:12:18+08:00
+- [0082 — Pass pretrained SegFormer CUDA optimizer-step smoke](steps/0082-pass-pretrained-segformer-cuda-optimizer-step-smoke.md) — Passed, 2026-10-26T00:12:23+08:00
+- [0083 — Correct project status helper option during Transformer handoff](steps/0083-correct-project-status-helper-option-transformer-handoff.md) — Failed, 2026-10-26T00:13:52+08:00

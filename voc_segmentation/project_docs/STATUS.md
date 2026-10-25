@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 00:01 +08:00
+- Last updated: 2026-10-26 00:11 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -16,7 +16,7 @@
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
-| 04 | Transformer baseline | In progress | Native MiT-B1/SegFormer interfaces pass; pretrained weight and CUDA diagnostics pending |
+| 04 | Transformer baseline | In progress | Pretrained MiT-B1 weight and CUDA smoke verified; overfit pending |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
@@ -41,8 +41,8 @@
 
 ## Next action
 
-Acquire and provenance-verify a compatible MiT-B1 ImageNet checkpoint, then
-run a 384×384 CUDA optimizer-step smoke before adding overfit and formal
+Implement and pass the deterministic two-sample SegFormer overfit gate with
+diagnostic-only checkpoint/history/TensorBoard evidence, then add formal
 training tooling. Keep diagnostic weights ineligible for submission.
 
 ## Latest checks
@@ -320,3 +320,34 @@ training tooling. Keep diagnostic weights ineligible for submission.
   nested quoted `python -c` command in a PowerShell argument and failed with a
   parser error before `record_step.py` ran. No file changed. The failure and
   both substantive steps were then recorded separately with safe quoting.
+- NVIDIA's official Hugging Face `nvidia/mit-b1` revision
+  `13ddceec4e8bdf401e7cd7acf5aebc526222518c` was acquired. The 54,732,285-byte
+  ImageNet-1K source archive matches its published LFS SHA-256
+  `980b86b60db37b1b1528086f6c53d253d879e9e09ebe07397b40fd275738a3bf`.
+- The deterministic conversion discarded only the 1,000-class classifier and
+  mapped 194 source tensors to all 176 native encoder tensors, including
+  concatenated attention key/value projections. Strict loading, tensor
+  finiteness, and a four-scale finite forward pass succeeded. The converted
+  52,658,798-byte checkpoint SHA-256 is
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- Provenance records the NVIDIA Source Code License for SegFormer, which limits
+  use to non-commercial research or evaluation, plus ImageNet terms. This
+  course project uses the checkpoint only for educational evaluation and
+  asserts no broader rights. The provenance JSON SHA-256 is
+  `2bf52c96aeb967605d4fe9975497c861cf3ee824bf62e6c892c0de3d688cf6ca`.
+- A first immediate relative-path verification after download reported the
+  final file absent, while the subsequent directory listing showed the atomic
+  rename had completed. Absolute-path verification then matched the published
+  size and SHA. An earlier read also requested nonexistent
+  `voc_segmentation/.gitignore`; the root `.gitignore` was the applicable file.
+  Neither read-only failure modified project state.
+- The conversion/config/SegFormer focused tests passed 9/9 in 1.096 seconds;
+  the acquisition tool's second run reused both files and repeated the same
+  strict-load/hash results. The complete container suite passed 29/29 in 5.894
+  seconds.
+- The pretrained SegFormer CUDA smoke passed one 384×384, batch-2 AdamW step
+  on official VOC train: loss 2.938904, finite pre-clip gradient norm 17.925528,
+  encoder/decoder learning rates 0.00006/0.0006, AMP scale 1,024 unchanged,
+  623,762,432 peak allocated CUDA bytes, and 1.747 seconds. The result is
+  diagnostic-only; SHA-256
+  `742b76f757d38b69385db2337d2a6ebf886d854a9abbe604c17cd38240df30b0`.
