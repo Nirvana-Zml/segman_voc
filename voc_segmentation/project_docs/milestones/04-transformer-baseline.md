@@ -1,7 +1,7 @@
 # Milestone 04: SegFormer baseline
 
 - State: **In progress — formal trainer verified; reportable run pending**
-- Last updated: 2026-10-26 00:26 +08:00
+- Last updated: 2026-10-26 00:30 +08:00
 
 Train and evaluate an 8 GB-safe SegFormer baseline with the same split,
 evaluator, seed policy, and artifact contract used by the CNN baseline.
@@ -153,9 +153,14 @@ evaluator, seed policy, and artifact contract used by the CNN baseline.
 - All saved trainer artifacts above are diagnostic only. Their limited-set
   validation metrics and weights cannot be cited as baseline results or used
   for model selection/submission.
+- Trainer source, tests, diagnostics, and evidence were committed as `7c22761`.
+  A staged whitespace warning found one extra EOF blank line after PowerShell
+  had continued to that commit; the formatting-only correction and its
+  immutable failure/correction records were committed as `705dad0`, after
+  which `git diff --check` passed.
 
 ## Next action
 
-Commit the trainer and launch the reportable 20,000-step official-train run
-from the resulting clean revision. Evaluate the complete 1,449-image official
-validation split every 1,000 steps and select `best.pt` only by saved mIoU.
+Launch the reportable 20,000-step official-train run from the final clean
+handoff revision. Evaluate the complete 1,449-image official validation split
+every 1,000 steps and select `best.pt` only by saved mIoU.

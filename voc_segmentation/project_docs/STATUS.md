@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 00:26 +08:00
+- Last updated: 2026-10-26 00:30 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the verified SegFormer trainer, then launch its reportable 20,000-step
-official-train run from that clean commit. Use the complete 1,449-image
-official validation split every 1,000 steps and select only by validation
-mIoU; do not treat any diagnostic metric or checkpoint as reportable.
+Launch the reportable 20,000-step SegFormer official-train run from the final
+clean handoff revision. Use the complete 1,449-image official validation split
+every 1,000 steps and select only by validation mIoU; do not treat any
+diagnostic metric or checkpoint as reportable.
 
 ## Latest checks
 
@@ -392,3 +392,8 @@ mIoU; do not treat any diagnostic metric or checkpoint as reportable.
   worktree assertion was rejected before any output directory was created, as
   required. All trainer diagnostic metrics and checkpoints remain ineligible
   for comparison, model selection, or submission.
+- The verified trainer and evidence were committed as `7c22761`. Its staged
+  whitespace check identified an extra EOF blank line but PowerShell continued
+  to the commit; the defect was removed and the immutable failure/correction
+  records were committed as `705dad0`. The correction is formatting-only and
+  the working-tree whitespace audit then passed.

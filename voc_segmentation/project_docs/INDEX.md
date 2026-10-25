@@ -87,3 +87,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0095 — Verify SegFormer reportable-run provenance guard](steps/0095-verify-segformer-reportable-run-provenance-guard.md) — Passed, 2026-10-26T00:28:08+08:00
 - [0096 — Detect trailing blank line after trainer commit](steps/0096-detect-trailing-blank-line-after-trainer-commit.md) — Failed, 2026-10-26T00:29:31+08:00
 - [0097 — Correct SegFormer trainer trailing blank line](steps/0097-correct-segformer-trainer-trailing-blank-line.md) — Passed, 2026-10-26T00:29:36+08:00
+- [0098 — Commit verified SegFormer trainer implementation](steps/0098-commit-verified-segformer-trainer-implementation.md) — Passed, 2026-10-26T00:30:31+08:00
