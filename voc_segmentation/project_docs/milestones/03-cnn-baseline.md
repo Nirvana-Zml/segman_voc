@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — history reconciliation verified; recommit pending**
-- Last updated: 2026-10-25 13:05 +08:00
+- State: **In progress — user-stopped; step-10,000 restart saved**
+- Last updated: 2026-10-25 14:32 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,35 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+At the user's request, exact training PID 422 was terminated with SIGTERM after
+the console reached step 10,047; the wrapper recorded exit code 143. Step
+10,000 had already completed a full 1,449-image validation and checkpoint. The
+47 later train records were preserved in a 10,058-record full-history archive
+(SHA-256
+`0ff6ae540aa0312792644a4356fdf73125309f099aa6701e4d1d3a82cd47beec`),
+then removed from the active 10,011-record history (SHA-256
+`e50f3344fdf55ca8b28da384b1996138c4ee6cb0bf1559393ba311294735aaa5`).
+
+The validation-selected best is step 9,000 at mIoU 0.562094, checkpoint
+SHA-256 `07e2364f7b34490f1d42515580dd73c9c54db79143967db943e5de0f1dca311f`.
+The exact restart point is step 10,000 at mIoU 0.540388, checkpoint SHA-256
+`1e46f3bce6fa88eaec822ae804c88793e189cf14adf939fe0ceb62a543edde81`.
+Both are non-diagnostic, 323,230,734-byte checkpoints with AMP scale 8,192 and
+one recorded recovered overflow. All hashes in
+`user_stop_20261025T142718+0800.json` independently matched. No process or
+terminal `result.json` remains, so this is a saved interruption, not a passed
+CNN baseline.
+
+The second step-8,000 recovery launched at 2026-10-25 13:09:39 +08:00 under
+clean commit `d789bc06c6db6883e4010ceba587d3212484ad5c`. Automatic reconciliation
+archived all 8,087 prior records (SHA-256
+`fcb176067aafa16520f8d85f6178b92e1ed811adb4dcec5830a38c157f1b2618`),
+kept 8,008 records through the checkpoint, and dropped 79 later records. At
+step 8,018 the active history contained unique train steps 1–8,018, eight full
+validations, and zero duplicate train steps. PID 422 was active, no exit-code
+file existed, and the GPU used about 2,030 MiB at 99% utilization. This remains
+in-progress evidence, not a completed CNN gate.
 
 The tested resume-history reconciliation and first-resume interruption record
 were committed as `6fab976`
@@ -189,9 +218,9 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Commit the verified reconciliation under a clean revision, resume from step
-8,000 again, independently verify the archive and active-history boundary, and
-monitor through terminal exit.
+Await user direction. A future continuation must resume from verified
+step-10,000 `last.pt`, reconcile history automatically, and reach terminal
+success before the CNN gate can pass.
 
 ## Formal trainer and pretrained diagnostic evidence
 

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 13:05 +08:00
+- Last updated: 2026-10-25 14:32 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -15,7 +15,7 @@
 | 00 | Project reset | Passed | New driver valid; ledger and standalone root created |
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
-| 03 | CNN baseline | In progress | Run interrupted at 8,039 by AMP overflow handling; recovery pending |
+| 03 | CNN baseline | In progress | User stopped at 10,047; verified step-10,000 restart saved |
 | 04 | Transformer baseline | Not started | Comparable SegFormer validation |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Commit the verified resume-history reconciliation, then restart from the
-unchanged step-8,000 checkpoint and verify the saved archive plus the clean
-active-history boundary. Diagnostic weights remain ineligible.
+No training process is active. If the user elects to continue, resume from the
+verified step-10,000 `last.pt` and train to terminal completion; otherwise the
+CNN formal-run gate remains incomplete. Diagnostic weights remain ineligible.
 
 ## Latest checks
 
@@ -187,3 +187,30 @@ active-history boundary. Diagnostic weights remain ineligible.
 - The reconciliation implementation, tests, and first-resume interruption
   evidence were committed as `6fab976`
   (`fix: reconcile history before training resume`).
+- The reconciled recovery launched at 2026-10-25 13:09:39 +08:00 under clean
+  commit `d789bc06c6db6883e4010ceba587d3212484ad5c`. It archived all 8,087 prior
+  JSONL records (SHA-256
+  `fcb176067aafa16520f8d85f6178b92e1ed811adb4dcec5830a38c157f1b2618`),
+  retained 8,008 records through checkpoint step 8,000, and dropped 79
+  uncheckpointed/duplicate records before appending.
+- Independent observation at step 8,018 found 8,018 unique train records,
+  eight validation records, zero duplicate train steps, no exit-code file, PID
+  422 active, and about 2,030 MiB GPU memory at 99% utilization.
+- At the user's request, exact PID 422 was terminated with SIGTERM after its
+  console reached step 10,047. The wrapper saved exit code 143. Step 10,000 had
+  already completed full 1,449-image validation and checkpointing; the 47 later
+  uncheckpointed train records were archived and removed from active history.
+- The active history now has 10,011 records through step 10,000 (10,000 train,
+  10 validation, one recovered AMP overflow at step 8,380), SHA-256
+  `e50f3344fdf55ca8b28da384b1996138c4ee6cb0bf1559393ba311294735aaa5`.
+  The full pre-stop history archive has 10,058 records, SHA-256
+  `0ff6ae540aa0312792644a4356fdf73125309f099aa6701e4d1d3a82cd47beec`.
+- Saved best: step 9,000, mIoU 0.562094, SHA-256
+  `07e2364f7b34490f1d42515580dd73c9c54db79143967db943e5de0f1dca311f`.
+  Saved restart point: step 10,000, mIoU 0.540388, SHA-256
+  `1e46f3bce6fa88eaec822ae804c88793e189cf14adf939fe0ceb62a543edde81`.
+  Both checkpoints are non-diagnostic and preserve AMP scale 8,192 plus one
+  recovered overflow. No `result.json` exists, so the CNN gate is not passed.
+- Machine-readable stop manifest:
+  `runs/deeplabv3plus_r50_voc_train/user_stop_20261025T142718+0800.json`;
+  all seven recorded artifact hashes were independently matched.
