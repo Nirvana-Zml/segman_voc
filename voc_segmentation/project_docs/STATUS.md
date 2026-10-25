@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 00:30 +08:00
+- Last updated: 2026-10-26 00:34 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -16,7 +16,7 @@
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
-| 04 | Transformer baseline | In progress | Formal trainer diagnostics verified; 20,000-step official-train run pending |
+| 04 | Transformer baseline | In progress | 20,000-step official-train run active; first full validation pending |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Launch the reportable 20,000-step SegFormer official-train run from the final
-clean handoff revision. Use the complete 1,449-image official validation split
-every 1,000 steps and select only by validation mIoU; do not treat any
-diagnostic metric or checkpoint as reportable.
+Monitor the active reportable SegFormer run through its first complete
+1,449-image official validation at step 1,000. Confirm the validation artifact
+and selected checkpoint before continuing to terminal completion; do not infer
+quality from pre-validation training loss.
 
 ## Latest checks
 
@@ -397,3 +397,15 @@ diagnostic metric or checkpoint as reportable.
   to the commit; the defect was removed and the immutable failure/correction
   records were committed as `705dad0`. The correction is formatting-only and
   the working-tree whitespace audit then passed.
+- The first formal-run preflight was blocked by managed access to the Docker
+  Desktop named pipe. The approved retry passed: `voc2012-gcb` was running,
+  RTX 4060 GPU use was 0 MiB/0%, `/workspace` had 756 GB available, no trainer
+  process existed, the formal output directory was absent, and the MiT-B1
+  checkpoint matched SHA-256
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- The reportable 20,000-step SegFormer run launched at 2026-10-26 00:33:53
+  +08:00 from clean commit
+  `d1f25d71c7f8e3fc3b0407e7cd8fa252e2d3a839`. Container PID 1248 remained
+  active. At independent observation it had 17 unique finite training records
+  through step 17, zero validation or overflow records, no exit-code file or
+  terminal result, and about 1,067 MiB GPU memory in use.

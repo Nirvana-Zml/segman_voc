@@ -1,7 +1,7 @@
 # Milestone 04: SegFormer baseline
 
-- State: **In progress — formal trainer verified; reportable run pending**
-- Last updated: 2026-10-26 00:30 +08:00
+- State: **In progress — reportable run active; first validation pending**
+- Last updated: 2026-10-26 00:34 +08:00
 
 Train and evaluate an 8 GB-safe SegFormer baseline with the same split,
 evaluator, seed policy, and artifact contract used by the CNN baseline.
@@ -159,8 +159,27 @@ evaluator, seed policy, and artifact contract used by the CNN baseline.
   immutable failure/correction records were committed as `705dad0`, after
   which `git diff --check` passed.
 
+## Reportable run launch
+
+- Preflight initially failed because the managed shell could not open the
+  Docker Desktop named pipe. The approved retry verified the running container,
+  no existing trainer, GPU at 0 MiB/0%, 756 GB free under `/workspace`, absent
+  `runs/segformer_b1_voc_train/`, and the accepted MiT-B1 checkpoint hash.
+- The gitignored wrapper `runs/segformer_b1_voc_train/launch.sh` records start
+  time, source commit, console output, and terminal exit code. It launched via
+  `docker exec -d` at 2026-10-26 00:33:53 +08:00.
+- Reportable provenance is clean commit
+  `d1f25d71c7f8e3fc3b0407e7cd8fa252e2d3a839`; the trainer received both the
+  full commit and `--git-worktree-clean` assertion.
+- Container PID 1248 was active. The first independent audit observed 17
+  unique train records for steps 1 through 17, with finite loss, gradient norm,
+  AMP scale, and both learning rates. No validation, AMP overflow, exit code,
+  or terminal `result.json` existed yet. GPU use was about 1,067 MiB.
+- This is launch evidence only. No Transformer baseline metric or checkpoint
+  is accepted until a complete official validation finishes.
+
 ## Next action
 
-Launch the reportable 20,000-step official-train run from the final clean
-handoff revision. Evaluate the complete 1,449-image official validation split
-every 1,000 steps and select `best.pt` only by saved mIoU.
+Monitor the active run through its complete step-1,000 official validation,
+then verify the validation JSON and selected checkpoint before continuing to
+terminal completion.

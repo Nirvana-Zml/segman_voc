@@ -88,3 +88,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0096 — Detect trailing blank line after trainer commit](steps/0096-detect-trailing-blank-line-after-trainer-commit.md) — Failed, 2026-10-26T00:29:31+08:00
 - [0097 — Correct SegFormer trainer trailing blank line](steps/0097-correct-segformer-trainer-trailing-blank-line.md) — Passed, 2026-10-26T00:29:36+08:00
 - [0098 — Commit verified SegFormer trainer implementation](steps/0098-commit-verified-segformer-trainer-implementation.md) — Passed, 2026-10-26T00:30:31+08:00
+- [0099 — Fail first SegFormer formal-run Docker preflight](steps/0099-fail-first-segformer-formal-run-docker-preflight.md) — Failed, 2026-10-26T00:35:23+08:00
+- [0100 — Pass SegFormer formal-run preflight](steps/0100-pass-segformer-formal-run-preflight.md) — Passed, 2026-10-26T00:35:28+08:00
+- [0101 — Launch reportable SegFormer VOC-train run](steps/0101-launch-reportable-segformer-voc-train-run.md) — In progress, 2026-10-26T00:35:33+08:00
