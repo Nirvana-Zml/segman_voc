@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
 - State: **In progress — AMP recovery verified; step-8,000 resume pending**
-- Last updated: 2026-10-25 12:47 +08:00
+- Last updated: 2026-10-25 12:51 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,10 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+The bounded AMP-overflow recovery, its 21-test regression evidence, the forced
+CUDA diagnostic, and the interrupted-run ledger were committed as `1bd318b`
+(`fix: recover from AMP gradient overflow`).
 
 Bounded AMP-overflow recovery is now verified. Non-finite gradients are
 recoverable only when AMP is enabled and GradScaler demonstrably lowers its

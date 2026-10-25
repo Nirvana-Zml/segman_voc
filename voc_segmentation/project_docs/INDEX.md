@@ -50,3 +50,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0058 — Launch reportable DeepLabV3+ VOC-train run](steps/0058-launch-reportable-deeplabv3-voc-train-run.md) — In progress, 2026-10-25T07:52:22+08:00
 - [0059 — Terminate formal CNN run on unhandled AMP overflow](steps/0059-terminate-formal-cnn-run-on-unhandled-amp-overflow.md) — Failed, 2026-10-25T12:38:18+08:00
 - [0060 — Implement and verify bounded AMP overflow recovery](steps/0060-implement-and-verify-bounded-amp-overflow-recovery.md) — Passed, 2026-10-25T12:47:54+08:00
+- [0061 — Commit bounded AMP overflow recovery](steps/0061-commit-bounded-amp-overflow-recovery.md) — Passed, 2026-10-25T12:51:45+08:00

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 12:47 +08:00
+- Last updated: 2026-10-25 12:51 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -170,3 +170,6 @@ source revision. Diagnostic weights remain ineligible.
   step 1, and checkpoint/result metadata recorded exactly one overflow. The
   diagnostic checkpoint SHA-256 is
   `35ea803109d352ae1a9e1f10f0162b9dbec670353078f9531e6e640071414bfc`.
+- The bounded recovery implementation, tests, diagnostic, and interruption
+  records were committed as `1bd318b`
+  (`fix: recover from AMP gradient overflow`).
