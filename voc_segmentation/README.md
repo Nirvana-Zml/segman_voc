@@ -199,6 +199,21 @@ decoder parameter groups, and the explicit hash-verified local checkpoint. It
 writes `artifacts/transformer_baseline/smoke.json` with
 `diagnostic_only=true`; its weights and metrics are never submission evidence.
 
+Run the deterministic pretrained two-sample overfit gate:
+
+```powershell
+docker exec voc2012-gcb python tools/overfit_segformer.py
+```
+
+It fixes the same two official-train samples at 128x128, verifies the local
+MiT-B1 checkpoint against its provenance, and runs 100 AMP updates with
+separate encoder and decoder AdamW groups. The command accepts the gate only
+when the final evaluation CE is at most half the initial training CE and all
+recorded losses and gradients are finite. It writes a diagnostic-only
+checkpoint, JSONL history, TensorBoard event, and `result.json` under
+`artifacts/transformer_baseline/overfit_two_samples/`; none are eligible for
+validation, model selection, or submission.
+
 ## Project layout
 
 ```text

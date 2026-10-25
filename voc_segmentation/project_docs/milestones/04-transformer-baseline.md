@@ -1,7 +1,7 @@
 # Milestone 04: SegFormer baseline
 
-- State: **In progress — pretrained MiT-B1 and CUDA smoke verified**
-- Last updated: 2026-10-26 00:11 +08:00
+- State: **In progress — pretrained MiT-B1, CUDA smoke, and overfit verified**
+- Last updated: 2026-10-26 00:17 +08:00
 
 Train and evaluate an 8 GB-safe SegFormer baseline with the same split,
 evaluator, seed policy, and artifact contract used by the CNN baseline.
@@ -81,8 +81,42 @@ evaluator, seed policy, and artifact contract used by the CNN baseline.
 - Conversion/SegFormer/config focused tests passed 9/9 in 1.096 seconds. The
   complete target-container suite passed 29/29 in 5.894 seconds.
 
+## Two-sample overfit evidence
+
+- Command: `docker exec voc2012-gcb python tools/overfit_segformer.py`
+- Result: `artifacts/transformer_baseline/overfit_two_samples/result.json`,
+  SHA-256
+  `9a6e4eeae1be267ba27bc1c6fc5ada4a31e4df345db2ac1eae6950e7bfea0210`,
+  with `ok=true` and `diagnostic_only=true`.
+- The deterministic batch contains official VOC-train samples `2008_005679`
+  and `2008_002175`, fixed to `[2,3,128,128]`, with seed 42 and the accepted
+  pretrained encoder hash.
+- One hundred AMP AdamW updates used disjoint, exhaustive encoder and decoder
+  groups at learning rates 0.0001 and 0.001. All recorded losses and pre-clip
+  gradient norms were finite; the AMP scale remained 1,024.
+- Evaluation CE fell from initial training CE 2.910582 to 0.016329, a ratio of
+  0.005610 against the required maximum 0.5. Same-sample pixel accuracy was
+  0.996751 and mIoU over present classes was 0.952548.
+- The 100-line history SHA-256 is
+  `f3bff2dbdec740f48a7276a129508803699a559b63be912d235ab8683a29386d`;
+  the 164,430,438-byte diagnostic checkpoint SHA-256 is
+  `e0269f9027c793286d3a1f7c223be5379a1c7180caffe8f96be334978c760212`;
+  the TensorBoard event SHA-256 is
+  `255c754fae113eea578e70d5cd32e2384d71d10568296d3fdce920ddc0ae3f1d`.
+  Independent post-run checks matched every recorded hash.
+- Peak allocated CUDA memory was 409,270,272 bytes and elapsed time was 8.347
+  seconds on the RTX 4060 Laptop GPU. These metrics and the saved checkpoint
+  are diagnostic only and cannot be used for validation or submission.
+- The tool passed an in-container syntax check, and the complete suite passed
+  29/29 in 5.618 seconds before the CUDA run.
+- Two read-only inspection commands failed without mutating artifacts: the
+  checkpoint implementation was first sought at nonexistent
+  `engine/checkpoint.py` instead of `engine/checkpointing.py`, and the initial
+  host finiteness audit used unavailable `[double]::IsFinite`. The corrected
+  container-Python audit verified all 100 loss and gradient values as finite.
+
 ## Next action
 
-Implement and pass the deterministic two-sample SegFormer overfit gate with
-diagnostic-only checkpoint, history, and TensorBoard evidence, then implement
-the formal trainer.
+Implement and verify the formal SegFormer trainer with official VOC train,
+independent full validation, safe AMP-overflow handling, resumable unambiguous
+history, and best-checkpoint selection by validation mIoU.

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 00:11 +08:00
+- Last updated: 2026-10-26 00:17 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -16,7 +16,7 @@
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
-| 04 | Transformer baseline | In progress | Pretrained MiT-B1 weight and CUDA smoke verified; overfit pending |
+| 04 | Transformer baseline | In progress | Pretrained MiT-B1 weight, CUDA smoke, and two-sample overfit verified; formal trainer pending |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
@@ -41,9 +41,10 @@
 
 ## Next action
 
-Implement and pass the deterministic two-sample SegFormer overfit gate with
-diagnostic-only checkpoint/history/TensorBoard evidence, then add formal
-training tooling. Keep diagnostic weights ineligible for submission.
+Implement and verify the formal SegFormer trainer with the same official-train,
+independent full-validation, AMP-overflow, resume-history, checkpoint, and
+validation-mIoU selection contracts as the CNN baseline. Keep smoke and
+two-sample-overfit weights ineligible for validation or submission.
 
 ## Latest checks
 
@@ -309,9 +310,8 @@ training tooling. Keep diagnostic weights ineligible for submission.
   resolution. It has 13,682,645 parameters: 13,151,424 encoder and 531,221
   decoder parameters.
 - The resource-safe config fixes MiT-B1, 384×384 crops, physical batch 2,
-  effective batch 8, and an explicit future weight path under
-  `artifacts/weights/mit_b1_imagenet1k/`. No pretrained artifact has yet been
-  acquired or accepted.
+  effective batch 8, and the accepted explicit weight path under
+  `artifacts/weights/mit_b1_imagenet1k/`.
 - Focused SegFormer/config tests passed 8/8 in 1.254 seconds. The complete
   in-container regression suite passed all 28 tests in 4.766 seconds,
   including four-scale shapes, finite 21-class original-size logits, strict
@@ -351,3 +351,16 @@ training tooling. Keep diagnostic weights ineligible for submission.
   623,762,432 peak allocated CUDA bytes, and 1.747 seconds. The result is
   diagnostic-only; SHA-256
   `742b76f757d38b69385db2337d2a6ebf886d854a9abbe604c17cd38240df30b0`.
+- The deterministic pretrained SegFormer two-sample gate passed 100 AMP steps
+  at 128×128. Evaluation CE decreased from 2.910582 to 0.016329 (ratio
+  0.005610, required at most 0.5); same-sample pixel accuracy was 0.996751,
+  peak allocated CUDA memory was 409,270,272 bytes, and elapsed time was 8.347
+  seconds. The result, 100-line history, checkpoint, and TensorBoard hashes
+  were independently matched; `result.json` SHA-256 is
+  `9a6e4eeae1be267ba27bc1c6fc5ada4a31e4df345db2ac1eae6950e7bfea0210`.
+- A read-only reference inspection first requested nonexistent
+  `engine/checkpoint.py`; the actual exported implementation is
+  `engine/checkpointing.py`. A later host finiteness audit used unavailable
+  `[double]::IsFinite` on the installed PowerShell/.NET runtime. The corrected
+  container-Python audit confirmed all 100 losses and gradient norms finite.
+  Neither failed command changed artifacts.

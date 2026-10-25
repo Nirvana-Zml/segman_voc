@@ -73,3 +73,8 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0081 — Implement and test MiT acquisition and SegFormer smoke tooling](steps/0081-implement-and-test-mit-acquisition-and-segformer-smoke-tooling.md) — Passed, 2026-10-26T00:12:18+08:00
 - [0082 — Pass pretrained SegFormer CUDA optimizer-step smoke](steps/0082-pass-pretrained-segformer-cuda-optimizer-step-smoke.md) — Passed, 2026-10-26T00:12:23+08:00
 - [0083 — Correct project status helper option during Transformer handoff](steps/0083-correct-project-status-helper-option-transformer-handoff.md) — Failed, 2026-10-26T00:13:52+08:00
+- [0084 — Correct checkpoint module path during SegFormer overfit planning](steps/0084-correct-checkpoint-module-path-segformer-overfit.md) — Failed, 2026-10-26T00:19:34+08:00
+- [0085 — Implement and test SegFormer two-sample overfit tooling](steps/0085-implement-test-segformer-two-sample-overfit-tooling.md) — Passed, 2026-10-26T00:19:38+08:00
+- [0086 — Pass pretrained SegFormer two-sample overfit gate](steps/0086-pass-pretrained-segformer-two-sample-overfit-gate.md) — Passed, 2026-10-26T00:19:43+08:00
+- [0087 — Correct unsupported host finiteness check for SegFormer artifacts](steps/0087-correct-unsupported-host-finiteness-check-segformer-artifacts.md) — Failed, 2026-10-26T00:19:47+08:00
+- [0088 — Verify SegFormer overfit artifacts independently](steps/0088-verify-segformer-overfit-artifacts-independently.md) — Passed, 2026-10-26T00:19:51+08:00
