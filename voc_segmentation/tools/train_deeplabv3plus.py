@@ -39,6 +39,7 @@ from engine import (  # noqa: E402
     is_recoverable_amp_overflow,
     load_checkpoint,
     poly_lr_factor,
+    reconcile_history_for_resume,
     save_checkpoint,
     set_learning_rate,
 )
@@ -307,6 +308,7 @@ def main() -> int:
     best_miou = float("-inf")
     best_step = 0
     total_amp_overflows = 0
+    history_reconciliation: dict[str, Any] | None = None
     resume_info: dict[str, Any] | None = None
     if args.resume is not None:
         resume_path = resolve_app_path(args.resume)
@@ -320,6 +322,8 @@ def main() -> int:
         if bool(payload["diagnostic_only"]) != bool(args.diagnostic_only):
             raise ValueError("resume checkpoint diagnostic status does not match this run")
         start_step = int(payload["step"])
+        if start_step >= max_iterations:
+            raise ValueError("resume checkpoint is already at or beyond max iterations")
         selection = payload.get("metrics", {}).get("selection", {})
         training_state = payload.get("metrics", {}).get("training_state", {})
         best_miou = float(selection.get("best_miou", payload["metrics"].get("miou", -math.inf)))
@@ -330,9 +334,25 @@ def main() -> int:
             "sha256": file_sha256(resume_path),
             "step": start_step,
         }
-    if start_step >= max_iterations:
-        raise ValueError("resume checkpoint is already at or beyond max iterations")
-
+        history_archive_path = (
+            output_dir
+            / "history_archive"
+            / (
+                f"resume_step_{start_step:06d}_"
+                f"{run_timestamp.strftime('%Y%m%dT%H%M%S%z')}.jsonl"
+            )
+        )
+        history_reconciliation = reconcile_history_for_resume(
+            history_path,
+            start_step=start_step,
+            archive_path=history_archive_path,
+        )
+        archive_value = history_reconciliation["archive"]
+        if archive_value is not None:
+            archive_file = Path(archive_value)
+            history_reconciliation["archive_bytes"] = archive_file.stat().st_size
+            history_reconciliation["archive_sha256"] = file_sha256(archive_file)
+        resume_info["history_reconciliation"] = history_reconciliation
     warmup_steps = min(int(training["warmup_iterations"]), max_iterations - 1)
     writer = SummaryWriter(log_dir=tensorboard_dir)
     history_mode = "a" if args.resume is not None and history_path.exists() else "w"
@@ -347,6 +367,14 @@ def main() -> int:
         torch.cuda.reset_peak_memory_stats(device)
         torch.cuda.synchronize(device)
     started = time.perf_counter()
+    if history_reconciliation is not None:
+        print(
+            "history_reconciliation "
+            f"kept={history_reconciliation['kept_records']} "
+            f"dropped={history_reconciliation['dropped_records']} "
+            f"archive={history_reconciliation['archive']}",
+            flush=True,
+        )
 
     with history_path.open(history_mode, encoding="utf-8", newline="\n") as stream:
         for step in range(start_step + 1, max_iterations + 1):

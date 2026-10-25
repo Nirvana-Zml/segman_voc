@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 import unittest
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import torch
 
-from engine import is_recoverable_amp_overflow, poly_lr_factor, set_learning_rate
+from engine import (
+    is_recoverable_amp_overflow,
+    poly_lr_factor,
+    reconcile_history_for_resume,
+    set_learning_rate,
+)
 
 
 class TrainingHelpersTest(unittest.TestCase):
@@ -54,6 +62,49 @@ class TrainingHelpersTest(unittest.TestCase):
                 scale_before=16384.0,
                 scale_after=16384.0,
             )
+
+    def test_resume_history_is_archived_and_trimmed_to_checkpoint(self) -> None:
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            history = root / "history.jsonl"
+            archive = root / "archive" / "before_resume.jsonl"
+            records = [
+                {"type": "train", "step": 1},
+                {"type": "validation", "step": 1},
+                {"type": "train", "step": 2},
+                {"type": "amp_overflow", "step": 3},
+            ]
+            original = "".join(json.dumps(item) + "\n" for item in records)
+            history.write_text(original, encoding="utf-8")
+
+            result = reconcile_history_for_resume(
+                history, start_step=1, archive_path=archive
+            )
+
+            self.assertEqual(result["original_records"], 4)
+            self.assertEqual(result["kept_records"], 2)
+            self.assertEqual(result["dropped_records"], 2)
+            self.assertEqual(archive.read_text(encoding="utf-8"), original)
+            kept = [
+                json.loads(line) for line in history.read_text().splitlines()
+            ]
+            self.assertEqual([item["type"] for item in kept], ["train", "validation"])
+
+    def test_resume_history_rejects_duplicate_completed_steps(self) -> None:
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            history = root / "history.jsonl"
+            history.write_text(
+                '{"type":"train","step":1}\n'
+                '{"type":"train","step":1}\n',
+                encoding="utf-8",
+            )
+            with self.assertRaises(ValueError):
+                reconcile_history_for_resume(
+                    history,
+                    start_step=1,
+                    archive_path=root / "archive.jsonl",
+                )
 
 
 if __name__ == "__main__":

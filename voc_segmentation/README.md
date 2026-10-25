@@ -159,6 +159,11 @@ interrupted run, pass the checkpoint with the greatest saved step (normally
 docker exec voc2012-gcb python tools/train_deeplabv3plus.py --resume runs/deeplabv3plus_r50_voc_train/last.pt --git-commit $vocCommit --git-worktree-clean
 ```
 
+Before appending a resumed segment, the trainer archives the complete existing
+JSONL under `history_archive/` and removes active records beyond the checkpoint
+step. It rejects duplicate completed train/validation records at or before the
+checkpoint, preventing ambiguous step histories after an interrupted run.
+
 With AMP enabled, a verified GradScaler overflow safely skips the unsafe
 optimizer update, reduces the scale, records an `amp_overflow` JSONL event,
 and retries the same logical iteration. The trainer still stops on non-AMP

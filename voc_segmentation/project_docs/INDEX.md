@@ -51,3 +51,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0059 — Terminate formal CNN run on unhandled AMP overflow](steps/0059-terminate-formal-cnn-run-on-unhandled-amp-overflow.md) — Failed, 2026-10-25T12:38:18+08:00
 - [0060 — Implement and verify bounded AMP overflow recovery](steps/0060-implement-and-verify-bounded-amp-overflow-recovery.md) — Passed, 2026-10-25T12:47:54+08:00
 - [0061 — Commit bounded AMP overflow recovery](steps/0061-commit-bounded-amp-overflow-recovery.md) — Passed, 2026-10-25T12:51:45+08:00
+- [0062 — Interrupt first step-8000 resume on duplicate history](steps/0062-interrupt-first-step-8000-resume-on-duplicate-history.md) — Failed, 2026-10-25T12:59:23+08:00
+- [0063 — Implement and test resume history reconciliation](steps/0063-implement-and-test-resume-history-reconciliation.md) — Passed, 2026-10-25T13:01:39+08:00

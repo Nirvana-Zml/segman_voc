@@ -1,7 +1,7 @@
 # Milestone 03: DeepLabV3+ CNN baseline
 
-- State: **In progress — AMP recovery verified; step-8,000 resume pending**
-- Last updated: 2026-10-25 12:51 +08:00
+- State: **In progress — history reconciliation verified; recommit pending**
+- Last updated: 2026-10-25 13:01 +08:00
 
 Implement the end-to-end data, loss, metric, checkpoint, TensorBoard,
 evaluation, and prediction path with DeepLabV3+ before custom-model work.
@@ -23,6 +23,21 @@ Require smoke, two-sample overfit, and independent validation evidence.
 - Final in-container regression suite: 11 tests passed in 2.708 seconds.
 
 ## Verification history
+
+Automatic resume-history reconciliation is implemented and passed all 23
+container tests in 2.712 seconds. Before append mode, it parses every record,
+rejects malformed records or duplicate completed train/validation steps at or
+before the checkpoint, archives the complete original JSONL, and atomically
+retains only records through the restart step. Focused tests verify both the
+archive/truncation result and duplicate rejection.
+
+The first resume from step 8,000 loaded correctly under commit `a4aeefe` and
+reached step 8,041, but the append-only history retained the failed segment's
+uncheckpointed steps 8,001–8,038 and added duplicate step numbers. The process
+was deliberately terminated at exact PID 270 with SIGTERM (exit 143) before a
+new validation or checkpoint. An earlier shell one-liner failed because
+PowerShell expanded `$()` before Docker received it; no process was affected by
+that failed command. The verified step-8,000 checkpoint hash is unchanged.
 
 The bounded AMP-overflow recovery, its 21-test regression evidence, the forced
 CUDA diagnostic, and the interrupted-run ledger were committed as `1bd318b`
@@ -170,10 +185,9 @@ initial scale before accepting an optimizer step.
 
 ## Next action
 
-Commit the recovery under a clean revision, resume from the verified step-8,000
-checkpoint, and monitor the appended history through terminal exit. Do not
-accept the CNN gate until the result and best checkpoint are independently
-verified.
+Commit the verified reconciliation under a clean revision, resume from step
+8,000 again, independently verify the archive and active-history boundary, and
+monitor through terminal exit.
 
 ## Formal trainer and pretrained diagnostic evidence
 

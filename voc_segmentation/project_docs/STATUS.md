@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-25 12:51 +08:00
+- Last updated: 2026-10-25 13:01 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Commit the verified bounded AMP-overflow recovery, then resume the reportable
-run from the verified step-8,000 `last.pt` checkpoint under the new clean
-source revision. Diagnostic weights remain ineligible.
+Commit the verified resume-history reconciliation, then restart from the
+unchanged step-8,000 checkpoint and verify the saved archive plus the clean
+active-history boundary. Diagnostic weights remain ineligible.
 
 ## Latest checks
 
@@ -173,3 +173,14 @@ source revision. Diagnostic weights remain ineligible.
 - The bounded recovery implementation, tests, diagnostic, and interruption
   records were committed as `1bd318b`
   (`fix: recover from AMP gradient overflow`).
+- A first step-8,000 resume under clean commit `a4aeefe` successfully loaded the
+  checkpoint and reached step 8,041, but appending to the prior failed run's
+  history duplicated step numbers 8,001 onward. The process was intentionally
+  terminated with SIGTERM (exit 143) before validation/checkpointing. The first
+  termination one-liner failed because PowerShell expanded its shell `$()`;
+  exact PID 270 was then verified and stopped. `last.pt` remains unchanged at
+  SHA-256 `57fcb009202f2c9ff9c073c3e512e4e9eec356d6828447ab1a22c6c85d3c8d67`.
+- Resume-history reconciliation now parses every JSONL record, rejects invalid
+  or duplicate completed records at/before the checkpoint, archives the full
+  pre-resume history, and atomically retains only records through the checkpoint
+  step before append mode starts. All 23 container tests passed in 2.712 seconds.

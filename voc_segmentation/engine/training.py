@@ -2,9 +2,82 @@
 
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
+from typing import Any
 
 from torch.optim import Optimizer
+
+
+def reconcile_history_for_resume(
+    history_path: Path | str,
+    *,
+    start_step: int,
+    archive_path: Path | str,
+) -> dict[str, Any]:
+    """Archive history and remove records beyond a restart checkpoint."""
+
+    if start_step < 0:
+        raise ValueError("start_step must be non-negative")
+    source = Path(history_path)
+    archive = Path(archive_path)
+    if not source.is_file():
+        return {
+            "history_existed": False,
+            "original_records": 0,
+            "kept_records": 0,
+            "dropped_records": 0,
+            "archive": None,
+        }
+
+    original_text = source.read_text(encoding="utf-8")
+    lines = [line for line in original_text.splitlines() if line.strip()]
+    kept_lines: list[str] = []
+    seen_completed: set[tuple[str, int]] = set()
+    for line_number, line in enumerate(lines, start=1):
+        try:
+            record = json.loads(line)
+            record_type = str(record["type"])
+            step = int(record["step"])
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
+            raise ValueError(
+                f"invalid history record at line {line_number}: {error}"
+            ) from error
+        if step > start_step:
+            continue
+        if record_type in {"train", "validation"}:
+            key = (record_type, step)
+            if key in seen_completed:
+                raise ValueError(
+                    f"duplicate completed history record before checkpoint: {key}"
+                )
+            seen_completed.add(key)
+        kept_lines.append(line)
+
+    dropped_records = len(lines) - len(kept_lines)
+    archive_value: str | None = None
+    if dropped_records:
+        if archive.exists():
+            raise FileExistsError(f"refusing to overwrite history archive: {archive}")
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        archive.write_text(original_text, encoding="utf-8", newline="\n")
+        temporary = source.with_suffix(source.suffix + ".reconcile.tmp")
+        temporary.write_text(
+            "\n".join(kept_lines) + ("\n" if kept_lines else ""),
+            encoding="utf-8",
+            newline="\n",
+        )
+        temporary.replace(source)
+        archive_value = str(archive.resolve())
+
+    return {
+        "history_existed": True,
+        "original_records": len(lines),
+        "kept_records": len(kept_lines),
+        "dropped_records": dropped_records,
+        "archive": archive_value,
+    }
 
 
 def poly_lr_factor(
