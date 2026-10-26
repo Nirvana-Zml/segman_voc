@@ -120,3 +120,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0128 — Expose TensorBoard reservoir assumption in first A1 terminal audit](steps/0128-expose-tensorboard-reservoir-assumption-first-a1-terminal-audit.md) — Failed, 2026-10-26T18:45:39+08:00
 - [0129 — Verify completed A1 GCM ablation run](steps/0129-verify-completed-a1-gcm-ablation-run.md) — Passed, 2026-10-26T18:45:44+08:00
 - [0130 — Align next action after A1 evidence commit](steps/0130-align-next-action-after-a1-evidence-commit.md) — Passed, 2026-10-26T18:47:02+08:00
+- [0131 — Remove self-referential next-action commit hash](steps/0131-remove-self-referential-next-action-commit-hash.md) — Passed, 2026-10-26T18:47:54+08:00

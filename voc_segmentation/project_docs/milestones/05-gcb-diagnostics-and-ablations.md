@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 18:46 +08:00
+- Last updated: 2026-10-26 18:48 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -275,5 +275,5 @@ controlled validation experiments.
 
 ## Next action
 
-Pass an A2 formal preflight from clean ledger commit `41ae781` before launching
-the gated-GFF experiment.
+Pass an A2 formal preflight from the current clean ledger revision before
+launching the gated-GFF experiment.

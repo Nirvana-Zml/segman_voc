@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 18:46 +08:00
+- Last updated: 2026-10-26 18:48 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,7 +41,7 @@
 
 ## Next action
 
-Run the A2 gated-GFF formal preflight from clean ledger commit `41ae781`.
+Run the A2 gated-GFF formal preflight from the current clean ledger revision.
 Require the exact common-budget contract, absent A2 output, idle GPU, no
 trainer, sufficient disk, and matching config/weight hashes before launching
 the next 20,000-step run.
