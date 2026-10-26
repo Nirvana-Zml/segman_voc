@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 09:39 +08:00
+- Last updated: 2026-10-26 09:42 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -211,6 +211,9 @@ controlled validation experiments.
   unique sequential finite records through step 51, CE 2.916139, gradient norm
   26.750391, AMP scale 1,024, no validation, and the correct resolved formal
   runtime and source commit.
+- At the final handoff snapshot, the same PIDs remained active at step 182;
+  latest CE was 1.692492, GPU use was about 1,138 MiB at 4%, and no exit code
+  or terminal result existed.
 
 ## Next action
 

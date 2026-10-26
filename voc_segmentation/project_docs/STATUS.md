@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 09:39 +08:00
+- Last updated: 2026-10-26 09:42 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -562,3 +562,7 @@ and hashes agree before accepting the first A1 metric.
   Step 51 CE was 2.916139, pre-clip gradient norm 26.750391, and AMP scale
   1,024. The resolved config records 20,000 reportable steps, full validation,
   and no diagnostic override; the injected source commit matches `c956520`.
+- Final handoff observation found wrapper/trainer PIDs 2447/2454 still active
+  at step 182. The latest CE was 1.692492, GPU use was about 1,138 MiB at 4%,
+  and neither `exit_code.txt` nor `result.json` existed. Source/documentation
+  worktree was clean at ledger commit `fd24be2` before this snapshot record.
