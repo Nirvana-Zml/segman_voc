@@ -5,7 +5,10 @@ model:
   name: gcb_seg
   encoder: mit_b1
   encoder_pretrained: imagenet1k
+  encoder_weights_path: artifacts/weights/mit_b1_imagenet1k/mit_b1.pth
   decoder_channels: 256
+  context_branch_channels: 64
+  boundary_channels: 64
   num_classes: 21
   global_context_dilations: [1, 3, 6]
   use_global_pooling: true
@@ -42,8 +45,12 @@ loss:
 training:
   physical_batch_size: 2
   effective_batch_size: 8
+  gradient_accumulation_steps: 4
   amp: true
+  max_consecutive_amp_overflows: 4
+  max_total_amp_overflows: 32
   seed: 42
+  num_workers: 0
   validate_every: 1000
   save_best_metric: miou
 inference:

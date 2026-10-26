@@ -75,6 +75,28 @@ class ConfigContractTest(unittest.TestCase):
         self.assertLess(training["warmup_iterations"], training["max_iterations"])
         self.assertGreater(training["max_total_amp_overflows"], 0)
 
+    def test_gcb_uses_verified_b1_profile_and_planned_components(self) -> None:
+        path = CONFIG_DIR / "gcb_seg_b1_384.yaml"
+        config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        model = config["model"]
+        self.assertEqual(model["encoder"], "mit_b1")
+        self.assertEqual(
+            model["encoder_weights_path"],
+            "artifacts/weights/mit_b1_imagenet1k/mit_b1.pth",
+        )
+        self.assertEqual(model["global_context_dilations"], [1, 3, 6])
+        self.assertTrue(model["use_global_pooling"])
+        self.assertTrue(model["use_gated_fusion"])
+        self.assertTrue(model["use_boundary_branch"])
+        self.assertTrue(model["auxiliary_head"])
+        self.assertEqual(config["data"]["crop_size"], [384, 384])
+        training = config["training"]
+        self.assertEqual(
+            training["physical_batch_size"]
+            * training["gradient_accumulation_steps"],
+            training["effective_batch_size"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

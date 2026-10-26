@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 08:30 +08:00
+- Last updated: 2026-10-26 08:38 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
+| 05 | GCB diagnostics and ablations | In progress | Interface/loss tests passed; pretrained CUDA smoke pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,9 +41,10 @@
 
 ## Next action
 
-Implement GCB-Seg modules and loss composition on the verified MiT-B1/384
-foundation. Pass focused interface/loss tests, a one-step CUDA smoke, and a
-deterministic two-sample overfit gate before starting any controlled ablation.
+Implement and pass a provenance-gated pretrained GCB-Seg CUDA optimizer-step
+smoke at 384×384 and physical batch 2. Record every loss component, gradient
+norm, AMP scale, parameter groups, output shapes, and peak memory before
+building the deterministic two-sample overfit gate.
 
 ## Latest checks
 
@@ -436,3 +437,22 @@ deterministic two-sample overfit gate before starting any controlled ablation.
   baseline results at `runs/segformer_b1_voc_train/result.json`. The helper
   reports Transformer complete and GCB diagnostics next; skill validation
   passed.
+- GCB-Seg now implements the planned five-branch GCM (1×1, depthwise-separable
+  dilations 1/3/6, and global pooling), 256-channel gated top-down GFF, C1/C2
+  BAB with 64-channel boundary features and one edge logit, full-resolution
+  main/auxiliary/edge output contract, and ablation switches. All new
+  convolutional blocks use GroupNorm; the complete model has 15,841,707
+  parameters, including 13,151,424 in the strictly loaded MiT-B1 encoder and
+  2,690,283 in new modules.
+- The composite loss implements label-smoothed CE + 0.5 Lovász-Softmax + 0.2
+  boundary BCE/Dice + 0.4 auxiliary CE. Boundary truth uses valid
+  four-neighbor differences, one 3×3 dilation, ignore-255 masking, and no
+  artificial image-border edges. Lovász processes only present classes and
+  excludes ignore pixels.
+- The first 13-test focused run passed all model/config checks but three loss
+  checks failed because PyTorch 2.1 rejects an in-place Lovász gradient update
+  on overlapping slices. Replacing it with an equivalent non-in-place
+  difference corrected the implementation. Focused tests then passed 13/13 in
+  2.986 seconds and the full container suite passed 40/40 in 5.282 seconds.
+  Strict pretrained loading passed; the decoder contains 28 GroupNorm and zero
+  BatchNorm layers.

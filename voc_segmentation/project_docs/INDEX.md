@@ -94,3 +94,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0102 — Verify completed formal SegFormer run](steps/0102-verify-completed-formal-segformer-run.md) — Passed, 2026-10-26T08:31:23+08:00
 - [0103 — Identify stale Transformer evidence path in status helper](steps/0103-identify-stale-transformer-evidence-path-status-helper.md) — Information, 2026-10-26T08:31:28+08:00
 - [0104 — Align and validate Transformer project status](steps/0104-align-validate-transformer-project-status.md) — Passed, 2026-10-26T08:31:33+08:00
+- [0105 — Expose Lovasz overlap defect in first GCB test run](steps/0105-expose-lovasz-overlap-defect-first-gcb-test-run.md) — Failed, 2026-10-26T08:39:48+08:00
+- [0106 — Verify GCB-Seg interfaces and composite losses](steps/0106-verify-gcb-seg-interfaces-composite-losses.md) — Passed, 2026-10-26T08:39:53+08:00

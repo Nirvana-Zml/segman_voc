@@ -243,6 +243,30 @@ If the latest completed step is held by `best.pt`, use that path instead. A
 resume archives and reconciles JSONL history before appending, and verified AMP
 overflows retry the same logical iteration within configured limits.
 
+## GCB-Seg interfaces and losses
+
+`models/gcb_seg.py` implements the planned MiT-B1/384 GCB-Seg profile: a
+five-branch global-context module, three-stage gated top-down fusion, a C1/C2
+boundary-aware branch, a main 21-class head, and a training-only auxiliary
+head. Training mode returns `logits`, `aux_logits`, and `edge_logits`; eval
+mode returns only full-resolution main logits. New convolutional blocks use
+GroupNorm rather than BatchNorm for batch-size-2 stability.
+
+`losses/gcb.py` implements the planned objective:
+
+```text
+CE + 0.5 * Lovasz-Softmax + 0.2 * boundary(BCE+Dice) + 0.4 * auxiliary CE
+```
+
+Semantic and auxiliary CE use label smoothing 0.05. Lovasz processes only
+classes present in each sample. Boundary targets compare valid four-neighbors,
+dilate once with a 3x3 kernel, ignore label 255, and do not treat image borders
+as object boundaries. Run the focused contract tests with:
+
+```powershell
+docker exec voc2012-gcb python -m unittest tests.test_gcb_seg tests.test_gcb_losses tests.test_config_contract -v
+```
+
 ## Project layout
 
 ```text
