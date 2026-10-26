@@ -117,3 +117,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0125 — Verify healthy early A1 training records](steps/0125-verify-healthy-early-a1-training-records.md) — Passed, 2026-10-26T09:40:46+08:00
 - [0126 — Confirm active A1 handoff state](steps/0126-confirm-active-a1-handoff-state.md) — In progress, 2026-10-26T09:42:54+08:00
 - [0127 — Verify A1 step-1000 full validation](steps/0127-verify-a1-step-1000-full-validation.md) — Passed, 2026-10-26T10:14:13+08:00
+- [0128 — Expose TensorBoard reservoir assumption in first A1 terminal audit](steps/0128-expose-tensorboard-reservoir-assumption-first-a1-terminal-audit.md) — Failed, 2026-10-26T18:45:39+08:00
+- [0129 — Verify completed A1 GCM ablation run](steps/0129-verify-completed-a1-gcm-ablation-run.md) — Passed, 2026-10-26T18:45:44+08:00

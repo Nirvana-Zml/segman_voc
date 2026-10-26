@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 10:13 +08:00
+- Last updated: 2026-10-26 18:44 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -235,7 +235,45 @@ controlled validation experiments.
   point at step 1,000. Wrapper/trainer PIDs 2447/2454 remained active; GPU use
   was about 1,162 MiB at 20%.
 
+## A1 terminal result
+
+- The wrapper saved exit code 0, `result.json` reports `ok=true` and
+  `diagnostic_only=false`, no Python trainer remains, and the GPU returned to
+  272 MiB / 0%.
+- History contains exactly 20,025 records: 20,000 unique sequential completed
+  train steps, 20 complete 1,449-image validations at every 1,000 steps, and
+  five valid AMP-overflow records with scale reduction followed by completion
+  of the same logical step. All completed numeric values are finite.
+- Independent global-confusion recomputation matched every per-class IoU,
+  mIoU, foreground mIoU, pixel accuracy, and mean pixel accuracy for all 20
+  validations. The validation mIoU sequence culminated at 0.736157, 0.736626,
+  and 0.736464 for steps 18,000, 19,000, and 20,000.
+- Best A1 is step 19,000: mIoU 0.736626, foreground mIoU 0.726605, pixel
+  accuracy 0.938822, and validation CE 0.328063. Against matched A0 mIoU
+  0.733889, GCM contributes +0.002738 absolute mIoU, or +0.274 percentage
+  points, under this single seed and budget.
+- Terminal step 20,000 has mIoU 0.736464 and CE 0.328045. Best and last are
+  non-diagnostic finite checkpoints of 166,840,812 bytes with SHA-256
+  `55839b61b0be34dbcc88217528ca1cd93859fcc089164c36357a2792e221f990`
+  and `c8c93dd77a7b8686c5e464ced2b326481378c53b376a644fcbbcfa0897bc4a3a`.
+- The first complete audit reached the TensorBoard count assertion after all
+  history, confusion, selection, checkpoint, and hash checks had passed, but
+  failed because the default EventAccumulator retains only 10,000 scalar
+  samples. Repeating with `size_guidance={SCALARS: 0}` verified all 20,000
+  training points, 20 validation points, and five extra AMP events.
+- SHA-256: result
+  `1813743cb1920c69cfbc3b265b220eb9e8086181c8363362190632e7371f7e41`;
+  history `05b64a5b0968ef629ff16468ca5e6377ad1c02fbd630bd4cc74d997e9369d8c6`;
+  best validation `840999427e09a4f423699e34c079a9838fd1e9534fea2f4e829996ca629f7f01`;
+  terminal validation
+  `33a139cd1897740f1aebd9d2e991ce5ec6d5627273c018a2f7339514c6c5e58c`;
+  TensorBoard event
+  `0778f767cdf91f291aea46b1749ef29264381310775ce3dce1309b1524bbdf06`.
+- Runtime was 34,049.165 seconds (about 9 h 27 min) and peak allocated CUDA
+  memory was 828,434,432 bytes. Source provenance remained clean commit
+  `c956520ca370a892fe4d63d9d181d2e0818315e9`.
+
 ## Next action
 
-Monitor and independently audit the complete step-2,000 validation, compare it
-with the accepted step-1,000 mIoU, and verify best-checkpoint selection.
+Commit the A1 terminal evidence, then pass a clean-revision A2 formal preflight
+before launching the gated-GFF experiment.

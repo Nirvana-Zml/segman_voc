@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 10:13 +08:00
+- Last updated: 2026-10-26 18:44 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 active; step-1,000 val mIoU 0.604609 verified |
+| 05 | GCB diagnostics and ablations | In progress | A1 passed at 0.736626; A2 formal preflight pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Keep A1 running and audit the next complete step-2,000 official validation.
-Verify history remains sequential and finite, compare validation mIoU against
-the accepted step-1,000 value 0.604609, and confirm best-checkpoint selection
-and hashes before accepting any improvement or regression.
+Commit the verified A1 terminal ledger, then run the A2 gated-GFF formal
+preflight from the resulting clean revision. Require the exact common-budget
+contract, absent A2 output, idle GPU, no trainer, sufficient disk, and matching
+config/weight hashes before launching the next 20,000-step run.
 
 ## Latest checks
 
@@ -580,3 +580,26 @@ and hashes before accepting any improvement or regression.
   `1e78e80303725915bab05d34f364d2f73584ba521f67e68a3e9689c542b5f49f`.
   TensorBoard exposed 15 expected scalar tags. PIDs 2447/2454 remained active,
   GPU use was about 1,162 MiB at 20%, and no terminal artifacts existed.
+- A1 exited successfully with code 0 and no Python trainer remained; the GPU
+  returned to 272 MiB and 0%. Terminal evidence contains exactly 20,000 unique
+  train steps, 20 full 1,449-image validations at steps 1,000-20,000, and five
+  isolated AMP overflows with verified scale reductions. All completed
+  training and validation numeric values are finite.
+- Independent validation selection reproduced the A1 best at step 19,000:
+  mIoU 0.736626, foreground mIoU 0.726605, pixel accuracy 0.938822, and CE
+  0.328063. This is +0.002738 mIoU (+0.274 percentage points) over the matched
+  A0 best 0.733889, with both best points at step 19,000.
+- Terminal step 20,000 mIoU was slightly lower at 0.736464 with CE 0.328045.
+  Best/last checkpoint SHA-256 values are
+  `55839b61b0be34dbcc88217528ca1cd93859fcc089164c36357a2792e221f990`
+  and `c8c93dd77a7b8686c5e464ced2b326481378c53b376a644fcbbcfa0897bc4a3a`;
+  both are non-diagnostic, finite, and preserve selection step 19,000.
+- The first terminal audit incorrectly expected 20,000 TensorBoard samples per
+  tag from the default `EventAccumulator`, whose reservoir cap returned 10,000;
+  all earlier artifact checks had passed. Repeating with scalar size guidance
+  zero exposed all 20,000 train points plus five AMP events and passed.
+- Result/history/event SHA-256 values are respectively
+  `1813743cb1920c69cfbc3b265b220eb9e8086181c8363362190632e7371f7e41`,
+  `05b64a5b0968ef629ff16468ca5e6377ad1c02fbd630bd4cc74d997e9369d8c6`,
+  and `0778f767cdf91f291aea46b1749ef29264381310775ce3dce1309b1524bbdf06`.
+  Runtime was 34,049.165 seconds and peak CUDA allocation 828,434,432 bytes.
