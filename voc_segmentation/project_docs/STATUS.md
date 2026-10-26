@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 18:48 +08:00
+- Last updated: 2026-10-26 18:59 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 passed at 0.736626; A2 formal preflight pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 passed at 0.736626; A2 preflight passed and clean launch commit pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Run the A2 gated-GFF formal preflight from the current clean ledger revision.
-Require the exact common-budget contract, absent A2 output, idle GPU, no
-trainer, sufficient disk, and matching config/weight hashes before launching
-the next 20,000-step run.
+Commit the passed A2 gated-GFF preflight ledger, then launch the reportable
+20,000-step run from that exact clean revision. Verify active processes, the
+resolved reportable configuration, and finite sequential early history before
+handoff.
 
 ## Latest checks
 
@@ -603,3 +603,30 @@ the next 20,000-step run.
   `05b64a5b0968ef629ff16468ca5e6377ad1c02fbd630bd4cc74d997e9369d8c6`,
   and `0778f767cdf91f291aea46b1749ef29264381310775ce3dce1309b1524bbdf06`.
   Runtime was 34,049.165 seconds and peak CUDA allocation 828,434,432 bytes.
+
+## A2 formal-run preflight
+
+- The first batched Docker query was partially denied by the intermittent
+  Windows Docker Desktop named-pipe permission layer. Read-only disk, output-
+  absence, and hash checks still passed; no output was created and no trainer
+  started. Approved serial access then completed the missing GPU and process
+  checks.
+- A first parsed-contract audit requested nonexistent key `val_interval` and
+  stopped with `KeyError`; the configuration actually uses `validate_every`.
+  The corrected read-only audit passed and no artifact changed.
+- Host source was clean at full commit
+  `670709997733f99122da0ab0063ab218087e3725`. No GPU compute process existed;
+  the RTX 4060 reported 285 of 8,188 MiB used and 0% utilization. The process
+  table contained only PID 1 and stale completed-run log tails, with no Python
+  trainer. `/workspace` had 757 GB available and
+  `runs/gcb_ablation_a2_gff_voc_train` was absent.
+- Container SHA-256 values matched the host A2 configuration and registered
+  MiT-B1 weight: config
+  `c711ec5498517081b9e6270c255986daef4061b3bea15a59c881e64ddf6ffc95`;
+  weight
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- A1 and A2 data, training, loss, and inference sections match after parsing.
+  The only model differences are `feature_fusion_mode` from `linear` to
+  `gated` and `use_gated_fusion` from false to true. A2 remains CE-only,
+  disables BAB and auxiliary output, uses official train/val, runs 20,000
+  steps, and validates every 1,000 steps.

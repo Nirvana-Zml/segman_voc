@@ -275,5 +275,25 @@ controlled validation experiments.
 
 ## Next action
 
-Pass an A2 formal preflight from the current clean ledger revision before
-launching the gated-GFF experiment.
+Commit the passed A2 preflight ledger, then launch the gated-GFF experiment
+from that exact clean revision and independently audit its early history.
+
+## A2 formal-run preflight
+
+- The first batched Docker preflight was incomplete because the Windows named
+  pipe denied the GPU and process queries. Disk, output-absence, and hash
+  checks passed, no output was created, and no process started. Approved
+  serial access completed the missing checks.
+- The first parsed-contract assertion used nonexistent key `val_interval`;
+  the corrected read-only check used `validate_every` and passed.
+- Source was clean at `670709997733f99122da0ab0063ab218087e3725`. The RTX
+  4060 had no compute PID, used 285/8,188 MiB at 0%, `/workspace` had 757 GB
+  free, no Python trainer was present, and the A2 output directory was absent.
+- A2 configuration SHA-256 is
+  `c711ec5498517081b9e6270c255986daef4061b3bea15a59c881e64ddf6ffc95`;
+  MiT-B1 SHA-256 remains
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- Parsed A1/A2 data, training, loss, and inference sections match. The exact
+  model delta is linear-to-gated fusion plus `use_gated_fusion=false` to true;
+  A2 is otherwise CE-only with no BAB or auxiliary head, official train/val,
+  20,000 steps, and full validation every 1,000 steps.
