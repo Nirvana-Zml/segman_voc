@@ -29,6 +29,21 @@ class GCBSegLossTest(unittest.TestCase):
         self.assertFalse(bool(valid[0, 0, 2, 3]))
         self.assertEqual(float(target[0, 0, 2, 3]), 0.0)
 
+        void_separated = torch.tensor(
+            [[[0, 0, 255, 1, 1], [0, 0, 255, 1, 1], [0, 0, 255, 1, 1]]],
+            dtype=torch.long,
+        )
+        target, valid = semantic_boundary_targets(void_separated)
+        self.assertGreater(int(target.sum()), 0)
+        self.assertFalse(bool(valid[0, 0, 1, 2]))
+        self.assertEqual(float(target[0, 0, 1, 2]), 0.0)
+
+        padding_only = torch.tensor(
+            [[[0, 0, 255, 255], [0, 0, 255, 255]]], dtype=torch.long
+        )
+        target, _ = semantic_boundary_targets(padding_only)
+        self.assertEqual(int(target.sum()), 0)
+
     def test_lovasz_uses_present_classes_and_ignores_255(self) -> None:
         labels = torch.tensor([[[0, 1], [255, 1]]], dtype=torch.long)
         good = torch.full((1, 3, 2, 2), -4.0)

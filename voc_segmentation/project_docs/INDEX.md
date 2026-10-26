@@ -96,3 +96,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0104 — Align and validate Transformer project status](steps/0104-align-validate-transformer-project-status.md) — Passed, 2026-10-26T08:31:33+08:00
 - [0105 — Expose Lovasz overlap defect in first GCB test run](steps/0105-expose-lovasz-overlap-defect-first-gcb-test-run.md) — Failed, 2026-10-26T08:39:48+08:00
 - [0106 — Verify GCB-Seg interfaces and composite losses](steps/0106-verify-gcb-seg-interfaces-composite-losses.md) — Passed, 2026-10-26T08:39:53+08:00
+- [0107 — Reject degenerate first GCB CUDA boundary smoke](steps/0107-reject-degenerate-first-gcb-cuda-boundary-smoke.md) — Failed, 2026-10-26T08:52:16+08:00
+- [0108 — Correct VOC void-band boundary targets](steps/0108-correct-voc-void-band-boundary-targets.md) — Passed, 2026-10-26T08:52:20+08:00
+- [0109 — Pass corrected pretrained GCB CUDA smoke](steps/0109-pass-corrected-pretrained-gcb-cuda-smoke.md) — Passed, 2026-10-26T08:52:25+08:00
+- [0110 — Independently audit GCB CUDA smoke evidence](steps/0110-independently-audit-gcb-cuda-smoke-evidence.md) — Passed, 2026-10-26T08:52:30+08:00

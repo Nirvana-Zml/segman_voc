@@ -259,13 +259,26 @@ CE + 0.5 * Lovasz-Softmax + 0.2 * boundary(BCE+Dice) + 0.4 * auxiliary CE
 ```
 
 Semantic and auxiliary CE use label smoothing 0.05. Lovasz processes only
-classes present in each sample. Boundary targets compare valid four-neighbors,
-dilate once with a 3x3 kernel, ignore label 255, and do not treat image borders
-as object boundaries. Run the focused contract tests with:
+classes present in each sample. Boundary targets compare valid four-neighbors
+and bridge only class-different valid endpoints separated by at most three
+consecutive VOC void pixels. They then dilate once with a 3x3 kernel, keep 255
+ignored, and do not turn crop padding or image borders into object boundaries.
+Run the focused contract tests with:
 
 ```powershell
 docker exec voc2012-gcb python -m unittest tests.test_gcb_seg tests.test_gcb_losses tests.test_config_contract -v
 ```
+
+Run the provenance-gated CUDA optimizer-step smoke:
+
+```powershell
+docker exec voc2012-gcb python tools/smoke_gcb_seg.py
+```
+
+It uses official VOC train, 384x384 crops, physical batch 2, pretrained MiT-B1,
+the complete composite loss, disjoint encoder/decoder AdamW groups, AMP, and a
+finite-gradient gate. It writes `artifacts/gcb_diagnostics/smoke.json` with
+`diagnostic_only=true`; neither its update nor losses are reportable results.
 
 ## Project layout
 

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 08:38 +08:00
+- Last updated: 2026-10-26 08:50 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | Interface/loss tests passed; pretrained CUDA smoke pending |
+| 05 | GCB diagnostics and ablations | In progress | Interface/loss tests and CUDA smoke passed; two-sample overfit pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Implement and pass a provenance-gated pretrained GCB-Seg CUDA optimizer-step
-smoke at 384×384 and physical batch 2. Record every loss component, gradient
-norm, AMP scale, parameter groups, output shapes, and peak memory before
-building the deterministic two-sample overfit gate.
+Implement and pass the deterministic pretrained GCB-Seg two-sample overfit
+gate with diagnostic-only checkpoint, complete loss history, TensorBoard, and
+finite gradients. Require a clear decrease in the same fixed-sample objective
+before beginning any controlled ablation.
 
 ## Latest checks
 
@@ -456,3 +456,23 @@ building the deterministic two-sample overfit gate.
   2.986 seconds and the full container suite passed 40/40 in 5.282 seconds.
   Strict pretrained loading passed; the decoder contains 28 GroupNorm and zero
   BatchNorm layers.
+- The first pretrained 384×384, batch-2 CUDA smoke completed an optimizer step
+  but exposed only 31 positive boundary pixels among 234,318 valid pixels.
+  Direct audit showed VOC object classes were separated by 1–3-pixel 255 void
+  bands, so immediate-valid-neighbor comparison suppressed genuine contours.
+  The `ok=true` artifact was rejected and overwritten.
+- Boundary generation now additionally bridges only different valid endpoint
+  classes whose intervening pixels are entirely 255, up to a width of three.
+  Ignore pixels remain invalid, and padding-only void regions have no opposite
+  valid endpoint and produce no edge. Corrected focused tests passed 8/8 in
+  3.045 seconds and the full suite passed 40/40 in 5.253 seconds.
+- The corrected CUDA smoke passed one complete AdamW+AMP update on fixed
+  official-train samples `2008_005679` and `2008_002175`. Total/CE/Lovász/
+  edge/aux losses were 4.829429/2.930575/0.887470/0.843542/3.216027;
+  2,474 boundary positives were recovered, pre-clip gradient norm was
+  12.056706, AMP scale remained 1,024, peak CUDA allocation was 1,078,124,544
+  bytes, and elapsed time was 3.119 seconds.
+- Independent audit matched the configured loss formula, all three output
+  shapes, exact encoder/decoder parameter coverage, configuration, provenance,
+  and checkpoint hashes. The diagnostic result SHA-256 is
+  `62ba3dfeddcddffd4dfc79a88186b84a4a8a3010b11ce702ae73c3a33de3998e`.

@@ -10,10 +10,12 @@ from torch.nn import functional as F
 
 
 def semantic_boundary_targets(
-    labels: Tensor, *, ignore_index: int = 255
+    labels: Tensor, *, ignore_index: int = 255, max_void_width: int = 3
 ) -> tuple[Tensor, Tensor]:
     if labels.ndim != 3:
         raise ValueError("labels must have shape [B,H,W]")
+    if max_void_width < 0:
+        raise ValueError("max_void_width must be nonnegative")
     valid = labels != ignore_index
     boundary = torch.zeros_like(valid)
 
@@ -26,6 +28,41 @@ def semantic_boundary_targets(
     vertical_edge = (labels[:, 1:, :] != labels[:, :-1, :]) & vertical_valid
     boundary[:, 1:, :] |= vertical_edge
     boundary[:, :-1, :] |= vertical_edge
+
+    height, width = labels.shape[-2:]
+    for distance in range(2, max_void_width + 2):
+        if distance < width:
+            left = labels[:, :, :-distance]
+            right = labels[:, :, distance:]
+            void_bridge = torch.ones_like(left, dtype=torch.bool)
+            for offset in range(1, distance):
+                void_bridge &= (
+                    labels[:, :, offset : width - distance + offset] == ignore_index
+                )
+            edge = (
+                (left != right)
+                & (left != ignore_index)
+                & (right != ignore_index)
+                & void_bridge
+            )
+            boundary[:, :, :-distance] |= edge
+            boundary[:, :, distance:] |= edge
+        if distance < height:
+            top = labels[:, :-distance, :]
+            bottom = labels[:, distance:, :]
+            void_bridge = torch.ones_like(top, dtype=torch.bool)
+            for offset in range(1, distance):
+                void_bridge &= (
+                    labels[:, offset : height - distance + offset, :] == ignore_index
+                )
+            edge = (
+                (top != bottom)
+                & (top != ignore_index)
+                & (bottom != ignore_index)
+                & void_bridge
+            )
+            boundary[:, :-distance, :] |= edge
+            boundary[:, distance:, :] |= edge
 
     boundary = F.max_pool2d(
         boundary.unsqueeze(1).to(torch.float32), kernel_size=3, stride=1, padding=1
