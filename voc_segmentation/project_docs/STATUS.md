@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 09:18 +08:00
+- Last updated: 2026-10-26 09:20 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -528,3 +528,8 @@ launch the 20,000-step reportable A1 GCM experiment if every gate passes.
   `914ebbe02f245815831d8493c95e6f8b68f038eb7a0c4e21639cb66e06fbd5f8`,
   `618f90ff79730461cda5c84927bdda3896606e9f6106c4d287c3ba45413ba80e`,
   and `7fd08e26b579ff4488975b971d775b74b3ef0c0e34c84cee44ad1a92491c1720`.
+- The verified implementation was committed as `f18e435`, but the staged
+  whitespace check reported extra EOF blank lines in four ablation configs and
+  the GCB wrapper. Because the shell command used `;`, commit execution still
+  continued. The five formatting defects were then removed and a clean
+  `git diff --check` passed; no executable content or runtime evidence changed.

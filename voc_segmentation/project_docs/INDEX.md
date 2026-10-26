@@ -107,3 +107,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0115 — Implement matched GCB ablation trainer and contracts](steps/0115-implement-matched-gcb-ablation-trainer-contracts.md) — Passed, 2026-10-26T09:17:03+08:00
 - [0116 — Pass one-step A4 formal-trainer CUDA diagnostic](steps/0116-pass-one-step-a4-formal-trainer-cuda-diagnostic.md) — Passed, 2026-10-26T09:19:01+08:00
 - [0117 — Independently audit A4 formal-trainer diagnostic](steps/0117-independently-audit-a4-formal-trainer-diagnostic.md) — Passed, 2026-10-26T09:19:06+08:00
+- [0118 — Detect EOF whitespace defects during ablation trainer commit](steps/0118-detect-eof-whitespace-defects-ablation-trainer-commit.md) — Failed, 2026-10-26T09:20:39+08:00
+- [0119 — Correct ablation trainer EOF whitespace](steps/0119-correct-ablation-trainer-eof-whitespace.md) — Passed, 2026-10-26T09:20:44+08:00

@@ -58,4 +58,3 @@ inference:
   horizontal_flip: false
   output_mode: L
   output_dtype: uint8
-

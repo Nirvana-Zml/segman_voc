@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 09:18 +08:00
+- Last updated: 2026-10-26 09:20 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -171,6 +171,10 @@ controlled validation experiments.
   history `914ebbe02f245815831d8493c95e6f8b68f038eb7a0c4e21639cb66e06fbd5f8`;
   checkpoint `618f90ff79730461cda5c84927bdda3896606e9f6106c4d287c3ba45413ba80e`;
   event `7fd08e26b579ff4488975b971d775b74b3ef0c0e34c84cee44ad1a92491c1720`.
+- Commit `f18e435` captured the verified implementation, but its preceding
+  staged whitespace audit identified five extra EOF blank lines and did not
+  stop the semicolon-chained commit. A formatting-only correction removed all
+  five; the subsequent working-tree whitespace audit passed.
 
 ## Next action
 
