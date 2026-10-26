@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 09:42 +08:00
+- Last updated: 2026-10-26 10:13 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 reportable run active; first full validation pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 active; step-1,000 val mIoU 0.604609 verified |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Monitor the active A1 run through its first complete step-1,000 official
-validation. Verify all steps remain unique and finite, validation covers all
-1,449 images, the selected checkpoint is non-diagnostic, and its saved mIoU
-and hashes agree before accepting the first A1 metric.
+Keep A1 running and audit the next complete step-2,000 official validation.
+Verify history remains sequential and finite, compare validation mIoU against
+the accepted step-1,000 value 0.604609, and confirm best-checkpoint selection
+and hashes before accepting any improvement or regression.
 
 ## Latest checks
 
@@ -566,3 +566,17 @@ and hashes agree before accepting the first A1 metric.
   at step 182. The latest CE was 1.692492, GPU use was about 1,138 MiB at 4%,
   and neither `exit_code.txt` nor `result.json` existed. Source/documentation
   worktree was clean at ledger commit `fd24be2` before this snapshot record.
+- A1 step 1,000 completed a full 1,449-image official validation: mIoU
+  0.604609, foreground mIoU 0.589999, pixel accuracy 0.902396, mean pixel
+  accuracy 0.724140, and CE 0.329029. All 21 class IoUs were defined.
+- Independent recomputation from the 21x21 confusion matrix matched every
+  saved metric and its 244,886,857 valid-pixel total. History had 1,348 unique
+  finite train records during the audit, zero AMP overflows, and one full
+  validation record at step 1,000.
+- `best.pt` is a non-diagnostic step-1,000 checkpoint, 166,840,812 bytes, with
+  finite model tensors and SHA-256
+  `b2165bb8ba17bd20af5b1df2a90b7e4ad7aa72ba2c404f4ee64999b8ec38a0db`.
+  The validation JSON SHA-256 is
+  `1e78e80303725915bab05d34f364d2f73584ba521f67e68a3e9689c542b5f49f`.
+  TensorBoard exposed 15 expected scalar tags. PIDs 2447/2454 remained active,
+  GPU use was about 1,162 MiB at 20%, and no terminal artifacts existed.

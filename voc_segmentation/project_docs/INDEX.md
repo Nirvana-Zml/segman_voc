@@ -116,3 +116,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0124 — Fail first A1 early-history audit invocation](steps/0124-fail-first-a1-early-history-audit-invocation.md) — Failed, 2026-10-26T09:40:40+08:00
 - [0125 — Verify healthy early A1 training records](steps/0125-verify-healthy-early-a1-training-records.md) — Passed, 2026-10-26T09:40:46+08:00
 - [0126 — Confirm active A1 handoff state](steps/0126-confirm-active-a1-handoff-state.md) — In progress, 2026-10-26T09:42:54+08:00
+- [0127 — Verify A1 step-1000 full validation](steps/0127-verify-a1-step-1000-full-validation.md) — Passed, 2026-10-26T10:14:13+08:00

@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 09:42 +08:00
+- Last updated: 2026-10-26 10:13 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -215,7 +215,27 @@ controlled validation experiments.
   latest CE was 1.692492, GPU use was about 1,138 MiB at 4%, and no exit code
   or terminal result existed.
 
+## A1 step-1,000 validation
+
+- The first full official validation covered all 1,449 samples and reported
+  mIoU 0.604609, foreground mIoU 0.589999, pixel accuracy 0.902396, mean pixel
+  accuracy 0.724140, validation CE 0.329029, and 244,886,857 valid pixels.
+- Independent audit found 1,348 unique sequential finite train records at its
+  snapshot, zero AMP overflows, exactly one validation record at step 1,000,
+  all 21 class IoUs defined, and no terminal result or exit code.
+- Recomputing intersection, union, all per-class IoUs, mIoU, foreground mIoU,
+  pixel accuracy, and mean pixel accuracy from the saved 21x21 global
+  confusion matrix matched every saved value.
+- `best.pt` is non-diagnostic at step 1,000, contains only finite model-state
+  tensors, is 166,840,812 bytes, and has SHA-256
+  `b2165bb8ba17bd20af5b1df2a90b7e4ad7aa72ba2c404f4ee64999b8ec38a0db`.
+  Validation JSON SHA-256 is
+  `1e78e80303725915bab05d34f364d2f73584ba521f67e68a3e9689c542b5f49f`.
+- TensorBoard contained all 15 expected scalar tags with its first validation
+  point at step 1,000. Wrapper/trainer PIDs 2447/2454 remained active; GPU use
+  was about 1,162 MiB at 20%.
+
 ## Next action
 
-Monitor the active A1 experiment through step 1,000 and independently verify
-its first complete 1,449-image validation and non-diagnostic checkpoint.
+Monitor and independently audit the complete step-2,000 validation, compare it
+with the accepted step-1,000 mIoU, and verify best-checkpoint selection.
