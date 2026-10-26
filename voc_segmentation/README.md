@@ -280,6 +280,19 @@ the complete composite loss, disjoint encoder/decoder AdamW groups, AMP, and a
 finite-gradient gate. It writes `artifacts/gcb_diagnostics/smoke.json` with
 `diagnostic_only=true`; neither its update nor losses are reportable results.
 
+Run the deterministic pretrained two-sample overfit gate:
+
+```powershell
+docker exec voc2012-gcb python tools/overfit_gcb_seg.py
+```
+
+This trains on two fixed official-train samples at 128x128 for 100 steps. It
+records every composite-loss component, finite gradient norms, AMP scales,
+TensorBoard scalars, and a diagnostic-only checkpoint under
+`artifacts/gcb_diagnostics/overfit_two_samples/`. The gate compares initial
+and final complete objectives using identical deterministic dropout/drop-path
+masks; these same-sample diagnostics are not validation or submission results.
+
 ## Project layout
 
 ```text

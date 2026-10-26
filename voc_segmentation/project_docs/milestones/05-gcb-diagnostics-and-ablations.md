@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
-- State: **In progress — interfaces, losses, and CUDA smoke verified**
-- Last updated: 2026-10-26 08:50 +08:00
+- State: **In progress — all diagnostics verified; ablations pending**
+- Last updated: 2026-10-26 09:03 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -80,8 +80,57 @@ controlled validation experiments.
   AMP, shapes, boundary signal, weight/provenance/config hashes, optimizer
   groups, and complete parameter coverage.
 
+## Two-sample overfit tooling
+
+- `tools/overfit_gcb_seg.py` fixes official-train samples `2008_005679` and
+  `2008_002175`, nearest-neighbor-resizes their masks to 128x128, strictly
+  verifies the accepted MiT-B1 checkpoint, and defaults to 100 AMP updates.
+- Every history record contains total, CE, Lovasz, boundary, boundary BCE,
+  boundary Dice, and auxiliary losses plus a finite pre-clip gradient norm,
+  AMP scale, and both optimizer-group learning rates.
+- Initial and final composite objectives use the same evaluation RNG seed,
+  making dropout and drop-path masks identical while retaining training-mode
+  auxiliary and boundary heads. The pass threshold is final/initial total loss
+  at most 0.5.
+- The tool saves a diagnostic-only checkpoint, 100-line JSONL history,
+  TensorBoard event, result JSON, artifact hashes, same-sample segmentation
+  metrics, boundary counts, peak CUDA memory, and provenance metadata.
+- The two new optimizer and loss-recording tests passed 2/2 in 0.025 seconds;
+  the full target-container suite passed 42/42 in 6.795 seconds.
+
+## Two-sample overfit evidence
+
+- Command: `docker exec voc2012-gcb python tools/overfit_gcb_seg.py`.
+- The pretrained 128x128, batch-2 run completed 100/100 AdamW+AMP updates in
+  24.154 seconds. All seven loss series and all gradient norms were finite;
+  AMP scale remained 1,024 and peak allocated CUDA memory was 467,688,960
+  bytes.
+- With identical stochastic masks, total composite loss fell from 4.708998 to
+  0.603445, a ratio of 0.128147 versus the maximum accepted 0.5. Final CE,
+  Lovasz, edge, and auxiliary terms were 0.357852, 0.083703, 0.230291, and
+  0.394208.
+- The fixed target retained 2,051 positive boundaries over 31,699 valid
+  pixels. Same-sample pixel accuracy was 0.994826 and mIoU was 0.936919; both
+  are diagnostic only and are not official-validation claims.
+- `history.jsonl` contains exactly steps 1-100. The 190,445,154-byte
+  checkpoint is step 100 and `diagnostic_only=true`. The 56,688-byte
+  TensorBoard event contains 11 scalar tags, each with exactly 100 finite
+  values.
+- A first read-only audit command failed because PowerShell stripped nested
+  Python quotes and caused `NameError: artifacts is not defined`; it changed
+  no artifact. The corrected Base64-carried audit independently recomputed all
+  100 loss formulas, verified all checkpoint model tensors finite, and matched
+  every metadata and file hash.
+- SHA-256: result
+  `e95bcfeae48aa43c5e3bc79172cada45694efddc48c0b21d8908b615c94084fc`;
+  history `86535a8bf4f8e9397f74c3fe40aff8d29b5d4d83315b480e8622eb5467e55b5a`;
+  checkpoint `14f6f2ad4a82c7567bb4a96ae30be85571d2ed6ebdaf24e5437278c48319fd17`;
+  TensorBoard event
+  `09df89f0080c86bfdb447a978406cd940efbbbf398a01e88a23583fb08fe6dcf`.
+
 ## Next action
 
-Implement and pass the deterministic pretrained two-sample GCB-Seg overfit
-gate with complete composite-loss history, finite gradients, diagnostic-only
-checkpoint, and TensorBoard evidence before starting ablations.
+Implement and test one shared formal GCB-Seg trainer plus exact cumulative
+A1-A4 configuration contracts. Pin a common VOC-train budget and determine
+whether the existing SegFormer result is a matched A0 before launching any
+reportable ablation.

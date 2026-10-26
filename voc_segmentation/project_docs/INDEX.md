@@ -100,3 +100,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0108 — Correct VOC void-band boundary targets](steps/0108-correct-voc-void-band-boundary-targets.md) — Passed, 2026-10-26T08:52:20+08:00
 - [0109 — Pass corrected pretrained GCB CUDA smoke](steps/0109-pass-corrected-pretrained-gcb-cuda-smoke.md) — Passed, 2026-10-26T08:52:25+08:00
 - [0110 — Independently audit GCB CUDA smoke evidence](steps/0110-independently-audit-gcb-cuda-smoke-evidence.md) — Passed, 2026-10-26T08:52:30+08:00
+- [0111 — Implement and test GCB two-sample overfit tooling](steps/0111-implement-test-gcb-two-sample-overfit-tooling.md) — Passed, 2026-10-26T09:00:51+08:00
+- [0112 — Pass pretrained GCB two-sample overfit gate](steps/0112-pass-pretrained-gcb-two-sample-overfit-gate.md) — Passed, 2026-10-26T09:04:42+08:00
+- [0113 — Fail first independent GCB overfit artifact audit command](steps/0113-fail-first-independent-gcb-overfit-artifact-audit-command.md) — Failed, 2026-10-26T09:04:47+08:00
+- [0114 — Independently verify GCB two-sample overfit artifacts](steps/0114-independently-verify-gcb-two-sample-overfit-artifacts.md) — Passed, 2026-10-26T09:04:52+08:00

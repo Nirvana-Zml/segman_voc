@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 08:50 +08:00
+- Last updated: 2026-10-26 09:03 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | Interface/loss tests and CUDA smoke passed; two-sample overfit pending |
+| 05 | GCB diagnostics and ablations | In progress | All diagnostic gates passed; controlled A0-A4 ablations pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Implement and pass the deterministic pretrained GCB-Seg two-sample overfit
-gate with diagnostic-only checkpoint, complete loss history, TensorBoard, and
-finite gradients. Require a clear decrease in the same fixed-sample objective
-before beginning any controlled ablation.
+Implement and test a shared formal GCB-Seg trainer and exact cumulative A1-A4
+ablation configurations. Before launching them, pin one common VOC-train
+training budget and document whether the completed SegFormer run is a fair A0
+or requires a matched rerun; keep every run on the same validation evaluator.
 
 ## Latest checks
 
@@ -476,3 +476,30 @@ before beginning any controlled ablation.
   shapes, exact encoder/decoder parameter coverage, configuration, provenance,
   and checkpoint hashes. The diagnostic result SHA-256 is
   `62ba3dfeddcddffd4dfc79a88186b84a4a8a3010b11ce702ae73c3a33de3998e`.
+- `tools/overfit_gcb_seg.py` now implements the fixed two-sample diagnostic at
+  128x128 for 100 AMP steps. It records all seven composite-loss values,
+  gradient norms, both learning rates, AMP scale, TensorBoard series, a
+  diagnostic-only checkpoint, pretrained provenance, boundary counts, and
+  hashes. Initial/final evaluation reuses the same deterministic stochastic
+  masks so the complete objective is comparable.
+- The new optimizer/loss-recording contracts passed 2/2 tests in 0.025
+  seconds. The complete target-container suite passed 42/42 in 6.795 seconds.
+- The deterministic pretrained GCB-Seg two-sample run passed all 100 AMP
+  updates. The matched initial/final composite objective fell from 4.708998 to
+  0.603445, ratio 0.128147 versus the required maximum 0.5. All seven loss
+  components and gradient norms were finite; AMP scale stayed at 1,024.
+- The same-sample diagnostic reached pixel accuracy 0.994826 and mIoU
+  0.936919; these are explicitly not validation results. The target contained
+  2,051 positive boundary pixels among 31,699 valid pixels. Runtime was 24.154
+  seconds and peak allocated CUDA memory was 467,688,960 bytes.
+- The first independent-audit invocation failed read-only because PowerShell
+  removed nested Python quotes, producing `NameError: artifacts is not
+  defined`. No artifact changed. The corrected Base64-carried audit passed.
+- Independent audit verified all 100 sequential history records and formulas,
+  finite checkpoint tensors, 11 TensorBoard tags with 100 values each,
+  parameter coverage, boundary signal, stable AMP, and every saved hash.
+  Result/history/checkpoint/event SHA-256 values are respectively
+  `e95bcfeae48aa43c5e3bc79172cada45694efddc48c0b21d8908b615c94084fc`,
+  `86535a8bf4f8e9397f74c3fe40aff8d29b5d4d83315b480e8622eb5467e55b5a`,
+  `14f6f2ad4a82c7567bb4a96ae30be85571d2ed6ebdaf24e5437278c48319fd17`,
+  and `09df89f0080c86bfdb447a978406cd940efbbbf398a01e88a23583fb08fe6dcf`.
