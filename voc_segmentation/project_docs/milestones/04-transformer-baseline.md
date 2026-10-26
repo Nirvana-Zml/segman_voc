@@ -1,7 +1,7 @@
 # Milestone 04: SegFormer baseline
 
-- State: **In progress — reportable run active; first validation pending**
-- Last updated: 2026-10-26 00:34 +08:00
+- State: **Passed — reportable baseline independently verified**
+- Last updated: 2026-10-26 08:30 +08:00
 
 Train and evaluate an 8 GB-safe SegFormer baseline with the same split,
 evaluator, seed policy, and artifact contract used by the CNN baseline.
@@ -178,8 +178,47 @@ evaluator, seed policy, and artifact contract used by the CNN baseline.
 - This is launch evidence only. No Transformer baseline metric or checkpoint
   is accepted until a complete official validation finishes.
 
+## Reportable run completion
+
+- Terminal state: wrapper exit code 0, no remaining trainer process,
+  `result.json` with `ok=true`, `diagnostic_only=false`, and clean source
+  commit `d1f25d71c7f8e3fc3b0407e7cd8fa252e2d3a839`.
+- The run completed exactly 20,000 unique train steps plus 20 validations at
+  steps 1,000 through 20,000. Every validation processed all 1,449 official
+  validation images and all 21 classes had defined IoU. Six isolated AMP
+  overflow events each recorded verified scale reduction; all remaining
+  training and validation numeric values were finite.
+- Independent selection reproduced best step 19,000: mIoU 0.733889,
+  foreground mIoU 0.723720, pixel accuracy 0.938803, and validation loss
+  0.298455. `best.pt` is non-diagnostic, 164,426,244 bytes, and has SHA-256
+  `dde4ca693315e290a431cd60eb3c8446b099b457adf2421620a97c13c34fdbad`.
+- Step 20,000 validation has mIoU 0.732272, foreground mIoU 0.722018, pixel
+  accuracy 0.938912, and loss 0.294703. `last.pt` is non-diagnostic,
+  164,426,244 bytes, and has SHA-256
+  `cb9fa1a73b2d60951ff41cac107db5b7f6ba10e72764d411a7422d4348fb95cc`.
+- Validation mIoU by 1,000-step interval was 0.641422, 0.638020, 0.671902,
+  0.685953, 0.689667, 0.706633, 0.692840, 0.717747, 0.715572, 0.718592,
+  0.722984, 0.714129, 0.708999, 0.723189, 0.726588, 0.725489, 0.728182,
+  0.727750, 0.733889, and 0.732272.
+- The independent audit passed all result flags, Git provenance, split and
+  weight hashes, exact history steps, full-validation fields, validation JSON
+  correspondence, best selection, checkpoint metadata, optimizer group names,
+  TensorBoard hashes, and exit code. Result SHA-256 is
+  `6b9fac34b0b6fb36c5e6a63f226d3c61592eb476717b05ae3c4edf72a2305ecd`;
+  history SHA-256 is
+  `94dc7af8b8359113793ddeab9ceaebb18cf50a266e65c746e9a898913dd099da`;
+  console SHA-256 is
+  `ac32d4750864ea60454d6fab6d924d2f7dc6a4e70b1c578fcc7671bb5bfca7e9`.
+- Runtime was 28,622.064 seconds and peak allocated CUDA memory was
+  816,525,824 bytes. These are reportable measurements from the formal run.
+- The status helper was corrected from obsolete `runs/segformer/result.json`
+  to `runs/segformer_b1_voc_train/result.json` and now requires reportable,
+  full-validation results for both baseline stages. It reports Transformer
+  complete and GCB diagnostics next; `quick_validate.py` reports the skill is
+  valid.
+
 ## Next action
 
-Monitor the active run through its complete step-1,000 official validation,
-then verify the validation JSON and selected checkpoint before continuing to
-terminal completion.
+Proceed to GCB-Seg interface and loss implementation, followed by focused
+tests, one-step CUDA smoke, and deterministic two-sample overfit before any
+controlled component ablation.

@@ -1,11 +1,11 @@
 # Project status
 
-- Last updated: 2026-10-26 00:34 +08:00
+- Last updated: 2026-10-26 08:30 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
-- Highest verified active milestone: **03 — CNN baseline**
-- Next milestone: **04 — Transformer baseline**
+- Highest verified active milestone: **04 — Transformer baseline**
+- Next milestone: **05 — GCB diagnostics and ablations**
 - First hardware-safe model profile: MiT-B1, 384×384, batch 2, effective batch 8
 
 ## Milestone summary
@@ -16,7 +16,7 @@
 | 01 | Environment and source | Passed | Clean Docker build and CUDA allocation report |
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
-| 04 | Transformer baseline | In progress | 20,000-step official-train run active; first full validation pending |
+| 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Not started | Interface/loss tests, smoke, overfit, controlled ablations |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
@@ -41,10 +41,9 @@
 
 ## Next action
 
-Monitor the active reportable SegFormer run through its first complete
-1,449-image official validation at step 1,000. Confirm the validation artifact
-and selected checkpoint before continuing to terminal completion; do not infer
-quality from pre-validation training loss.
+Implement GCB-Seg modules and loss composition on the verified MiT-B1/384
+foundation. Pass focused interface/loss tests, a one-step CUDA smoke, and a
+deterministic two-sample overfit gate before starting any controlled ablation.
 
 ## Latest checks
 
@@ -409,3 +408,31 @@ quality from pre-validation training loss.
   active. At independent observation it had 17 unique finite training records
   through step 17, zero validation or overflow records, no exit-code file or
   terminal result, and about 1,067 MiB GPU memory in use.
+- The formal SegFormer run exited with code 0 and no trainer process remains.
+  `result.json` reports `ok=true`, `diagnostic_only=false`, clean source commit
+  `d1f25d71c7f8e3fc3b0407e7cd8fa252e2d3a839`, 20,000 iterations, and 20
+  complete 1,449-image official validations.
+- Independent history validation found exactly 20,000 unique train records for
+  steps 1 through 20,000, validation records at every 1,000 steps, and six
+  isolated AMP overflow records with verified scale backoff. All recorded
+  training and validation numeric values are finite.
+- Validation selection was independently reproduced. Best step 19,000 has
+  mIoU 0.733889, foreground mIoU 0.723720, pixel accuracy 0.938803, and loss
+  0.298455. The non-diagnostic `best.pt` SHA-256 is
+  `dde4ca693315e290a431cd60eb3c8446b099b457adf2421620a97c13c34fdbad`.
+- Terminal step 20,000 has mIoU 0.732272, foreground mIoU 0.722018, pixel
+  accuracy 0.938912, and loss 0.294703. The non-diagnostic `last.pt` SHA-256
+  is `cb9fa1a73b2d60951ff41cac107db5b7f6ba10e72764d411a7422d4348fb95cc`.
+- All independently audited result, history, checkpoint, config, pretrained
+  weight, split, validation JSON, and TensorBoard hashes matched. Result
+  SHA-256 is
+  `6b9fac34b0b6fb36c5e6a63f226d3c61592eb476717b05ae3c4edf72a2305ecd`;
+  history SHA-256 is
+  `94dc7af8b8359113793ddeab9ceaebb18cf50a266e65c746e9a898913dd099da`.
+  Runtime was 28,622.064 seconds and peak allocated CUDA memory was
+  816,525,824 bytes.
+- The project-status helper previously looked for obsolete
+  `runs/segformer/result.json`. It now requires non-diagnostic, full-validation
+  baseline results at `runs/segformer_b1_voc_train/result.json`. The helper
+  reports Transformer complete and GCB diagnostics next; skill validation
+  passed.

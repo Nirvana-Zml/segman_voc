@@ -33,6 +33,17 @@ def completed_result(path: Path) -> bool:
     return bool(value and (value.get("ok") is True or value.get("status") == "complete"))
 
 
+def completed_training_result(path: Path) -> bool:
+    value = load_json(path)
+    return bool(
+        value
+        and value.get("ok") is True
+        and value.get("diagnostic_only") is False
+        and value.get("validation_is_full_official_split") is True
+        and value.get("best_checkpoint", {}).get("diagnostic_only") is False
+    )
+
+
 def build_status(repo: Path) -> dict[str, Any]:
     app = repo / "voc_segmentation"
     docs = app / "project_docs"
@@ -126,13 +137,19 @@ def build_status(repo: Path) -> dict[str, Any]:
 
     stage_files = {
         "cnn_baseline": runs / "deeplabv3plus_r50_voc_train/result.json",
-        "transformer_baseline": runs / "segformer/result.json",
+        "transformer_baseline": runs / "segformer_b1_voc_train/result.json",
         "gcb_diagnostics_and_ablations": artifacts / "gcb_diagnostics.json",
         "formal_training_and_selection": artifacts / "model_selection.json",
     }
     stage_values = {
         name: {
-            "state": "complete" if completed_result(path) else "pending",
+            "state": "complete"
+            if (
+                completed_training_result(path)
+                if name in {"cnn_baseline", "transformer_baseline"}
+                else completed_result(path)
+            )
+            else "pending",
             "evidence": relative([path], repo) if path.is_file() else [],
         }
         for name, path in stage_files.items()

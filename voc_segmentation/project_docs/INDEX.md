@@ -91,3 +91,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0099 — Fail first SegFormer formal-run Docker preflight](steps/0099-fail-first-segformer-formal-run-docker-preflight.md) — Failed, 2026-10-26T00:35:23+08:00
 - [0100 — Pass SegFormer formal-run preflight](steps/0100-pass-segformer-formal-run-preflight.md) — Passed, 2026-10-26T00:35:28+08:00
 - [0101 — Launch reportable SegFormer VOC-train run](steps/0101-launch-reportable-segformer-voc-train-run.md) — In progress, 2026-10-26T00:35:33+08:00
+- [0102 — Verify completed formal SegFormer run](steps/0102-verify-completed-formal-segformer-run.md) — Passed, 2026-10-26T08:31:23+08:00
+- [0103 — Identify stale Transformer evidence path in status helper](steps/0103-identify-stale-transformer-evidence-path-status-helper.md) — Information, 2026-10-26T08:31:28+08:00
+- [0104 — Align and validate Transformer project status](steps/0104-align-validate-transformer-project-status.md) — Passed, 2026-10-26T08:31:33+08:00
