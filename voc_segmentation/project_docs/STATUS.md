@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 18:59 +08:00
+- Last updated: 2026-10-26 19:04 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 passed at 0.736626; A2 preflight passed and clean launch commit pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 passed at 0.736626; A2 formal run active and first full validation pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,9 @@
 
 ## Next action
 
-Commit the passed A2 gated-GFF preflight ledger, then launch the reportable
-20,000-step run from that exact clean revision. Verify active processes, the
-resolved reportable configuration, and finite sequential early history before
-handoff.
+Allow the active A2 gated-GFF run to reach step 1,000, then independently
+verify the first complete 1,449-image official validation, checkpoint status,
+history continuity, process health, and absence of terminal artifacts.
 
 ## Latest checks
 
@@ -630,3 +629,21 @@ handoff.
   `gated` and `use_gated_fusion` from false to true. A2 remains CE-only,
   disables BAB and auxiliary output, uses official train/val, runs 20,000
   steps, and validates every 1,000 steps.
+
+## A2 reportable launch
+
+- The passed preflight ledger was committed as clean source
+  `7ca7d0d892fec7529fc5193b078c6c9d30cb27b7`. The ignored launch wrapper
+  passed `sh -n` and has SHA-256
+  `3daacd10132943540e2571bc1f54f68a47ab6218c26688f3a9323d1b1820c5e8`.
+- The reportable A2 job started at 2026-10-26 19:01:56 +08:00 with wrapper
+  PID 2784 and trainer PID 2791. Its command injects the exact source commit
+  and clean-worktree assertion. GPU use was 1,684 MiB at 50% during the first
+  process snapshot.
+- Independent early audit found 91 unique sequential train records through
+  step 91. Every recorded scalar was finite and each total loss exactly
+  matched CE; the latest observed loss was 1.848219. The resolved configuration
+  records A2 gated fusion, no BAB or auxiliary head, 20,000 reportable steps,
+  full validation every 1,000 steps, and no validation limit.
+- `source_commit.txt` matches the injected revision. Neither `exit_code.txt`
+  nor `result.json` existed, so no terminal result is claimed.

@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Commit the passed A2 preflight ledger, then launch the gated-GFF experiment
-from that exact clean revision and independently audit its early history.
+Allow the active A2 gated-GFF run to reach step 1,000, then independently
+audit its first complete official validation and checkpoint.
 
 ## A2 formal-run preflight
 
@@ -297,3 +297,19 @@ from that exact clean revision and independently audit its early history.
   model delta is linear-to-gated fusion plus `use_gated_fusion=false` to true;
   A2 is otherwise CE-only with no BAB or auxiliary head, official train/val,
   20,000 steps, and full validation every 1,000 steps.
+
+## A2 reportable launch
+
+- Preflight documentation was committed as clean source
+  `7ca7d0d892fec7529fc5193b078c6c9d30cb27b7`. The ignored launch wrapper
+  passed shell syntax validation and has SHA-256
+  `3daacd10132943540e2571bc1f54f68a47ab6218c26688f3a9323d1b1820c5e8`.
+- The background job started at 2026-10-26 19:01:56 +08:00. Wrapper/trainer
+  PIDs 2784/2791 were active with the exact source commit and clean-worktree
+  assertion; GPU use was 1,684 MiB at 50%.
+- An independent audit at step 91 verified unique sequential finite history,
+  total loss exactly equal to CE, latest loss 1.848219, A2 gated fusion, no
+  BAB or auxiliary head, 20,000 reportable steps, full validation every 1,000
+  steps, and no validation limit.
+- No exit code or terminal result existed. The first reportable acceptance
+  gate is the full 1,449-image validation at step 1,000.

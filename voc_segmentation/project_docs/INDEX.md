@@ -124,3 +124,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0132 — Record incomplete first A2 Docker preflight](steps/0132-record-incomplete-first-a2-docker-preflight.md) — Failed, 2026-10-26T18:59:05+08:00
 - [0133 — Correct A2 parsed-contract key](steps/0133-correct-a2-parsed-contract-key.md) — Failed, 2026-10-26T18:59:10+08:00
 - [0134 — Pass reportable A2 formal-run preflight](steps/0134-pass-reportable-a2-formal-run-preflight.md) — Passed, 2026-10-26T18:59:15+08:00
+- [0135 — Launch reportable A2 gated-GFF VOC-train run](steps/0135-launch-reportable-a2-gated-gff-voc-train-run.md) — In progress, 2026-10-26T19:05:05+08:00
