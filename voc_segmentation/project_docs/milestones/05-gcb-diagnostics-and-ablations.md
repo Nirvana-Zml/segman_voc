@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 09:20 +08:00
+- Last updated: 2026-10-26 09:35 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -176,7 +176,26 @@ controlled validation experiments.
   stop the semicolon-chained commit. A formatting-only correction removed all
   five; the subsequent working-tree whitespace audit passed.
 
+## A1 formal-run preflight
+
+- The first parallel Docker preflight was incomplete because three queries
+  were denied by the Windows Docker named pipe. No process started. The
+  approved serial retry passed every non-process check, but its `pgrep` pattern
+  matched the checking shell itself. A later full process-table query first
+  hit the same permission denial and then succeeded with approved access.
+- Final process evidence contained only container PID 1, two stale completed-
+  run log tails, and the `ps` command; no Python training process existed.
+- Host source was clean at full commit
+  `9386a12918cb01d0deee122047e655d6e823ea40`. The RTX 4060 reported 114 of
+  8,188 MiB used, 0% utilization, and no compute process. `/workspace` had
+  757 GB available, and `runs/gcb_ablation_a1_gcm_voc_train` was absent.
+- Container hashes matched: A1 config
+  `bceb04f2d0a9ae6d35c7b65f6da0c33ead063399c9452c9043b9b49baeef4e66`;
+  MiT-B1 `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+  Parsed configuration asserted A1, linear fusion, no BAB, CE-only loss,
+  20,000 steps, validation every 1,000, and official train/val.
+
 ## Next action
 
-Commit the verified source, then require a clean-revision A1 formal preflight
-before launching its 20,000-step reportable VOC-train experiment.
+Commit this preflight ledger, verify the new clean revision, then launch and
+observe the first finite records of the 20,000-step reportable A1 experiment.

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 09:20 +08:00
+- Last updated: 2026-10-26 09:35 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A4 trainer diagnostic passed; A1 formal launch pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 formal preflight passed; clean-ledger commit and launch pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-From the committed clean source revision, run the A1 formal-run preflight:
-verify the container/GPU/disk, exact config and weight hashes, absent output
-directory and trainer process, full host commit, and clean worktree. Then
-launch the 20,000-step reportable A1 GCM experiment if every gate passes.
+Commit the A1 preflight ledger, verify the resulting full host commit and clean
+worktree, then create the gitignored launch wrapper and start the 20,000-step
+reportable A1 GCM experiment. Immediately verify its PID, finite unique early
+history, source commit, absence of terminal result, and live GPU allocation.
 
 ## Latest checks
 
@@ -533,3 +533,18 @@ launch the 20,000-step reportable A1 GCM experiment if every gate passes.
   the GCB wrapper. Because the shell command used `;`, commit execution still
   continued. The five formatting defects were then removed and a clean
   `git diff --check` passed; no executable content or runtime evidence changed.
+- The first parallel A1 preflight was rejected because three Docker queries
+  hit intermittent Windows named-pipe permission denial; no training started.
+  An approved serial retry verified the GPU, disk, hashes, output absence, and
+  config but its process regex matched the checking shell itself. A direct
+  process-table query initially hit the same pipe denial, then succeeded under
+  approved access and proved that no Python trainer was running.
+- Final A1 preflight evidence: clean commit
+  `9386a12918cb01d0deee122047e655d6e823ea40`; RTX 4060 at 114/8,188 MiB and
+  0% utilization with no compute process; 757 GB workspace free; no GCB
+  trainer; formal output absent; config SHA-256
+  `bceb04f2d0a9ae6d35c7b65f6da0c33ead063399c9452c9043b9b49baeef4e66`;
+  weight SHA-256
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`;
+  parsed A1 contract is linear GCM, CE only, 20,000 steps, validation every
+  1,000, official train/val.

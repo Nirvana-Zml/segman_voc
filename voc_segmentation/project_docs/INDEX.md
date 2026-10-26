@@ -109,3 +109,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0117 — Independently audit A4 formal-trainer diagnostic](steps/0117-independently-audit-a4-formal-trainer-diagnostic.md) — Passed, 2026-10-26T09:19:06+08:00
 - [0118 — Detect EOF whitespace defects during ablation trainer commit](steps/0118-detect-eof-whitespace-defects-ablation-trainer-commit.md) — Failed, 2026-10-26T09:20:39+08:00
 - [0119 — Correct ablation trainer EOF whitespace](steps/0119-correct-ablation-trainer-eof-whitespace.md) — Passed, 2026-10-26T09:20:44+08:00
+- [0120 — Reject incomplete initial A1 formal preflight attempts](steps/0120-reject-incomplete-initial-a1-formal-preflight-attempts.md) — Failed, 2026-10-26T09:36:32+08:00
+- [0121 — Pass reportable A1 formal-run preflight](steps/0121-pass-reportable-a1-formal-run-preflight.md) — Passed, 2026-10-26T09:36:37+08:00
