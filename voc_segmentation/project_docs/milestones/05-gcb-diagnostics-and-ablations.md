@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 09:35 +08:00
+- Last updated: 2026-10-26 09:39 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -195,7 +195,24 @@ controlled validation experiments.
   Parsed configuration asserted A1, linear fusion, no BAB, CE-only loss,
   20,000 steps, validation every 1,000, and official train/val.
 
+## A1 reportable launch
+
+- The preflight ledger was committed at full clean revision
+  `c956520ca370a892fe4d63d9d181d2e0818315e9`. A first read-only wrapper check
+  was denied by the Docker named pipe and started nothing. Approved retry
+  passed `sh -n`, matched launch-wrapper SHA-256
+  `3cd4fce521998a761c982f92ac0ebce809dd9ebf355a54748d45a67f3922fbd3`,
+  and started the background job at 2026-10-26 09:38:08 +08:00.
+- Wrapper PID 2447 and Python trainer PID 2454 were active with explicit
+  `--git-commit c956520... --git-worktree-clean`. GPU use was approximately
+  1,134 MiB at 14%; no exit code or terminal result existed.
+- The first nested-shell early audit failed read-only when PowerShell truncated
+  its Python quotes. Direct Base64-carried container Python then verified 51
+  unique sequential finite records through step 51, CE 2.916139, gradient norm
+  26.750391, AMP scale 1,024, no validation, and the correct resolved formal
+  runtime and source commit.
+
 ## Next action
 
-Commit this preflight ledger, verify the new clean revision, then launch and
-observe the first finite records of the 20,000-step reportable A1 experiment.
+Monitor the active A1 experiment through step 1,000 and independently verify
+its first complete 1,449-image validation and non-diagnostic checkpoint.

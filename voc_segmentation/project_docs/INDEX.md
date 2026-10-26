@@ -111,3 +111,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0119 — Correct ablation trainer EOF whitespace](steps/0119-correct-ablation-trainer-eof-whitespace.md) — Passed, 2026-10-26T09:20:44+08:00
 - [0120 — Reject incomplete initial A1 formal preflight attempts](steps/0120-reject-incomplete-initial-a1-formal-preflight-attempts.md) — Failed, 2026-10-26T09:36:32+08:00
 - [0121 — Pass reportable A1 formal-run preflight](steps/0121-pass-reportable-a1-formal-run-preflight.md) — Passed, 2026-10-26T09:36:37+08:00
+- [0122 — Fail first A1 launch-wrapper container check](steps/0122-fail-first-a1-launch-wrapper-container-check.md) — Failed, 2026-10-26T09:40:29+08:00
+- [0123 — Launch reportable A1 GCM VOC-train run](steps/0123-launch-reportable-a1-gcm-voc-train-run.md) — In progress, 2026-10-26T09:40:35+08:00
+- [0124 — Fail first A1 early-history audit invocation](steps/0124-fail-first-a1-early-history-audit-invocation.md) — Failed, 2026-10-26T09:40:40+08:00
+- [0125 — Verify healthy early A1 training records](steps/0125-verify-healthy-early-a1-training-records.md) — Passed, 2026-10-26T09:40:46+08:00

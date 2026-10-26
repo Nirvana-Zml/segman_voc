@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 09:35 +08:00
+- Last updated: 2026-10-26 09:39 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 formal preflight passed; clean-ledger commit and launch pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 reportable run active; first full validation pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the A1 preflight ledger, verify the resulting full host commit and clean
-worktree, then create the gitignored launch wrapper and start the 20,000-step
-reportable A1 GCM experiment. Immediately verify its PID, finite unique early
-history, source commit, absence of terminal result, and live GPU allocation.
+Monitor the active A1 run through its first complete step-1,000 official
+validation. Verify all steps remain unique and finite, validation covers all
+1,449 images, the selected checkpoint is non-diagnostic, and its saved mIoU
+and hashes agree before accepting the first A1 metric.
 
 ## Latest checks
 
@@ -548,3 +548,17 @@ history, source commit, absence of terminal result, and live GPU allocation.
   `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`;
   parsed A1 contract is linear GCM, CE only, 20,000 steps, validation every
   1,000, official train/val.
+- The preflight ledger was committed as clean source
+  `c956520ca370a892fe4d63d9d181d2e0818315e9`. The first launch-wrapper syntax
+  and hash query was denied by the Docker named pipe, so no process started;
+  approved retry passed syntax, measured wrapper SHA-256
+  `3cd4fce521998a761c982f92ac0ebce809dd9ebf355a54748d45a67f3922fbd3`,
+  and launched the reportable A1 job at 2026-10-26 09:38:08 +08:00.
+- Wrapper PID 2447 and trainer PID 2454 were active. GPU use was about 1,134
+  MiB at 14%. The first Base64 audit nested inside `sh -lc` failed read-only
+  because PowerShell truncated its quotes; direct container Python then passed.
+- At the corrected observation, history contained 51 unique sequential finite
+  train records through step 51, no validation, no exit code, and no result.
+  Step 51 CE was 2.916139, pre-clip gradient norm 26.750391, and AMP scale
+  1,024. The resolved config records 20,000 reportable steps, full validation,
+  and no diagnostic override; the injected source commit matches `c956520`.
