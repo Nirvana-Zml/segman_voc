@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
 - State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 09:03 +08:00
+- Last updated: 2026-10-26 09:18 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -128,9 +128,51 @@ controlled validation experiments.
   TensorBoard event
   `09df89f0080c86bfdb447a978406cd940efbbbf398a01e88a23583fb08fe6dcf`.
 
+## Controlled ablation definition and trainer
+
+- Decision 0004 accepts the existing 20,000-step SegFormer-B1 formal run as
+  A0 because A1-A4 configs exactly match its official train/val split, seed,
+  crop, augmentation, batch, pretrained encoder, optimizer, learning rates,
+  schedule, validation interval, and evaluator.
+- A1 adds GCM while retaining SegFormer-style linear multi-scale fusion; A2
+  replaces it with gated top-down GFF; A3 adds BAB and edge loss 0.2; A4 adds
+  Lovasz 0.5. Auxiliary loss and label smoothing are zero throughout this
+  comparison, preventing unlisted simultaneous changes.
+- `GCBSeg` now supports the explicit `linear` A1 and `gated` A2-A4 fusion
+  modes. Linear mode rejects BAB, while both modes preserve the train/eval
+  output and full-resolution contracts.
+- `tools/train_gcb_seg.py` calls the shared proven formal trainer. The engine
+  now accepts either tensor or mapped model outputs, records every finite
+  active loss component, and retains bounded AMP recovery, history-safe
+  resume, host Git provenance, checkpoint selection, TensorBoard, and native-
+  resolution global-confusion validation.
+- Focused model, loss, trainer, and configuration checks passed 21/21 in 2.362
+  seconds. The complete target-container suite passed 48/48 in 5.962 seconds.
+
+## Formal-trainer CUDA diagnostic
+
+- Command: `docker exec voc2012-gcb python tools/train_gcb_seg.py --config
+  configs/gcb_ablation_a4_lovasz.yaml --output-dir
+  runs/diagnostics/gcb_a4_one_step --max-iterations 1 --validate-every 1
+  --validation-limit 2 --diagnostic-only`.
+- One effective-batch-8 update completed with total 3.558069, CE 2.924114,
+  Lovasz 0.932956, edge 0.837382, auxiliary 0, and finite pre-clip gradient
+  norm 9.638385. Encoder/decoder learning rates stayed at 0.00006/0.00060,
+  AMP recorded zero overflow, runtime was 13.461 seconds, and peak allocated
+  CUDA memory was 1,165,862,400 bytes.
+- Validation was deliberately limited to two of 1,449 official-val images;
+  its mIoU 0.208359 is non-reportable and only proves evaluator integration.
+- Independent audit recomputed the active A4 formula, verified the two history
+  records, resolved diagnostic overrides, step-1 diagnostic checkpoint, all
+  finite model tensors, 15 one-point TensorBoard series, split/weight
+  metadata, and file hashes.
+- SHA-256: result
+  `c2cc812cc163eddb353f32462fc3c7100a0c101d5c95eee1c9df7b66a14790ef`;
+  history `914ebbe02f245815831d8493c95e6f8b68f038eb7a0c4e21639cb66e06fbd5f8`;
+  checkpoint `618f90ff79730461cda5c84927bdda3896606e9f6106c4d287c3ba45413ba80e`;
+  event `7fd08e26b579ff4488975b971d775b74b3ef0c0e34c84cee44ad1a92491c1720`.
+
 ## Next action
 
-Implement and test one shared formal GCB-Seg trainer plus exact cumulative
-A1-A4 configuration contracts. Pin a common VOC-train budget and determine
-whether the existing SegFormer result is a matched A0 before launching any
-reportable ablation.
+Commit the verified source, then require a clean-revision A1 formal preflight
+before launching its 20,000-step reportable VOC-train experiment.

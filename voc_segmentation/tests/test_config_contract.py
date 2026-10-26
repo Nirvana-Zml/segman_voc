@@ -87,6 +87,7 @@ class ConfigContractTest(unittest.TestCase):
         self.assertEqual(model["global_context_dilations"], [1, 3, 6])
         self.assertTrue(model["use_global_pooling"])
         self.assertTrue(model["use_gated_fusion"])
+        self.assertEqual(model["feature_fusion_mode"], "gated")
         self.assertTrue(model["use_boundary_branch"])
         self.assertTrue(model["auxiliary_head"])
         self.assertEqual(config["data"]["crop_size"], [384, 384])
@@ -96,6 +97,81 @@ class ConfigContractTest(unittest.TestCase):
             * training["gradient_accumulation_steps"],
             training["effective_batch_size"],
         )
+
+    def test_gcb_ablation_matrix_is_cumulative_and_a0_matched(self) -> None:
+        names = {
+            "A1": "gcb_ablation_a1_gcm.yaml",
+            "A2": "gcb_ablation_a2_gff.yaml",
+            "A3": "gcb_ablation_a3_bab.yaml",
+            "A4": "gcb_ablation_a4_lovasz.yaml",
+        }
+        configs = {
+            ablation_id: yaml.safe_load(
+                (CONFIG_DIR / filename).read_text(encoding="utf-8")
+            )
+            for ablation_id, filename in names.items()
+        }
+        baseline = yaml.safe_load(
+            (CONFIG_DIR / "segformer_b1.yaml").read_text(encoding="utf-8")
+        )
+        common_data_keys = (
+            "train_split",
+            "val_split",
+            "crop_size",
+            "scale_range",
+            "horizontal_flip_probability",
+            "ignore_index",
+            "reduce_zero_label",
+        )
+        common_training_keys = (
+            "physical_batch_size",
+            "effective_batch_size",
+            "gradient_accumulation_steps",
+            "encoder_lr",
+            "decoder_lr",
+            "weight_decay",
+            "gradient_clip_norm",
+            "amp",
+            "seed",
+            "max_iterations",
+            "validate_every",
+            "warmup_iterations",
+            "poly_power",
+            "save_best_metric",
+        )
+        for ablation_id, config in configs.items():
+            with self.subTest(ablation=ablation_id):
+                self.assertEqual(config["experiment"]["ablation_id"], ablation_id)
+                self.assertEqual(
+                    config["experiment"]["comparison_group"],
+                    "gcb_a0_a4_voc_train_20k",
+                )
+                for key in common_data_keys:
+                    self.assertEqual(config["data"][key], baseline["data"][key])
+                for key in common_training_keys:
+                    self.assertEqual(
+                        config["training"][key], baseline["training"][key]
+                    )
+                self.assertFalse(config["model"]["auxiliary_head"])
+                self.assertEqual(config["loss"]["aux_weight"], 0.0)
+                self.assertEqual(config["loss"]["label_smoothing"], 0.0)
+
+        self.assertEqual(configs["A1"]["model"]["feature_fusion_mode"], "linear")
+        self.assertFalse(configs["A1"]["model"]["use_boundary_branch"])
+        self.assertEqual(configs["A1"]["loss"]["lovasz_weight"], 0.0)
+        self.assertEqual(configs["A1"]["loss"]["edge_weight"], 0.0)
+
+        self.assertEqual(configs["A2"]["model"]["feature_fusion_mode"], "gated")
+        self.assertTrue(configs["A2"]["model"]["use_gated_fusion"])
+        self.assertFalse(configs["A2"]["model"]["use_boundary_branch"])
+        self.assertEqual(configs["A2"]["loss"]["edge_weight"], 0.0)
+
+        self.assertTrue(configs["A3"]["model"]["use_boundary_branch"])
+        self.assertEqual(configs["A3"]["loss"]["edge_weight"], 0.2)
+        self.assertEqual(configs["A3"]["loss"]["lovasz_weight"], 0.0)
+
+        self.assertEqual(configs["A4"]["loss"]["lovasz_weight"], 0.5)
+        self.assertEqual(configs["A4"]["loss"]["edge_weight"], 0.2)
 
 
 if __name__ == "__main__":

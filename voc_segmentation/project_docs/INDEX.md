@@ -104,3 +104,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0112 — Pass pretrained GCB two-sample overfit gate](steps/0112-pass-pretrained-gcb-two-sample-overfit-gate.md) — Passed, 2026-10-26T09:04:42+08:00
 - [0113 — Fail first independent GCB overfit artifact audit command](steps/0113-fail-first-independent-gcb-overfit-artifact-audit-command.md) — Failed, 2026-10-26T09:04:47+08:00
 - [0114 — Independently verify GCB two-sample overfit artifacts](steps/0114-independently-verify-gcb-two-sample-overfit-artifacts.md) — Passed, 2026-10-26T09:04:52+08:00
+- [0115 — Implement matched GCB ablation trainer and contracts](steps/0115-implement-matched-gcb-ablation-trainer-contracts.md) — Passed, 2026-10-26T09:17:03+08:00
+- [0116 — Pass one-step A4 formal-trainer CUDA diagnostic](steps/0116-pass-one-step-a4-formal-trainer-cuda-diagnostic.md) — Passed, 2026-10-26T09:19:01+08:00
+- [0117 — Independently audit A4 formal-trainer diagnostic](steps/0117-independently-audit-a4-formal-trainer-diagnostic.md) — Passed, 2026-10-26T09:19:06+08:00

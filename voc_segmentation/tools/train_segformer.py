@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Train SegFormer and select checkpoints on official full-resolution val."""
+"""Train SegFormer or GCB-Seg and select on official full-resolution val."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from collections.abc import Mapping
 from typing import Any
 
 import numpy as np
@@ -43,6 +44,8 @@ from engine import (  # noqa: E402
     save_checkpoint,
     set_learning_rate,
 )
+from losses import GCBSegLoss  # noqa: E402
+from models import build_gcb_seg  # noqa: E402
 from models.baselines import build_segformer  # noqa: E402
 
 
@@ -52,10 +55,14 @@ EXPECTED_WEIGHT_SHA256 = (
 )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(
+    *,
+    default_config: Path = Path("configs/segformer_b1.yaml"),
+    default_output_dir: Path = Path("runs/segformer_b1_voc_train"),
+) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--config", type=Path, default=Path("configs/segformer_b1.yaml")
+        "--config", type=Path, default=default_config
     )
     parser.add_argument(
         "--voc-root",
@@ -63,7 +70,7 @@ def parse_args() -> argparse.Namespace:
         default=Path("/data/VOCtrainval_11-May-2012/VOCdevkit/VOC2012"),
     )
     parser.add_argument(
-        "--output-dir", type=Path, default=Path("runs/segformer_b1_voc_train")
+        "--output-dir", type=Path, default=default_output_dir
     )
     parser.add_argument("--max-iterations", type=int)
     parser.add_argument("--validate-every", type=int)
@@ -120,7 +127,12 @@ def build_optimizer(
     model: nn.Module, training: dict[str, Any]
 ) -> torch.optim.AdamW:
     encoder_parameters = list(model.encoder.parameters())
-    decoder_parameters = list(model.decode_head.parameters())
+    encoder_parameter_ids = {id(parameter) for parameter in encoder_parameters}
+    decoder_parameters = [
+        parameter
+        for parameter in model.parameters()
+        if id(parameter) not in encoder_parameter_ids
+    ]
     model_parameter_ids = {id(parameter) for parameter in model.parameters()}
     grouped_parameter_ids = [
         id(parameter) for parameter in (*encoder_parameters, *decoder_parameters)
@@ -146,8 +158,78 @@ def build_optimizer(
     )
 
 
-def main() -> int:
-    args = parse_args()
+def build_model(
+    config: dict[str, Any], weight_path: Path
+) -> nn.Module:
+    model_config = config["model"]
+    model_name = str(model_config["name"])
+    if model_name == "segformer":
+        return build_segformer(
+            num_classes=int(model_config["num_classes"]),
+            encoder=str(model_config["encoder"]),
+            decoder_channels=int(model_config["decoder_channels"]),
+            dropout=float(model_config["dropout"]),
+            encoder_weights_path=weight_path,
+        )
+    if model_name == "gcb_seg":
+        return build_gcb_seg(
+            num_classes=int(model_config["num_classes"]),
+            encoder=str(model_config["encoder"]),
+            decoder_channels=int(model_config["decoder_channels"]),
+            context_branch_channels=int(model_config["context_branch_channels"]),
+            boundary_channels=int(model_config["boundary_channels"]),
+            global_context_dilations=tuple(
+                int(value) for value in model_config["global_context_dilations"]
+            ),
+            use_global_pooling=bool(model_config["use_global_pooling"]),
+            use_gated_fusion=bool(model_config["use_gated_fusion"]),
+            feature_fusion_mode=str(model_config["feature_fusion_mode"]),
+            use_boundary_branch=bool(model_config["use_boundary_branch"]),
+            auxiliary_head=bool(model_config["auxiliary_head"]),
+            dropout=float(model_config["dropout"]),
+            encoder_weights_path=weight_path,
+        )
+    raise ValueError(f"unsupported model name: {model_name}")
+
+
+def build_training_criterion(config: dict[str, Any]) -> nn.Module:
+    ignore_index = int(config["data"]["ignore_index"])
+    if config["model"]["name"] == "segformer":
+        return nn.CrossEntropyLoss(ignore_index=ignore_index)
+    loss_config = config["loss"]
+    return GCBSegLoss(
+        ignore_index=ignore_index,
+        ce_weight=float(loss_config["ce_weight"]),
+        lovasz_weight=float(loss_config["lovasz_weight"]),
+        edge_weight=float(loss_config["edge_weight"]),
+        aux_weight=float(loss_config["aux_weight"]),
+        label_smoothing=float(loss_config["label_smoothing"]),
+    )
+
+
+def compute_training_losses(
+    outputs: torch.Tensor | Mapping[str, torch.Tensor | None],
+    masks: torch.Tensor,
+    criterion: nn.Module,
+) -> dict[str, torch.Tensor]:
+    computed = criterion(outputs, masks)
+    losses = {"total": computed} if isinstance(computed, torch.Tensor) else dict(computed)
+    if "total" not in losses:
+        raise ValueError("training criterion did not return a total loss")
+    if not all(torch.isfinite(value) for value in losses.values()):
+        raise RuntimeError("training criterion produced a non-finite loss component")
+    return losses
+
+
+def main(
+    *,
+    default_config: Path = Path("configs/segformer_b1.yaml"),
+    default_output_dir: Path = Path("runs/segformer_b1_voc_train"),
+) -> int:
+    args = parse_args(
+        default_config=default_config,
+        default_output_dir=default_output_dir,
+    )
     if args.device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but is unavailable")
     if args.validation_limit is not None and not args.diagnostic_only:
@@ -289,17 +371,11 @@ def main() -> int:
         persistent_workers=workers > 0,
     )
 
-    model = build_segformer(
-        num_classes=int(config["model"]["num_classes"]),
-        encoder=str(config["model"]["encoder"]),
-        decoder_channels=int(config["model"]["decoder_channels"]),
-        dropout=float(config["model"]["dropout"]),
-        encoder_weights_path=weight_path,
-    ).to(device)
+    model = build_model(config, weight_path).to(device)
     optimizer = build_optimizer(model, training)
     amp_enabled = bool(training["amp"] and device.type == "cuda")
     scaler = torch.cuda.amp.GradScaler(enabled=amp_enabled, init_scale=1024.0)
-    criterion = nn.CrossEntropyLoss(ignore_index=int(config["data"]["ignore_index"]))
+    criterion = build_training_criterion(config)
 
     start_step = 0
     best_miou = float("-inf")
@@ -386,7 +462,7 @@ def main() -> int:
             while True:
                 attempt += 1
                 optimizer.zero_grad(set_to_none=True)
-                accumulated_loss = 0.0
+                accumulated_losses: dict[str, float] = {}
                 for _ in range(accumulation_steps):
                     try:
                         batch = next(train_iterator)
@@ -396,12 +472,15 @@ def main() -> int:
                     images = batch["image"].to(device, non_blocking=True)
                     masks = batch["mask"].to(device, non_blocking=True)
                     with torch.cuda.amp.autocast(enabled=amp_enabled):
-                        logits = model(images)
-                        micro_loss = criterion(logits, masks)
-                        backward_loss = micro_loss / accumulation_steps
-                    if not torch.isfinite(micro_loss):
-                        raise RuntimeError(f"non-finite train loss at iteration {step}")
-                    accumulated_loss += float(micro_loss.detach())
+                        outputs = model(images)
+                        micro_losses = compute_training_losses(
+                            outputs, masks, criterion
+                        )
+                        backward_loss = micro_losses["total"] / accumulation_steps
+                    for name, value in micro_losses.items():
+                        accumulated_losses[name] = accumulated_losses.get(name, 0.0) + (
+                            float(value.detach()) / accumulation_steps
+                        )
                     scaler.scale(backward_loss).backward()
 
                 if (
@@ -446,7 +525,8 @@ def main() -> int:
                     "type": "amp_overflow",
                     "step": step,
                     "attempt": attempt,
-                    "loss": accumulated_loss / accumulation_steps,
+                    "loss": accumulated_losses["total"],
+                    "losses": accumulated_losses,
                     "gradient_norm": None,
                     "amp_scale_before": amp_scale_before,
                     "amp_scale_after": amp_scale_after,
@@ -476,11 +556,12 @@ def main() -> int:
                         f"{total_amp_overflows} > {max_total_amp_overflows}"
                     )
 
-            train_loss = accumulated_loss / accumulation_steps
+            train_loss = accumulated_losses["total"]
             train_entry = {
                 "type": "train",
                 "step": step,
                 "loss": train_loss,
+                "losses": accumulated_losses,
                 "gradient_norm": gradient_norm_value,
                 "amp_scale": amp_scale_after,
                 "learning_rates": learning_rates,
@@ -488,7 +569,8 @@ def main() -> int:
             }
             stream.write(json.dumps(train_entry) + "\n")
             stream.flush()
-            writer.add_scalar("Loss/train_ce", train_loss, step)
+            for name, value in accumulated_losses.items():
+                writer.add_scalar(f"Loss/train_{name}", value, step)
             writer.add_scalar("System/gradient_norm", gradient_norm_value, step)
             writer.add_scalar("System/amp_overflow", 0.0, step)
             writer.add_scalar("AMP/scale", amp_scale_after, step)
@@ -496,6 +578,7 @@ def main() -> int:
             writer.add_scalar("LearningRate/decoder", learning_rates[1], step)
             print(
                 f"iteration={step}/{max_iterations} loss={train_loss:.6f} "
+                f"components={json.dumps(accumulated_losses, sort_keys=True)} "
                 f"grad={gradient_norm_value:.6f} "
                 f"encoder_lr={learning_rates[0]:.8f} decoder_lr={learning_rates[1]:.8f}",
                 flush=True,
@@ -612,6 +695,8 @@ def main() -> int:
         "cuda_version": torch.version.cuda,
         "cudnn_version": torch.backends.cudnn.version(),
         "git": git_state,
+        "model_name": config["model"]["name"],
+        "ablation_id": config["experiment"].get("ablation_id"),
         "train_split": config["data"]["train_split"],
         "train_samples": len(train_dataset),
         "train_split_file": str(train_split_path.resolve()),

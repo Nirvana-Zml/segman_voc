@@ -49,11 +49,37 @@ class GCBSegTest(unittest.TestCase):
         self.assertIsNone(outputs["aux_logits"])
         self.assertIsNone(outputs["edge_logits"])
 
+    def test_a1_linear_fusion_preserves_training_contract(self) -> None:
+        model = build_gcb_seg(
+            feature_fusion_mode="linear",
+            use_boundary_branch=False,
+            auxiliary_head=False,
+        )
+        model.train()
+        outputs = model(torch.randn(1, 3, 64, 96))
+        self.assertEqual(outputs["logits"].shape, (1, 21, 64, 96))
+        self.assertIsNone(outputs["aux_logits"])
+        self.assertIsNone(outputs["edge_logits"])
+        self.assertIsNone(model.feature_fusion)
+        self.assertIsNotNone(model.linear_head)
+
+    def test_linear_fusion_rejects_boundary_branch(self) -> None:
+        with self.assertRaises(ValueError):
+            build_gcb_seg(
+                feature_fusion_mode="linear",
+                use_boundary_branch=True,
+            )
+
+    def test_rejects_unknown_feature_fusion_mode(self) -> None:
+        with self.assertRaises(ValueError):
+            build_gcb_seg(feature_fusion_mode="unknown")
+
     def test_new_modules_use_group_norm_not_batch_norm(self) -> None:
         model = build_gcb_seg()
         decoder_modules = (
             model.global_context,
             model.feature_fusion,
+            model.linear_head,
             model.boundary_branch,
             model.main_head,
             model.auxiliary_head,

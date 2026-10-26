@@ -293,6 +293,32 @@ TensorBoard scalars, and a diagnostic-only checkpoint under
 and final complete objectives using identical deterministic dropout/drop-path
 masks; these same-sample diagnostics are not validation or submission results.
 
+The controlled VOC-train ablations use the completed SegFormer run as A0 and
+the following cumulative configurations:
+
+| ID | Config | Added factor |
+| --- | --- | --- |
+| A1 | `configs/gcb_ablation_a1_gcm.yaml` | GCM |
+| A2 | `configs/gcb_ablation_a2_gff.yaml` | gated GFF |
+| A3 | `configs/gcb_ablation_a3_bab.yaml` | BAB plus edge loss |
+| A4 | `configs/gcb_ablation_a4_lovasz.yaml` | Lovasz-Softmax |
+
+All variants match A0's 20,000-step budget and validation protocol. Run a
+one-step, two-validation-image diagnostic before any formal launch:
+
+```powershell
+docker exec voc2012-gcb python tools/train_gcb_seg.py `
+  --config configs/gcb_ablation_a4_lovasz.yaml `
+  --output-dir runs/diagnostics/gcb_a4_one_step `
+  --max-iterations 1 --validate-every 1 --validation-limit 2 `
+  --diagnostic-only
+```
+
+For reportable runs, omit diagnostic-only/validation-limit overrides and pass
+the full host Git commit plus `--git-worktree-clean` after verifying a clean
+host worktree. The shared trainer records every active loss component, bounded
+AMP recovery, full-resolution validation, checkpoints, JSONL, and TensorBoard.
+
 ## Project layout
 
 ```text

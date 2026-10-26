@@ -222,6 +222,7 @@ def main() -> int:
         ),
         use_global_pooling=bool(model_config["use_global_pooling"]),
         use_gated_fusion=bool(model_config["use_gated_fusion"]),
+        feature_fusion_mode=str(model_config.get("feature_fusion_mode", "gated")),
         use_boundary_branch=bool(model_config["use_boundary_branch"]),
         auxiliary_head=bool(model_config["auxiliary_head"]),
         dropout=float(model_config["dropout"]),

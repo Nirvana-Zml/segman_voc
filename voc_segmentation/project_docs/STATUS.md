@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-26 09:03 +08:00
+- Last updated: 2026-10-26 09:18 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | All diagnostic gates passed; controlled A0-A4 ablations pending |
+| 05 | GCB diagnostics and ablations | In progress | A4 trainer diagnostic passed; A1 formal launch pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Implement and test a shared formal GCB-Seg trainer and exact cumulative A1-A4
-ablation configurations. Before launching them, pin one common VOC-train
-training budget and document whether the completed SegFormer run is a fair A0
-or requires a matched rerun; keep every run on the same validation evaluator.
+From the committed clean source revision, run the A1 formal-run preflight:
+verify the container/GPU/disk, exact config and weight hashes, absent output
+directory and trainer process, full host commit, and clean worktree. Then
+launch the 20,000-step reportable A1 GCM experiment if every gate passes.
 
 ## Latest checks
 
@@ -503,3 +503,28 @@ or requires a matched rerun; keep every run on the same validation evaluator.
   `86535a8bf4f8e9397f74c3fe40aff8d29b5d4d83315b480e8622eb5467e55b5a`,
   `14f6f2ad4a82c7567bb4a96ae30be85571d2ed6ebdaf24e5437278c48319fd17`,
   and `09df89f0080c86bfdb447a978406cd940efbbbf398a01e88a23583fb08fe6dcf`.
+- Decision 0004 pins the controlled A0-A4 comparison to the completed A0's
+  20,000-step VOC-train budget. A1 adds GCM with linear fusion, A2 adds gated
+  GFF, A3 adds BAB/edge loss, and A4 adds Lovasz. Auxiliary loss and label
+  smoothing remain zero so they cannot confound the four planned factors.
+- The proven SegFormer formal trainer now supports GCB output mappings and
+  arbitrary finite loss-component histories while preserving its existing CE
+  behavior, validation evaluator, provenance, checkpoint, resume, Git, and
+  bounded AMP-recovery contracts. `tools/train_gcb_seg.py` supplies GCB
+  defaults without duplicating the training engine.
+- Model/config/trainer focused tests passed 21/21 in 2.362 seconds. The full
+  target-container regression suite passed 48/48 in 5.962 seconds.
+- The one-step A4 diagnostic completed one effective-batch-8 AdamW+AMP update
+  and two explicitly non-reportable validation images. Total/CE/Lovasz/edge
+  losses were 3.558069/2.924114/0.932956/0.837382, the pre-clip gradient norm
+  was 9.638385, AMP had zero overflows, and peak CUDA allocation was
+  1,165,862,400 bytes. Runtime was 13.461 seconds.
+- The diagnostic checkpoint is step 1 and `diagnostic_only=true`; the two-image
+  mIoU 0.208359 is not an ablation result. Independent audit verified the
+  formula, history, resolved overrides, finite checkpoint tensors, 15
+  TensorBoard series, split/weight metadata, and all hashes. Result/history/
+  checkpoint/event SHA-256 values are respectively
+  `c2cc812cc163eddb353f32462fc3c7100a0c101d5c95eee1c9df7b66a14790ef`,
+  `914ebbe02f245815831d8493c95e6f8b68f038eb7a0c4e21639cb66e06fbd5f8`,
+  `618f90ff79730461cda5c84927bdda3896606e9f6106c4d287c3ba45413ba80e`,
+  and `7fd08e26b579ff4488975b971d775b74b3ef0c0e34c84cee44ad1a92491c1720`.
