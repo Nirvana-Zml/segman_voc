@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Allow the active A2 gated-GFF run to reach step 1,000, then independently
-audit its first complete official validation and checkpoint.
+Pass an A3 BAB/edge-loss formal preflight from the current clean ledger
+revision before launching the next controlled experiment.
 
 ## A2 formal-run preflight
 
@@ -313,3 +313,34 @@ audit its first complete official validation and checkpoint.
   steps, and no validation limit.
 - No exit code or terminal result existed. The first reportable acceptance
   gate is the full 1,449-image validation at step 1,000.
+
+## A2 terminal result
+
+- A2 exited with code 0. No Python trainer remained and the terminal GPU
+  snapshot was idle. The run retained clean source provenance
+  `7ca7d0d892fec7529fc5193b078c6c9d30cb27b7`.
+- Independent audit found 20,000 sequential finite train steps, 20 full
+  validations, and six bounded AMP recoveries in 20,026 total history records.
+  All A2 total losses equal CE, and every 1,449-image validation contains the
+  same 244,886,857 valid pixels.
+- Recomputing all 20 global confusion matrices reproduced every reported
+  metric. Best step 18,000 has mIoU 0.755643, foreground mIoU 0.746083, pixel
+  accuracy 0.945714, and CE 0.274758. It improves on A1 by 0.019017 mIoU
+  (+1.902 percentage points) and A0 by 0.021755 (+2.175 points).
+- Terminal step 20,000 is lower at mIoU 0.752653 and CE 0.283783, so the
+  selected artifact is `best.pt`. Best/last checkpoint SHA-256 values are
+  `82ef8b83f1c5e65dd47bd2383b2788b374bedef10f3747ae54b9bf884e59a624`
+  and `fb72e73a5ddc2c24630b99aa4073bc506a2ed10ad02c0753bd4b981ecfdc0504`;
+  all recursively inspected tensors are finite and both are non-diagnostic.
+- Two complete-audit attempts were rejected for assumptions about TensorBoard
+  representation: tag order is not semantic, and the two AMP tags contain six
+  extra overflow events. The corrected full-retention audit verified all
+  training, validation, and overflow step multiplicities and passed.
+- Result/history/best-validation/terminal-validation/event SHA-256 values are
+  `7abb59bbe865a164df18bfa3aca4ce85ac3705fc2d2abc4f2bc603edc465674b`,
+  `3e14be84e34869161a7e96df406d993cde899b2d275604bb3d66a496c96aff37`,
+  `a1402f246128314c9cfb19f8e12c8571227e434b631b6ef955afca059a315ad7`,
+  `4974eb0aaf3fdf4929b6d6725756449b151f42a9f8f76f38c39f8ba7d8da7ed0`,
+  and `7928d46d15ac71ec167d7159c6846a8879e80a15260a708f86f3baabf7d194f9`.
+- Runtime was 34,986.868 seconds and peak allocated CUDA memory was
+  1,218,130,944 bytes.
