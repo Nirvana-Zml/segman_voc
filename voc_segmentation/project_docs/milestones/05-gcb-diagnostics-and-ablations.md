@@ -535,3 +535,24 @@ the verified step-1,000 checkpoint, with unique history continuation.
   1,000, with finite values and the configured
   `CE + 0.5 * Lovasz + 0.2 * edge` formula. A4 is eligible to resume uniquely
   from step 1,001.
+
+## A4 recovery launch
+
+- Three ordinary Docker follow-up query batches were denied by the Windows named
+  pipe and passed when retried with approved access. The background launch was
+  issued only once. Before launch, the paused console and exit 143 were moved
+  into `interruption_archive/`; their SHA-256 values are `afe8c95c...` and
+  `9d9b1872...`.
+- The ignored resume wrapper passed shell syntax validation and has SHA-256
+  `255e60000b4a0e1d6c8c684c4c3c23635a0cb273f24f745465f786a26a72fd8f`.
+  It started at 2026-10-28 00:00:55 +08:00 under clean source
+  `f51af0720b3ebcad9a6cd9cda40f047cafc3d622`; wrapper/trainer PIDs are
+  125/132.
+- Trainer reconciliation retained all 1,001 accepted records through step
+  1,000 and dropped none. Independent live audit at step 1,070 verified unique
+  train steps 1-1,070, exact continuation at 1,001, 70 finite resumed records,
+  the configured composite-loss formula, and retained validation step 1,000.
+- The RTX 4060 used 1,794/8,188 MiB at 21%. No new `exit_code.txt` or
+  `result.json` exists. A later approved handoff snapshot confirmed PIDs
+  125/132 still active at step 1,139, with finite logged values and no terminal
+  artifacts. A4 recovery is active toward the 20,000-step contract.

@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 23:41 +08:00
+- Last updated: 2026-10-28 00:03 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the passed A4 recovery preflight, preserve the paused console and exit
-code, then resume only from the verified step-1,000 `best.pt`. Require
-automatic history reconciliation and independently confirm unique continuation
-from step 1,001 before handing the active run back to the user.
+Allow the active A4 recovery to continue to its 20,000-step terminal result.
+Monitor the next full official validation at step 2,000; do not select or
+compare A4 until the reportable run finishes and all terminal artifacts pass
+independent audit.
 
 ## Latest checks
 
@@ -927,3 +927,25 @@ from step 1,001 before handing the active run back to the user.
   train steps 1-1,000 exactly once plus the step-1,000 full validation; every
   train record is finite and satisfies
   `total = CE + 0.5 * Lovasz + 0.2 * edge`.
+
+## A4 recovery launch
+
+- Three ordinary post-preflight Docker inspection batches were denied by the
+  Windows named pipe; approved retries succeeded. Neither denial stopped or
+  duplicated the background job. The paused console and exit 143 were first
+  preserved in `interruption_archive/` with SHA-256 values `afe8c95c...` and
+  `9d9b1872...`.
+- The resume wrapper passed `sh -n`, has SHA-256
+  `255e60000b4a0e1d6c8c684c4c3c23635a0cb273f24f745465f786a26a72fd8f`,
+  and launched at 2026-10-28 00:00:55 +08:00 under clean source
+  `f51af0720b3ebcad9a6cd9cda40f047cafc3d622`. Wrapper/trainer PIDs are
+  125/132.
+- Built-in reconciliation reported `kept=1001 dropped=0 archive=None`.
+  Independent audit at step 1,070 found train steps 1-1,070 exactly once, the
+  first resumed step exactly 1,001, 70 finite resumed records satisfying
+  `total = CE + 0.5 * Lovasz + 0.2 * edge`, and the original step-1,000 full
+  validation retained.
+- GPU use was 1,794/8,188 MiB at 21%. No new exit code or terminal result
+  exists. A later approved handoff snapshot found the same PIDs active at step
+  1,139 with finite values and still no terminal artifacts; A4 is actively
+  continuing toward 20,000 steps.

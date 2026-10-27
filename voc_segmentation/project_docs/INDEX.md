@@ -141,3 +141,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0149 — Pause and save A4 at step 1000](steps/0149-pause-and-save-a4-at-step-1000.md) — Information, 2026-10-27T23:01:08+08:00
 - [0150 — Correct A4 recovery audit invocation](steps/0150-correct-a4-recovery-audit-invocation.md) — Failed, 2026-10-27T23:42:46+08:00
 - [0151 — Pass A4 step-1000 recovery preflight](steps/0151-pass-a4-step-1000-recovery-preflight.md) — Passed, 2026-10-27T23:42:46+08:00
+- [0152 — Retry A4 resume Docker inspections](steps/0152-retry-a4-resume-docker-inspections.md) — Failed, 2026-10-28T00:03:38+08:00
+- [0153 — Resume A4 from verified step-1000 checkpoint](steps/0153-resume-a4-from-verified-step-1000-checkpoint.md) — In progress, 2026-10-28T00:03:38+08:00
+- [0154 — Retry A4 handoff snapshot](steps/0154-retry-a4-handoff-snapshot.md) — Failed, 2026-10-28T00:04:49+08:00
