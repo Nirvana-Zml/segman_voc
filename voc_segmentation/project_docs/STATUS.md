@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 09:44 +08:00
+- Last updated: 2026-10-27 12:29 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 user-stopped and resumable from step 3,000 |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 recovery preflight passed at step 3,000 |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Await user direction. If continuation is requested, pass a recovery preflight
-and resume A3 only from the verified step-3,000 `best.pt`; require automatic
-history reconciliation, unique continuation from step 3,001, matching source
-and configuration provenance, and no competing trainer.
+Commit the passed A3 recovery preflight ledger, preserve the interrupted
+console and exit code, then resume only from the verified step-3,000 `best.pt`.
+Verify unique continuation from step 3,001, matching provenance, finite
+composite loss, active processes, and absence of a premature terminal result.
 
 ## Latest checks
 
@@ -752,3 +752,27 @@ and configuration provenance, and no competing trainer.
   size and hash; its SHA-256 is
   `93aea8ebe4c96b6ab8983ff427fd2b2657e83b443ad9730ccb59c59942796f0c`.
   A3 remains incomplete and must not be compared as a terminal ablation result.
+
+## A3 recovery preflight
+
+- A first read-only source search passed `--resume|resume` without `rg`'s
+  option terminator, so `rg` rejected it as an option. The corrected query
+  confirmed the trainer's resume path and automatic history reconciliation;
+  no file or runtime artifact changed.
+- Source and documentation were clean at
+  `d6f2218f1b22cd1f7b96eaad9112fba770df39bd`. The RTX 4060 reported 0 of
+  8,188 MiB used and 0% utilization with no compute process. Container PID 1
+  and the inspection command were the only processes, `/workspace` had 757 GB
+  available, and no competing trainer existed.
+- The step-3,000 `best.pt`, reconciled history, and stop manifest retained
+  their registered SHA-256 values `89a3a2af...`, `0d9b0330...`, and
+  `93aea8eb...`. A3 config SHA-256 is `11127f069...`; MiT-B1 remains
+  `8944b871...`. Exit 143 is preserved and `result.json` remains absent.
+- Recursive checkpoint inspection found 1,068 tensors across model,
+  optimizer, and scaler state; all floating tensors are finite. The checkpoint
+  is non-diagnostic at step 3,000, selection is mIoU 0.477465 at step 3,000,
+  and saved AMP overflow count is zero.
+- The resolved configuration exactly matches the checkpoint config. Active
+  history contains 3,003 records with train steps 1-3,000 exactly once and
+  validations at 1,000/2,000/3,000. The trainer is eligible to resume at step
+  3,001 under the unchanged 20,000-step A3 contract.

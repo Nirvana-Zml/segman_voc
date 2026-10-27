@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Await user direction. Resume A3 only after a recovery preflight and only from
-the verified step-3,000 checkpoint, with unique history continuation.
+Commit the passed recovery preflight, preserve the interrupted console and
+exit code, then resume A3 from step 3,000 and verify unique continuation.
 
 ## A2 formal-run preflight
 
@@ -399,3 +399,19 @@ the verified step-3,000 checkpoint, with unique history continuation.
   `93aea8ebe4c96b6ab8983ff427fd2b2657e83b443ad9730ccb59c59942796f0c`.
   A future resume must start at step 3,001 from this checkpoint and must not
   treat the discarded post-checkpoint records as completed continuation.
+
+## A3 recovery preflight
+
+- A read-only `rg` query first omitted the option terminator and rejected the
+  `--resume` pattern; the corrected query confirmed the supported resume and
+  history-reconciliation path without changing state.
+- Source was clean at `d6f2218f1b22cd1f7b96eaad9112fba770df39bd`.
+  The RTX 4060 had no compute process, 0/8,188 MiB reported use and 0%
+  utilization; no trainer existed and `/workspace` had 757 GB free.
+- Registered hashes for the step-3,000 checkpoint, active history, stop
+  manifest, A3 config, and MiT-B1 weight all matched. Exit 143 remains saved,
+  no terminal result exists, and all 1,068 recursively discovered checkpoint
+  tensors are finite.
+- Checkpoint/resolved configuration equality passed. History contains train
+  steps 1-3,000 exactly once and full validations at 1,000/2,000/3,000. The
+  unchanged A3 contract is eligible to continue uniquely from step 3,001.
