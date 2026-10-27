@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 21:58 +08:00
+- Last updated: 2026-10-27 22:59 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 0.726746; A4 formal run active |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 0.726746; A4 paused and resumable from step 1,000 |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Allow the active A4 Lovasz run to reach step 1,000, then independently verify
-the first complete 1,449-image official validation, checkpoint status,
-composite-loss history continuity, process health, and absence of terminal
-artifacts.
+Await user direction. If continuation is requested, pass a recovery preflight
+and resume A4 only from the verified step-1,000 `best.pt`; require automatic
+history reconciliation, unique continuation from step 1,001, matching source
+and configuration provenance, and no competing trainer.
 
 ## Latest checks
 
@@ -875,3 +875,32 @@ artifacts.
   head, 20,000 reportable steps, full validation every 1,000 steps, and no
   validation limit. Source provenance matches; neither `exit_code.txt` nor
   `result.json` existed.
+
+## A4 user-requested pause
+
+- A first read-only checkpoint loop embedded `$f` inside a PowerShell double-
+  quoted command. PowerShell expanded it before Docker, causing both iterations
+  to list the run directory instead of individual checkpoint paths. Explicit
+  path checks then confirmed `best.pt` exists and `last.pt` is absent; no state
+  changed during the failed query.
+- At the user's request, exact trainer PID 416 received `SIGTERM`. The trainer
+  and wrapper exited, `exit_code.txt` contains 143, no terminal `result.json`
+  exists, no Python trainer remains, and the GPU returned to 0% utilization.
+- Training had completed step 1,788 when paused. The full 1,789-record history
+  was preserved at `history_archive/user_pause_20261027T225706+0800.jsonl`;
+  it contains train steps 1-1,788 and the step-1,000 validation. SHA-256 is
+  `8d017947dccbbea86eafa66a197846b4f20fb562815da6b72e823f4234477e14`.
+- Active history was reconciled to checkpoint step 1,000 and now contains
+  exactly 1,001 records: train steps 1-1,000 plus the complete validation. Its
+  SHA-256 is
+  `384042982302d63051b296e712adcbfdda972023afe67750f64e5d2c0fc93324`.
+- `best.pt` is a non-diagnostic step-1,000 checkpoint with mIoU 0.188642;
+  all 1,068 recursively discovered floating tensors are finite and SHA-256 is
+  `35aa3e4d122ced56851905066e26a69b5551b365776fd2528201268bf7e0ce6d`.
+  The matched validation SHA-256 is
+  `f31b5c64f4afe3cebc505e9e436f42733f3958cd42153898d8090f5f8c4856e8`.
+- The machine-readable pause manifest
+  `user_pause_20261027T225706+0800.json` matched every referenced size and hash;
+  its SHA-256 is
+  `22826e4013ea50faa31393007cd5fead8eb49f501a75a271dc8bb482c1950d5b`.
+  A4 remains incomplete and must not be compared as a terminal result.

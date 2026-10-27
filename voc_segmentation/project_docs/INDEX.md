@@ -137,3 +137,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0145 — Verify completed recovered A3 ablation run](steps/0145-verify-completed-recovered-a3-ablation-run.md) — Passed, 2026-10-27T21:50:10+08:00
 - [0146 — Pass reportable A4 formal-run preflight](steps/0146-pass-reportable-a4-formal-run-preflight.md) — Passed, 2026-10-27T21:54:46+08:00
 - [0147 — Launch reportable A4 Lovasz VOC-train run](steps/0147-launch-reportable-a4-lovasz-voc-train-run.md) — In progress, 2026-10-27T21:59:28+08:00
+- [0148 — Correct A4 checkpoint path inspection](steps/0148-correct-a4-checkpoint-path-inspection.md) — Failed, 2026-10-27T23:01:01+08:00
+- [0149 — Pause and save A4 at step 1000](steps/0149-pause-and-save-a4-at-step-1000.md) — Information, 2026-10-27T23:01:08+08:00

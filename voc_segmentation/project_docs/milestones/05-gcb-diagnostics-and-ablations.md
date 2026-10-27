@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Allow active A4 to reach step 1,000, then independently audit its first
-complete official validation and checkpoint.
+Await user direction. Resume A4 only after a recovery preflight and only from
+the verified step-1,000 checkpoint, with unique history continuation.
 
 ## A2 formal-run preflight
 
@@ -491,3 +491,26 @@ complete official validation and checkpoint.
 - Resolved runtime is the full 20,000-step non-diagnostic A4 contract with
   official validation every 1,000 steps. No exit code or terminal result
   existed; the first acceptance gate is the complete step-1,000 validation.
+
+## A4 user-requested pause
+
+- A PowerShell-expanded `$f` made the first read-only checkpoint loop list the
+  directory rather than each target. Correct explicit-path checks proved that
+  `best.pt` exists and `last.pt` does not; the failed query changed nothing.
+- Exact trainer PID 416 received `SIGTERM` at the user's request. Exit code
+  143 was saved, no result exists, no trainer remains, and GPU utilization
+  returned to 0%. This is a saved interruption, not a completed A4 result.
+- The process reached train step 1,788. Its original 1,789-record history was
+  archived with SHA-256
+  `8d017947dccbbea86eafa66a197846b4f20fb562815da6b72e823f4234477e14`;
+  active history was reconciled to 1,001 records through step 1,000 with SHA
+  `384042982302d63051b296e712adcbfdda972023afe67750f64e5d2c0fc93324`.
+- The recoverable non-diagnostic `best.pt` is step 1,000, has mIoU 0.188642,
+  1,068 finite recursively inspected tensors, and SHA-256
+  `35aa3e4d122ced56851905066e26a69b5551b365776fd2528201268bf7e0ce6d`.
+  Its validation JSON SHA-256 is
+  `f31b5c64f4afe3cebc505e9e436f42733f3958cd42153898d8090f5f8c4856e8`.
+- The verified pause manifest is `user_pause_20261027T225706+0800.json`,
+  SHA-256 `22826e4013ea50faa31393007cd5fead8eb49f501a75a271dc8bb482c1950d5b`.
+  A future resume must start at step 1,001 and must not treat discarded
+  post-checkpoint records as completed continuation.
