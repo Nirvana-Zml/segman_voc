@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 08:03 +08:00
+- Last updated: 2026-10-27 08:12 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 preflight passed and clean launch commit pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 formal run active and first full validation pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the passed A3 BAB/edge-loss preflight ledger, then launch the reportable
-20,000-step run from that exact clean revision. Verify active processes, the
-resolved reportable configuration, finite early composite-loss records, and
-nonzero boundary supervision before handoff.
+Allow the active A3 BAB/edge-loss run to reach step 1,000, then independently
+verify the first complete 1,449-image official validation, checkpoint status,
+composite-loss history continuity, process health, and absence of terminal
+artifacts.
 
 ## Latest checks
 
@@ -709,3 +709,22 @@ nonzero boundary supervision before handoff.
   is `edge_weight=0.0` to `0.2`. A3 retains gated GFF, CE weight 1.0, zero
   Lovasz/auxiliary/label-smoothing weights, official train/val, 20,000 steps,
   and full validation every 1,000 steps.
+
+## A3 reportable launch
+
+- The passed preflight ledger was committed as clean source
+  `c3ff587f59396890816dfa6a17fdb7a1ed7bbdfa`. The ignored launch wrapper
+  passed `sh -n` and has SHA-256
+  `af20a507b75c401ef458531286c9ad010349092e74af3bedb3dd2ad02b64d36b`.
+- The reportable A3 job started at 2026-10-27 08:05:24 +08:00 with wrapper
+  PID 3246 and trainer PID 3253. Its command injects the exact source commit
+  and clean-worktree assertion. GPU use was 2,379 MiB at 54% during the first
+  process snapshot.
+- Independent early audit found 341 unique sequential train records through
+  step 341. Every scalar was finite, all boundary/edge-BCE/edge-Dice losses
+  were nonzero, and each total matched `CE + 0.2 * edge`. At the snapshot,
+  total/CE/edge were 0.927822/0.804647/0.615879.
+- The resolved configuration records A3 gated GFF with BAB, no auxiliary
+  head, zero Lovasz/auxiliary/label-smoothing weights, 20,000 reportable steps,
+  full validation every 1,000 steps, and no validation limit. Source provenance
+  matches; neither `exit_code.txt` nor `result.json` existed.

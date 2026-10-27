@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Commit the passed A3 preflight ledger, then launch the BAB/edge-loss experiment
-from that exact clean revision and independently audit its early history.
+Allow the active A3 BAB/edge-loss run to reach step 1,000, then independently
+audit its first complete official validation and checkpoint.
 
 ## A2 formal-run preflight
 
@@ -359,3 +359,21 @@ from that exact clean revision and independently audit its early history.
   to 0.2. Gated GFF remains enabled; Lovasz, auxiliary loss, and label
   smoothing remain zero. A3 uses official train/val for 20,000 steps with full
   validation every 1,000 steps.
+
+## A3 reportable launch
+
+- Preflight documentation was committed as clean source
+  `c3ff587f59396890816dfa6a17fdb7a1ed7bbdfa`. The ignored launch wrapper
+  passed shell syntax validation and has SHA-256
+  `af20a507b75c401ef458531286c9ad010349092e74af3bedb3dd2ad02b64d36b`.
+- The background job started at 2026-10-27 08:05:24 +08:00. Wrapper/trainer
+  PIDs 3246/3253 were active with the exact source commit and clean-worktree
+  assertion; GPU use was 2,379 MiB at 54%.
+- An independent audit at step 341 verified unique sequential finite history,
+  nonzero boundary loss components, and the exact `total = CE + 0.2 * edge`
+  formula. The latest total/CE/edge values were
+  0.927822/0.804647/0.615879.
+- Resolved runtime is A3 gated GFF plus BAB, no auxiliary head or Lovasz,
+  20,000 reportable steps, full validation every 1,000 steps, and no limit.
+  No exit code or terminal result existed; the first acceptance gate is the
+  complete step-1,000 validation.
