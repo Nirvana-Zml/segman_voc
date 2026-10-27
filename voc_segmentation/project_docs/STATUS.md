@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 12:35 +08:00
+- Last updated: 2026-10-27 21:49 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 resumed from step 3,000 and active |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 passed at 0.726746; A4 preflight pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Allow the resumed A3 run to reach step 4,000, then independently verify its
-first post-resume complete 1,449-image validation, checkpoint selection,
-unique composite-loss history, process health, and absence of terminal
-artifacts.
+Run the A4 Lovasz formal preflight from the current clean ledger revision.
+Require the exact A3 common-budget contract with only the planned Lovasz-loss
+delta, absent A4 output, idle GPU, no trainer, sufficient disk, and matching
+config/weight hashes before launch.
 
 ## Latest checks
 
@@ -796,3 +796,44 @@ artifacts.
 - GPU use was 1,675 MiB at 11% during the first recovery snapshot. The resolved
   runtime remains the 20,000-step non-diagnostic A3 contract, and neither a new
   exit code nor terminal `result.json` existed.
+
+## A3 terminal result
+
+- The resumed wrapper saved exit code 0, `result.json` reports `ok=true` and
+  `diagnostic_only=false`, no Python trainer remains, and the terminal GPU
+  snapshot was idle at 0% with 1,107 MiB allocated.
+- Reconciled history contains exactly 20,026 records: train steps 1-20,000
+  exactly once, 20 complete 1,449-image official validations at every 1,000
+  steps, and six isolated recovered AMP overflows after resume. Every recorded
+  scalar is finite; every train record has nonzero boundary supervision and
+  satisfies `total = CE + 0.2 * edge`.
+- Independent recomputation from all 20 saved 21x21 global confusion matrices
+  reproduced every reported metric. Each validation contains 244,886,857
+  valid pixels. Best and terminal are both step 20,000: mIoU 0.726746,
+  foreground mIoU 0.715886, pixel accuracy 0.940076, and CE 0.306535.
+- A3 is 0.028897 mIoU lower than A2 (-2.890 percentage points), 0.009880 lower
+  than A1, and 0.007143 lower than A0 under the common single-seed budget.
+  Therefore BAB plus edge loss did not improve segmentation mIoU in A3, and
+  A2 remains the best ablation so far.
+- The selected non-diagnostic `best.pt` is step 20,000, contains 1,068 finite
+  recursively discovered tensors, and has SHA-256
+  `41ab47394605b7fc509c97954b1e2f5f4dbc42e1567d145066450a4311cec182`.
+  `last.pt` is a finite but stale step-16,000 non-improvement artifact, not the
+  terminal checkpoint; its SHA-256 is
+  `69dc2e3f5bb6a45d23a55a832ae69d8689c8f15bb6730d0a6446c9a1f30cbad1`.
+- TensorBoard was independently verified across both sessions. The initial
+  event contains raw train steps 1-3,314 and validations through 3,000; only
+  steps 1-3,000 are accepted before the saved interruption. The resumed event
+  contains unique steps 3,001-20,000, validations 4,000-20,000, and six extra
+  AMP events. Event SHA-256 values are
+  `929e3a371265a63487c30be6b3eaa6e48ab4e7300c0839c2713623fd610016cc`
+  and `de67ca5ce6749a2db8bb4471808f28e536d4bee6ddcec20da95eb0b63c544ccd`.
+- Result/history/terminal-validation SHA-256 values are
+  `85a691f89401c9dbad15f645b1b8a0e328698598cf612f079bed5794c2d58263`,
+  `9244f4f02ce6ec70b9b292a7027627bd084b385614f4cd7467f56df64dd7edd5`,
+  and `0474418b4fc0b2bcb36aed2d754c8f64b6353309bc9f51777af56e3ef3058cb1`.
+  The stop manifest and original 3,317-record archive retained their verified
+  hashes `93aea8eb...` and `02f6bb11...`.
+- The resumed segment ran for 30,096.928 seconds (about 8 h 22 min) and peaked
+  at 1,350,610,432 allocated CUDA bytes. Original source was `c3ff587...` and
+  clean resume provenance was `c3638045039867aaa77addd8579b32b4d532ba6d`.

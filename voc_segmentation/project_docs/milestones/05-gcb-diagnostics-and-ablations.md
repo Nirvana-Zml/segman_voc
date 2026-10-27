@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Allow resumed A3 to reach step 4,000, then audit the first complete
-post-resume official validation and checkpoint selection.
+Pass an A4 Lovasz formal preflight from the current clean ledger revision
+before launching the final controlled ablation.
 
 ## A2 formal-run preflight
 
@@ -431,3 +431,32 @@ post-resume official validation and checkpoint selection.
   configured `CE + 0.2 * edge` formula.
 - GPU use was 1,675 MiB at 11%. No new exit code or result existed; A3 remains
   active under the full 20,000-step reportable contract.
+
+## A3 terminal result
+
+- The resumed run exited with code 0; no trainer remains. Reconciled history
+  has 20,000 unique train steps, 20 full validations, and six recovered AMP
+  overflows in 20,026 records. All composite losses are finite, have nonzero
+  edge supervision, and match `CE + 0.2 * edge`.
+- All 20 global confusion matrices independently reproduced the reported
+  metrics. Best and terminal are step 20,000: mIoU 0.726746, foreground mIoU
+  0.715886, pixel accuracy 0.940076, and CE 0.306535.
+- A3 trails A2 by 0.028897 mIoU (-2.890 percentage points), A1 by 0.009880,
+  and A0 by 0.007143. Under this seed and budget, BAB plus edge loss did not
+  improve the primary metric; A2 remains the leading ablation.
+- The selected step-20,000 `best.pt` is non-diagnostic, has 1,068 finite
+  tensors, and SHA-256
+  `41ab47394605b7fc509c97954b1e2f5f4dbc42e1567d145066450a4311cec182`.
+  The remaining `last.pt` is an older step-16,000 non-improvement checkpoint,
+  SHA-256 `69dc2e3f5bb6a45d23a55a832ae69d8689c8f15bb6730d0a6446c9a1f30cbad1`.
+- The initial TensorBoard event was validated against the full pre-stop
+  archive, while accepted initial steps stop at 3,000. The resumed event
+  uniquely covers 3,001-20,000 plus validations 4,000-20,000 and six overflow
+  events. Their SHA-256 values are `929e3a37...` and `de67ca5c...`.
+- Result/history/terminal-validation SHA-256 values are
+  `85a691f89401c9dbad15f645b1b8a0e328698598cf612f079bed5794c2d58263`,
+  `9244f4f02ce6ec70b9b292a7027627bd084b385614f4cd7467f56df64dd7edd5`,
+  and `0474418b4fc0b2bcb36aed2d754c8f64b6353309bc9f51777af56e3ef3058cb1`.
+- The resumed segment elapsed 30,096.928 seconds and peaked at 1,350,610,432
+  CUDA bytes. Resume provenance is clean commit
+  `c3638045039867aaa77addd8579b32b4d532ba6d`.
