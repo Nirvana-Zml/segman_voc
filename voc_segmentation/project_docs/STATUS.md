@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 21:49 +08:00
+- Last updated: 2026-10-27 21:54 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 passed at 0.726746; A4 preflight pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 0.726746; A4 preflight passed |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Run the A4 Lovasz formal preflight from the current clean ledger revision.
-Require the exact A3 common-budget contract with only the planned Lovasz-loss
-delta, absent A4 output, idle GPU, no trainer, sufficient disk, and matching
-config/weight hashes before launch.
+Commit the passed A4 Lovasz preflight ledger, then launch the reportable
+20,000-step run from that exact clean revision. Verify active processes, the
+resolved reportable configuration, finite early composite-loss records, and
+the exact CE/Lovasz/edge formula before handoff.
 
 ## Latest checks
 
@@ -837,3 +837,21 @@ config/weight hashes before launch.
 - The resumed segment ran for 30,096.928 seconds (about 8 h 22 min) and peaked
   at 1,350,610,432 allocated CUDA bytes. Original source was `c3ff587...` and
   clean resume provenance was `c3638045039867aaa77addd8579b32b4d532ba6d`.
+
+## A4 formal-run preflight
+
+- Source and documentation were clean at full commit
+  `6c8cfcb13261438c871aec992d1d0270bba3c0c5`. No GPU compute process existed;
+  the RTX 4060 reported 1,107 of 8,188 MiB used and 0% utilization. The process
+  table contained only PID 1, a stale A3 log tail, and the inspection command,
+  with no Python trainer. `/workspace` had 757 GB available and
+  `runs/gcb_ablation_a4_lovasz_voc_train` was absent.
+- Container SHA-256 values matched the host A4 configuration and registered
+  MiT-B1 weight: config
+  `f1d5532abf381ea2d31c7a60d84cc5d7e98def6fdd7553b43207b41303c0b596`;
+  weight
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- Parsed A3/A4 model, data, training, and inference sections match exactly.
+  The only loss delta is `lovasz_weight=0.0` to `0.5`. A4 retains gated GFF,
+  BAB, CE weight 1.0, edge weight 0.2, zero auxiliary/label-smoothing weights,
+  official train/val, 20,000 steps, and full validation every 1,000 steps.

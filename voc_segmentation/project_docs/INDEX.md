@@ -135,3 +135,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0143 — Pass A3 step-3000 recovery preflight](steps/0143-pass-a3-step-3000-recovery-preflight.md) — Passed, 2026-10-27T12:29:53+08:00
 - [0144 — Resume A3 from verified step-3000 checkpoint](steps/0144-resume-a3-from-verified-step-3000-checkpoint.md) — In progress, 2026-10-27T12:36:31+08:00
 - [0145 — Verify completed recovered A3 ablation run](steps/0145-verify-completed-recovered-a3-ablation-run.md) — Passed, 2026-10-27T21:50:10+08:00
+- [0146 — Pass reportable A4 formal-run preflight](steps/0146-pass-reportable-a4-formal-run-preflight.md) — Passed, 2026-10-27T21:54:46+08:00

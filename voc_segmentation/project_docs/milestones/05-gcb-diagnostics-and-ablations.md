@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Pass an A4 Lovasz formal preflight from the current clean ledger revision
-before launching the final controlled ablation.
+Commit the passed A4 preflight ledger, then launch the Lovasz experiment from
+that exact clean revision and independently audit its early history.
 
 ## A2 formal-run preflight
 
@@ -460,3 +460,17 @@ before launching the final controlled ablation.
 - The resumed segment elapsed 30,096.928 seconds and peaked at 1,350,610,432
   CUDA bytes. Resume provenance is clean commit
   `c3638045039867aaa77addd8579b32b4d532ba6d`.
+
+## A4 formal-run preflight
+
+- Source was clean at `6c8cfcb13261438c871aec992d1d0270bba3c0c5`. The RTX
+  4060 had no compute PID, used 1,107/8,188 MiB at 0%, `/workspace` had 757 GB
+  free, no Python trainer was present, and the A4 output directory was absent.
+- A4 configuration SHA-256 is
+  `f1d5532abf381ea2d31c7a60d84cc5d7e98def6fdd7553b43207b41303c0b596`;
+  MiT-B1 SHA-256 remains
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- Parsed A3/A4 model, data, training, and inference sections are identical.
+  The exact and only loss delta enables Lovasz with weight 0.5. A4 retains CE
+  weight 1.0, edge weight 0.2, gated GFF, BAB, no auxiliary head, official
+  train/val, 20,000 steps, and full validation every 1,000 steps.
