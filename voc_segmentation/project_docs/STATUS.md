@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 07:55 +08:00
+- Last updated: 2026-10-27 08:03 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 passed at 0.736626; A2 passed at 0.755643; A3 formal preflight pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 preflight passed and clean launch commit pending |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Run the A3 BAB/edge-loss formal preflight from the current clean ledger
-revision. Require the exact A2 common-budget contract, only the planned BAB
-and edge-loss delta, absent A3 output, idle GPU, no trainer, sufficient disk,
-and matching config/weight hashes before launch.
+Commit the passed A3 BAB/edge-loss preflight ledger, then launch the reportable
+20,000-step run from that exact clean revision. Verify active processes, the
+resolved reportable configuration, finite early composite-loss records, and
+nonzero boundary supervision before handoff.
 
 ## Latest checks
 
@@ -690,3 +690,22 @@ and matching config/weight hashes before launch.
 - Runtime was 34,986.868 seconds (about 9 h 43 min), peak CUDA allocation was
   1,218,130,944 bytes, and source provenance remained clean commit
   `7ca7d0d892fec7529fc5193b078c6c9d30cb27b7`.
+
+## A3 formal-run preflight
+
+- Source and documentation were clean at full commit
+  `38d68e2f011291dd8e0580bc4206abbd39a81315`. No GPU compute process existed;
+  the RTX 4060 reported 846 of 8,188 MiB used and 0% utilization. The process
+  table contained only PID 1 and stale completed-run log tails, with no Python
+  trainer. `/workspace` had 757 GB available and
+  `runs/gcb_ablation_a3_bab_voc_train` was absent.
+- Container SHA-256 values matched the host A3 configuration and registered
+  MiT-B1 weight: config
+  `11127f069b01f0464df539a3974aace591d2267868867f6aaf8aee4a6393354c`;
+  weight
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- Parsed A2/A3 data, training, and inference sections match exactly. The only
+  model delta is `use_boundary_branch=false` to true, and the only loss delta
+  is `edge_weight=0.0` to `0.2`. A3 retains gated GFF, CE weight 1.0, zero
+  Lovasz/auxiliary/label-smoothing weights, official train/val, 20,000 steps,
+  and full validation every 1,000 steps.

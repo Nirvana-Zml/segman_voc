@@ -128,3 +128,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0136 — Reject ordered TensorBoard tag assumption in A2 audit](steps/0136-reject-ordered-tensorboard-tag-assumption-in-a2-audit.md) — Failed, 2026-10-27T07:56:11+08:00
 - [0137 — Correct A2 TensorBoard overflow-count assumption](steps/0137-correct-a2-tensorboard-overflow-count-assumption.md) — Failed, 2026-10-27T07:56:17+08:00
 - [0138 — Verify completed A2 gated-GFF ablation run](steps/0138-verify-completed-a2-gated-gff-ablation-run.md) — Passed, 2026-10-27T07:56:21+08:00
+- [0139 — Pass reportable A3 formal-run preflight](steps/0139-pass-reportable-a3-formal-run-preflight.md) — Passed, 2026-10-27T08:03:49+08:00

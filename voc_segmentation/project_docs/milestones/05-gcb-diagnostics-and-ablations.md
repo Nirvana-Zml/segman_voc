@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Pass an A3 BAB/edge-loss formal preflight from the current clean ledger
-revision before launching the next controlled experiment.
+Commit the passed A3 preflight ledger, then launch the BAB/edge-loss experiment
+from that exact clean revision and independently audit its early history.
 
 ## A2 formal-run preflight
 
@@ -344,3 +344,18 @@ revision before launching the next controlled experiment.
   and `7928d46d15ac71ec167d7159c6846a8879e80a15260a708f86f3baabf7d194f9`.
 - Runtime was 34,986.868 seconds and peak allocated CUDA memory was
   1,218,130,944 bytes.
+
+## A3 formal-run preflight
+
+- Source was clean at `38d68e2f011291dd8e0580bc4206abbd39a81315`. The RTX
+  4060 had no compute PID, used 846/8,188 MiB at 0%, `/workspace` had 757 GB
+  free, no Python trainer was present, and the A3 output directory was absent.
+- A3 configuration SHA-256 is
+  `11127f069b01f0464df539a3974aace591d2267868867f6aaf8aee4a6393354c`;
+  MiT-B1 SHA-256 remains
+  `8944b871fc4379ddc9c72df16daeea22c53ed5eac3ce65d7219d967d77a9ee8b`.
+- Parsed A2/A3 data, training, and inference sections match. The exact model
+  delta enables BAB, while the exact loss delta changes edge weight from zero
+  to 0.2. Gated GFF remains enabled; Lovasz, auxiliary loss, and label
+  smoothing remain zero. A3 uses official train/val for 20,000 steps with full
+  validation every 1,000 steps.
