@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 12:29 +08:00
+- Last updated: 2026-10-27 12:35 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 recovery preflight passed at step 3,000 |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 resumed from step 3,000 and active |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the passed A3 recovery preflight ledger, preserve the interrupted
-console and exit code, then resume only from the verified step-3,000 `best.pt`.
-Verify unique continuation from step 3,001, matching provenance, finite
-composite loss, active processes, and absence of a premature terminal result.
+Allow the resumed A3 run to reach step 4,000, then independently verify its
+first post-resume complete 1,449-image validation, checkpoint selection,
+unique composite-loss history, process health, and absence of terminal
+artifacts.
 
 ## Latest checks
 
@@ -776,3 +776,23 @@ composite loss, active processes, and absence of a premature terminal result.
   history contains 3,003 records with train steps 1-3,000 exactly once and
   validations at 1,000/2,000/3,000. The trainer is eligible to resume at step
   3,001 under the unchanged 20,000-step A3 contract.
+
+## A3 recovery launch
+
+- The recovery preflight ledger was committed as clean source
+  `c3638045039867aaa77addd8579b32b4d532ba6d`. Before launch, the original
+  `console.log` and exit-code 143 were moved into `interruption_archive/`.
+  The archived console retained SHA-256
+  `e8e1ca010fa18366aab172b70fbd417ae2d98662839800ddc7f654aee7213619`.
+- The ignored resume wrapper passed `sh -n` and has SHA-256
+  `1588ffcd3ad5d57c6c4091f6c110659b3d6febcbb510489d2b92fdc89034e281`.
+  It resumed from `best.pt` at 2026-10-27 12:33:55 +08:00 with wrapper/trainer
+  PIDs 97/104 and injected the exact clean recovery source revision.
+- The trainer reported `history_reconciliation kept=3003 dropped=0
+  archive=None`. Independent audit found train steps 1-3,058 exactly once,
+  with the first resumed record at 3,001 and all three earlier validation
+  records retained. All 58 observed resumed records were finite, had nonzero
+  boundary loss, and matched `total = CE + 0.2 * edge`.
+- GPU use was 1,675 MiB at 11% during the first recovery snapshot. The resolved
+  runtime remains the 20,000-step non-diagnostic A3 contract, and neither a new
+  exit code nor terminal `result.json` existed.

@@ -133,3 +133,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0141 — Stop and save A3 at step 3000](steps/0141-stop-and-save-a3-at-step-3000.md) — Information, 2026-10-27T09:45:01+08:00
 - [0142 — Correct A3 resume source search invocation](steps/0142-correct-a3-resume-source-search-invocation.md) — Failed, 2026-10-27T12:29:48+08:00
 - [0143 — Pass A3 step-3000 recovery preflight](steps/0143-pass-a3-step-3000-recovery-preflight.md) — Passed, 2026-10-27T12:29:53+08:00
+- [0144 — Resume A3 from verified step-3000 checkpoint](steps/0144-resume-a3-from-verified-step-3000-checkpoint.md) — In progress, 2026-10-27T12:36:31+08:00

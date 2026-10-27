@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Commit the passed recovery preflight, preserve the interrupted console and
-exit code, then resume A3 from step 3,000 and verify unique continuation.
+Allow resumed A3 to reach step 4,000, then audit the first complete
+post-resume official validation and checkpoint selection.
 
 ## A2 formal-run preflight
 
@@ -415,3 +415,19 @@ exit code, then resume A3 from step 3,000 and verify unique continuation.
 - Checkpoint/resolved configuration equality passed. History contains train
   steps 1-3,000 exactly once and full validations at 1,000/2,000/3,000. The
   unchanged A3 contract is eligible to continue uniquely from step 3,001.
+
+## A3 recovery launch
+
+- Recovery preflight documentation was committed as clean source
+  `c3638045039867aaa77addd8579b32b4d532ba6d`. The original console and exit
+  143 were preserved under `interruption_archive/`; the console retained SHA
+  `e8e1ca010fa18366aab172b70fbd417ae2d98662839800ddc7f654aee7213619`.
+- The resume wrapper passed syntax validation, has SHA-256
+  `1588ffcd3ad5d57c6c4091f6c110659b3d6febcbb510489d2b92fdc89034e281`,
+  and started wrapper/trainer PIDs 97/104 at 2026-10-27 12:33:55 +08:00.
+- Built-in reconciliation reported 3,003 records kept and none dropped. An
+  independent snapshot found unique train steps through 3,058, exact resume
+  from 3,001, finite composite losses, nonzero boundary supervision, and the
+  configured `CE + 0.2 * edge` formula.
+- GPU use was 1,675 MiB at 11%. No new exit code or result existed; A3 remains
+  active under the full 20,000-step reportable contract.
