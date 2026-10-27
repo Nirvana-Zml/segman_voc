@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 22:59 +08:00
+- Last updated: 2026-10-27 23:41 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Await user direction. If continuation is requested, pass a recovery preflight
-and resume A4 only from the verified step-1,000 `best.pt`; require automatic
-history reconciliation, unique continuation from step 1,001, matching source
-and configuration provenance, and no competing trainer.
+Commit the passed A4 recovery preflight, preserve the paused console and exit
+code, then resume only from the verified step-1,000 `best.pt`. Require
+automatic history reconciliation and independently confirm unique continuation
+from step 1,001 before handing the active run back to the user.
 
 ## Latest checks
 
@@ -904,3 +904,26 @@ and configuration provenance, and no competing trainer.
   its SHA-256 is
   `22826e4013ea50faa31393007cd5fead8eb49f501a75a271dc8bb482c1950d5b`.
   A4 remains incomplete and must not be compared as a terminal result.
+
+## A4 recovery preflight
+
+- The first container preflight invocation was denied by the Windows Docker
+  named pipe and started nothing. The approved retry reached the read-only
+  audit, but its temporary checker incorrectly searched history key `event`
+  instead of the actual key `type`; checkpoint loading and all hash checks had
+  passed before that local assertion failed. Correcting only the checker made
+  the complete audit pass.
+- Source remains clean at `c8ebb4ee9304bd44bdadc0c01e8a7e740495e0fb`.
+  The process table contains only container PID 1 and the inspection command,
+  with no trainer. The RTX 4060 reports 120/8,188 MiB and 0% utilization, no
+  compute process, and `/workspace` has 757 GB available.
+- Registered SHA-256 values for the step-1,000 checkpoint, active and archived
+  histories, validation, resolved config, paused console, pause manifest, A4
+  config, and MiT-B1 weight all match. Exit 143 remains saved; `result.json`
+  and `last.pt` remain absent.
+- The checkpoint is non-diagnostic at step 1,000 with mIoU 0.188642. Its
+  configuration exactly matches `resolved_config.yaml`, and all 1,068
+  recursively inspected floating tensors are finite. Active history contains
+  train steps 1-1,000 exactly once plus the step-1,000 full validation; every
+  train record is finite and satisfies
+  `total = CE + 0.5 * Lovasz + 0.2 * edge`.

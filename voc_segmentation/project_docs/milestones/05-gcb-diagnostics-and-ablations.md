@@ -514,3 +514,24 @@ the verified step-1,000 checkpoint, with unique history continuation.
   SHA-256 `22826e4013ea50faa31393007cd5fead8eb49f501a75a271dc8bb482c1950d5b`.
   A future resume must start at step 1,001 and must not treat discarded
   post-checkpoint records as completed continuation.
+
+## A4 recovery preflight
+
+- The first batched container query was denied by the Docker named pipe and
+  launched no process. On the approved retry, a temporary read-only checker
+  used the wrong JSONL discriminator (`event` instead of `type`) and stopped
+  after checkpoint/hash validation. The corrected checker passed completely;
+  this tooling error did not modify run evidence.
+- Source was clean at `c8ebb4ee9304bd44bdadc0c01e8a7e740495e0fb`.
+  No trainer or GPU compute process exists; the RTX 4060 reports 120/8,188 MiB
+  at 0%, and `/workspace` has 757 GB available.
+- All registered hashes match for `best.pt`, active history, the full paused
+  history archive, step-1,000 validation, resolved config, paused console,
+  pause manifest, A4 config, and MiT-B1 weights. Exit code 143 is intact;
+  `result.json` and `last.pt` are absent.
+- `best.pt` is non-diagnostic at step 1,000 with mIoU 0.188642; its config
+  equals the resolved run config, and all 1,068 recursively inspected floating
+  tensors are finite. History has exactly train steps 1-1,000 plus validation
+  1,000, with finite values and the configured
+  `CE + 0.5 * Lovasz + 0.2 * edge` formula. A4 is eligible to resume uniquely
+  from step 1,001.
