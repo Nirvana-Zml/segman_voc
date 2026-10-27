@@ -130,3 +130,4 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0138 — Verify completed A2 gated-GFF ablation run](steps/0138-verify-completed-a2-gated-gff-ablation-run.md) — Passed, 2026-10-27T07:56:21+08:00
 - [0139 — Pass reportable A3 formal-run preflight](steps/0139-pass-reportable-a3-formal-run-preflight.md) — Passed, 2026-10-27T08:03:49+08:00
 - [0140 — Launch reportable A3 BAB edge-loss VOC-train run](steps/0140-launch-reportable-a3-bab-edge-loss-voc-train-run.md) — In progress, 2026-10-27T08:13:14+08:00
+- [0141 — Stop and save A3 at step 3000](steps/0141-stop-and-save-a3-at-step-3000.md) — Information, 2026-10-27T09:45:01+08:00

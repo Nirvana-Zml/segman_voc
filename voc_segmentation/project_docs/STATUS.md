@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 08:12 +08:00
+- Last updated: 2026-10-27 09:44 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 formal run active and first full validation pending |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 user-stopped and resumable from step 3,000 |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Allow the active A3 BAB/edge-loss run to reach step 1,000, then independently
-verify the first complete 1,449-image official validation, checkpoint status,
-composite-loss history continuity, process health, and absence of terminal
-artifacts.
+Await user direction. If continuation is requested, pass a recovery preflight
+and resume A3 only from the verified step-3,000 `best.pt`; require automatic
+history reconciliation, unique continuation from step 3,001, matching source
+and configuration provenance, and no competing trainer.
 
 ## Latest checks
 
@@ -728,3 +728,27 @@ artifacts.
   head, zero Lovasz/auxiliary/label-smoothing weights, 20,000 reportable steps,
   full validation every 1,000 steps, and no validation limit. Source provenance
   matches; neither `exit_code.txt` nor `result.json` existed.
+
+## A3 user-requested stop
+
+- At the user's request, exact trainer PID 3253 received `SIGTERM`. The trainer
+  and wrapper exited, `exit_code.txt` contains 143, no terminal `result.json`
+  exists, no Python trainer remains, and the GPU returned to 0% utilization.
+- The process had completed train step 3,314 when stopped. The full 3,317-record
+  history (3,314 train plus validations at 1,000/2,000/3,000) was preserved at
+  `history_archive/user_stop_20261027T094129+0800.jsonl`; SHA-256
+  `02f6bb11af54494f12422b79162cb15796a1a6ff7828f2ec93c4238a3495aee1`.
+- The active history was reconciled to the latest recoverable checkpoint at
+  step 3,000 and now contains 3,003 records: train steps 1-3,000 exactly once
+  plus all three validations. Its SHA-256 is
+  `0d9b03305fe8d2ecb1af8763ec9e669ac3aa542fe96bef7e90bbd9f7a390217f`.
+- `best.pt` is a non-diagnostic step-3,000 checkpoint with mIoU 0.477465;
+  its model tensors are finite and SHA-256 is
+  `89a3a2af52c6aab49c7c7670d541e0d9fcb36851d163b0e6cccdd1af6af08f26`.
+  The matched step-3,000 validation SHA-256 is
+  `4ed955a0efbe4e4e2909957c46b00259e41349ce062234a1691ed9c09ac600d9`.
+- The machine-readable stop manifest
+  `user_stop_20261027T094129+0800.json` independently matched every referenced
+  size and hash; its SHA-256 is
+  `93aea8ebe4c96b6ab8983ff427fd2b2657e83b443ad9730ccb59c59942796f0c`.
+  A3 remains incomplete and must not be compared as a terminal ablation result.

@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Allow the active A3 BAB/edge-loss run to reach step 1,000, then independently
-audit its first complete official validation and checkpoint.
+Await user direction. Resume A3 only after a recovery preflight and only from
+the verified step-3,000 checkpoint, with unique history continuation.
 
 ## A2 formal-run preflight
 
@@ -377,3 +377,25 @@ audit its first complete official validation and checkpoint.
   20,000 reportable steps, full validation every 1,000 steps, and no limit.
   No exit code or terminal result existed; the first acceptance gate is the
   complete step-1,000 validation.
+
+## A3 user-requested stop
+
+- Exact trainer PID 3253 received `SIGTERM` at the user's request. Exit code
+  143 was saved, no terminal result exists, no trainer remains, and GPU use
+  returned to 0%. This is a saved interruption, not a completed A3 result.
+- Training had reached step 3,314. The original 3,317-record history was
+  archived with SHA-256
+  `02f6bb11af54494f12422b79162cb15796a1a6ff7828f2ec93c4238a3495aee1`;
+  the active ledger was reconciled to 3,003 records through checkpoint step
+  3,000 with SHA-256
+  `0d9b03305fe8d2ecb1af8763ec9e669ac3aa542fe96bef7e90bbd9f7a390217f`.
+- The recoverable non-diagnostic `best.pt` is step 3,000, has mIoU 0.477465,
+  finite model tensors, and SHA-256
+  `89a3a2af52c6aab49c7c7670d541e0d9fcb36851d163b0e6cccdd1af6af08f26`.
+  Its validation JSON SHA-256 is
+  `4ed955a0efbe4e4e2909957c46b00259e41349ce062234a1691ed9c09ac600d9`.
+- The hash-verified stop manifest is
+  `user_stop_20261027T094129+0800.json`, SHA-256
+  `93aea8ebe4c96b6ab8983ff427fd2b2657e83b443ad9730ccb59c59942796f0c`.
+  A future resume must start at step 3,001 from this checkpoint and must not
+  treat the discarded post-checkpoint records as completed continuation.
