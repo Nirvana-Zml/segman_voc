@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-27 21:54 +08:00
+- Last updated: 2026-10-27 21:58 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 0.726746; A4 preflight passed |
+| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 0.726746; A4 formal run active |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the passed A4 Lovasz preflight ledger, then launch the reportable
-20,000-step run from that exact clean revision. Verify active processes, the
-resolved reportable configuration, finite early composite-loss records, and
-the exact CE/Lovasz/edge formula before handoff.
+Allow the active A4 Lovasz run to reach step 1,000, then independently verify
+the first complete 1,449-image official validation, checkpoint status,
+composite-loss history continuity, process health, and absence of terminal
+artifacts.
 
 ## Latest checks
 
@@ -855,3 +855,23 @@ the exact CE/Lovasz/edge formula before handoff.
   The only loss delta is `lovasz_weight=0.0` to `0.5`. A4 retains gated GFF,
   BAB, CE weight 1.0, edge weight 0.2, zero auxiliary/label-smoothing weights,
   official train/val, 20,000 steps, and full validation every 1,000 steps.
+
+## A4 reportable launch
+
+- The passed preflight ledger was committed as clean source
+  `fb2b376e43a04f5f351f83b33bfcb71c8349bbfb`. The ignored launch wrapper
+  passed `sh -n` and has SHA-256
+  `b6cefef816e4d97ef9138d669d0a21b4ad148cccb9e9742ab192d77ac3dd185b`.
+- The reportable A4 job started at 2026-10-27 21:56:48 +08:00 with wrapper
+  PID 409 and trainer PID 416. Its command injects the exact source commit and
+  clean-worktree assertion. GPU use was 2,642 MiB at 11% during the first
+  process snapshot.
+- Independent early audit found 52 unique sequential train records through
+  step 52. Every scalar was finite, Lovasz and all boundary-loss components
+  were nonzero, and each total matched
+  `CE + 0.5 * Lovasz + 0.2 * edge`. At the snapshot, total/CE/Lovasz/edge were
+  2.211768/1.633973/0.829992/0.813998.
+- The resolved configuration records A4 gated GFF with BAB, no auxiliary
+  head, 20,000 reportable steps, full validation every 1,000 steps, and no
+  validation limit. Source provenance matches; neither `exit_code.txt` nor
+  `result.json` existed.

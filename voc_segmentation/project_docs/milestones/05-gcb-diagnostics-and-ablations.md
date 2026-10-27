@@ -275,8 +275,8 @@ controlled validation experiments.
 
 ## Next action
 
-Commit the passed A4 preflight ledger, then launch the Lovasz experiment from
-that exact clean revision and independently audit its early history.
+Allow active A4 to reach step 1,000, then independently audit its first
+complete official validation and checkpoint.
 
 ## A2 formal-run preflight
 
@@ -474,3 +474,20 @@ that exact clean revision and independently audit its early history.
   The exact and only loss delta enables Lovasz with weight 0.5. A4 retains CE
   weight 1.0, edge weight 0.2, gated GFF, BAB, no auxiliary head, official
   train/val, 20,000 steps, and full validation every 1,000 steps.
+
+## A4 reportable launch
+
+- Preflight documentation was committed as clean source
+  `fb2b376e43a04f5f351f83b33bfcb71c8349bbfb`. The ignored launch wrapper
+  passed shell syntax validation and has SHA-256
+  `b6cefef816e4d97ef9138d669d0a21b4ad148cccb9e9742ab192d77ac3dd185b`.
+- The background job started at 2026-10-27 21:56:48 +08:00. Wrapper/trainer
+  PIDs 409/416 were active with the exact source commit and clean-worktree
+  assertion; GPU use was 2,642 MiB at 11%.
+- An independent audit at step 52 verified unique sequential finite history,
+  nonzero Lovasz and boundary loss components, and the exact
+  `total = CE + 0.5 * Lovasz + 0.2 * edge` formula. Latest total/CE/Lovasz/edge
+  values were 2.211768/1.633973/0.829992/0.813998.
+- Resolved runtime is the full 20,000-step non-diagnostic A4 contract with
+  official validation every 1,000 steps. No exit code or terminal result
+  existed; the first acceptance gate is the complete step-1,000 validation.
