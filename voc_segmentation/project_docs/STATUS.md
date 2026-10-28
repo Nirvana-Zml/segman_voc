@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 08:57 +08:00
+- Last updated: 2026-10-28 12:52 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,10 +41,9 @@
 
 ## Next action
 
-Await user direction. If continuation is requested, pass a recovery preflight
-and resume only from the verified step-1,000 `best.pt`; preserve the stopped
-console/exit evidence and require automatic history reconciliation with unique
-continuation from step 1,001.
+Commit the passed recovery preflight ledger, preserve the stopped console and
+exit-code evidence, then resume from the verified step-1,000 `best.pt`. Require
+automatic history reconciliation and unique continuation from step 1,001.
 
 ## Latest checks
 
@@ -1077,3 +1076,13 @@ continuation from step 1,001.
   `user_stop_20261028T085659+0800.json`, SHA-256
   `cf208b9ac441dc1228fc3ce8a67125e46047f92ab146a554193587a97f056deb`.
   A future run must resume from step 1,000 and continue uniquely at 1,001.
+- Three read-only selected-A2 recovery checker versions were rejected for
+  assumptions about the resolved-config runtime block, trainaug-summary key,
+  and nested learning-rate fields. No trainer started and no reportable
+  artifact changed during these corrections.
+- The corrected step-1,000 recovery preflight passed: no trainer or GPU compute
+  process exists, GPU is 0/8,188 MiB at 0%, and `/workspace` has 756 GB free.
+  All registered checkpoint/history/config/data/weight/stop hashes match;
+  exit 143 is preserved, `result.json` and `last.pt` are absent, all 1,036
+  checkpoint tensors are finite, and active history is uniquely reconciled
+  through step 1,000. The run is eligible to resume at step 1,001.

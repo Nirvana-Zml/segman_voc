@@ -156,3 +156,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0164 — Launch selected A2 trainaug reportable run](steps/0164-launch-selected-a2-trainaug-reportable-run.md) — In progress, 2026-10-28T08:26:12+08:00
 - [0165 — Retry selected A2 trainaug stop inspections](steps/0165-retry-selected-a2-trainaug-stop-inspections.md) — Failed, 2026-10-28T08:58:19+08:00
 - [0166 — Stop and save selected A2 trainaug at step 1000](steps/0166-stop-and-save-selected-a2-trainaug-at-step-1000.md) — Information, 2026-10-28T08:58:19+08:00
+- [0167 — Reject selected A2 recovery config-equality assumption](steps/0167-reject-selected-a2-recovery-config-equality-assumption.md) — Failed, 2026-10-28T12:52:12+08:00
+- [0168 — Reject selected A2 trainaug summary key assumption](steps/0168-reject-selected-a2-trainaug-summary-key-assumption.md) — Failed, 2026-10-28T12:52:12+08:00
+- [0169 — Reject selected A2 flat learning-rate assumption](steps/0169-reject-selected-a2-flat-learning-rate-assumption.md) — Failed, 2026-10-28T12:52:12+08:00
+- [0170 — Pass selected A2 step-1000 recovery preflight](steps/0170-pass-selected-a2-step-1000-recovery-preflight.md) — Passed, 2026-10-28T12:52:12+08:00

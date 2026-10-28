@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
 - State: **In progress — selected A2 trainaug configuration verified**
-- Last updated: 2026-10-28 08:15 +08:00
+- Last updated: 2026-10-28 12:52 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Await user direction. Before any continuation, verify the saved step-1,000
-checkpoint, manifest, histories, source/config hashes, idle GPU, and absent
-trainer; then resume uniquely at step 1,001 while preserving stop evidence.
+Commit the passed recovery preflight ledger, preserve the stopped console and
+exit-code artifacts in the interruption archive, and resume uniquely at step
+1,001 from the verified step-1,000 checkpoint.
 
 ## One-step CUDA diagnostic
 
@@ -113,3 +113,25 @@ trainer; then resume uniquely at step 1,001 while preserving stop evidence.
 - The hash-verified stop manifest
   `user_stop_20261028T085659+0800.json` has SHA-256 `cf208b9a...`. A recovery
   must use this checkpoint and continue uniquely from step 1,001.
+
+## Step-1,000 recovery preflight
+
+- The first three read-only checker versions were rejected without starting a
+  trainer: they respectively required source and resolved YAML to be identical
+  despite the expected `runtime` section, used the nonexistent summary field
+  `official_val_overlap_count` instead of `train_val_overlap`, and assumed
+  flat learning-rate fields instead of the saved `learning_rates` list. Each
+  correction changed only the ignored checker.
+- The corrected audit passed. No trainer or competing GPU process exists; the
+  RTX 4060 reports 0/8,188 MiB at 0% utilization, and `/workspace` has 756 GB
+  available.
+- Registered hashes for the checkpoint, active and stopped histories,
+  validation, resolved and source configs, stop manifest, stopped console,
+  exit code, A2 selection summary, trainaug manifest/summary/provenance,
+  MiT-B1 weight, and official validation split all match. Exit 143 remains
+  saved; `result.json` and `last.pt` remain absent.
+- `best.pt` is non-diagnostic at step 1,000, its resolved configuration matches
+  the source contract plus the expected CUDA runtime block, and all 1,036
+  recursively inspected tensors are finite. Active history is exactly train
+  steps 1-1,000 plus validation 1,000; the 1,067-record stop archive retains
+  steps 1-1,066. Recovery is eligible to continue at exactly step 1,001.
