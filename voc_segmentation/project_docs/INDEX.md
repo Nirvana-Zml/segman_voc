@@ -152,3 +152,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0160 — Retry selected A2 trainaug Docker preflight access](steps/0160-retry-selected-a2-trainaug-docker-preflight-access.md) — Failed, 2026-10-28T08:22:03+08:00
 - [0161 — Pass selected A2 trainaug CUDA diagnostic](steps/0161-pass-selected-a2-trainaug-cuda-diagnostic.md) — Passed, 2026-10-28T08:22:03+08:00
 - [0162 — Pass selected A2 trainaug formal-run preflight](steps/0162-pass-selected-a2-trainaug-formal-run-preflight.md) — Passed, 2026-10-28T08:22:03+08:00
+- [0163 — Retry selected A2 trainaug launch inspections](steps/0163-retry-selected-a2-trainaug-launch-inspections.md) — Failed, 2026-10-28T08:26:12+08:00
+- [0164 — Launch selected A2 trainaug reportable run](steps/0164-launch-selected-a2-trainaug-reportable-run.md) — In progress, 2026-10-28T08:26:12+08:00

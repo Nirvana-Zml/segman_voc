@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Commit the passed diagnostic and formal preflight evidence, then launch the
-40,000-step reportable job from the resulting clean full commit and audit its
-first unique finite train records before handoff.
+Monitor the active reportable job through its first full official validation
+at step 1,000, then independently audit validation metrics, history,
+checkpoint, TensorBoard, process/GPU state, and provenance.
 
 ## One-step CUDA diagnostic
 
@@ -71,3 +71,21 @@ first unique finite train records before handoff.
   SBD archive `6a5a2918...`; MiT-B1 weight `8944b871...`; official val split
   `cdc1326d...`; trainaug count 10,582 and val overlap zero. The reportable
   contract is eligible to launch for 40,000 steps with validation every 1,000.
+
+## Reportable trainaug launch
+
+- The ordinary wrapper-validation and first observation calls were each denied
+  once by the Windows Docker named pipe; approved retries passed, and the
+  background job was launched exactly once.
+- Wrapper SHA-256 is
+  `675914feb7689aa2165fa519da8d03c0733e0dfee641b8a5d0b284a746f75c5b`.
+  It started at 2026-10-28 08:24:15 +08:00 under clean source
+  `ad026dba623eae384046aa7be5abdb6b341252e5`; wrapper/trainer PIDs are
+  784/792.
+- An independent step-43 audit verified unique sequential steps 1-43, no AMP
+  overflow, finite loss/gradients/LRs, exact total=CE, the locked trainaug
+  manifest, selected A2 model/loss, 40,000-step runtime, full val every 1,000,
+  and no exit/result artifacts. Latest loss/gradient were 2.236667/6.605145.
+- GPU use was 1,523/8,188 MiB at 38%. A subsequent local console snapshot had
+  reached step 54 with finite loss 2.086697 and gradient norm 4.833095. The
+  first reportable acceptance point is the complete step-1,000 validation.

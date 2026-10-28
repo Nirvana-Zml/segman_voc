@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 08:21 +08:00
+- Last updated: 2026-10-28 08:25 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | CUDA diagnostic and formal preflight passed; commit evidence and launch 40,000-step run next |
+| 06 | Formal training and selection | In progress | A2 trainaug 40,000-step run active; first full validation due at step 1,000 |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the passed diagnostic and formal preflight ledger, then launch the
-40,000-step reportable A2 trainaug job from that clean full commit. Immediately
-audit unique finite early history, exact provenance, active PIDs/GPU, and the
-absence of terminal artifacts.
+Allow the active A2 trainaug job to continue. At step 1,000, independently
+audit the complete 1,449-image official validation, checkpoint metadata and
+hash, history continuity, TensorBoard points, active PIDs/GPU, and absence of
+terminal artifacts.
 
 ## Latest checks
 
@@ -1033,3 +1033,21 @@ absence of terminal artifacts.
   all match their registered values. The parsed contract selects A2, uses
   10,582 leak-free trainaug samples, preserves official val, and specifies
   40,000 steps with full validation every 1,000.
+
+## Selected A2 trainaug reportable launch
+
+- Ordinary Docker access was denied once while validating the launch wrapper
+  and once during the first post-launch observation; approved retries passed.
+  The background launch command was issued exactly once.
+- The ignored wrapper passed `sh -n` with SHA-256
+  `675914feb7689aa2165fa519da8d03c0733e0dfee641b8a5d0b284a746f75c5b`.
+  It launched at 2026-10-28 08:24:15 +08:00 from clean source
+  `ad026dba623eae384046aa7be5abdb6b341252e5`, with wrapper/trainer PIDs
+  784/792 and explicit clean-worktree assertion.
+- Independent early audit found 43 unique sequential train steps beginning at
+  1, zero AMP overflows, finite values, and exact CE-only totals; latest loss
+  was 2.236667 and gradient norm 6.605145. Resolved runtime is 40,000 steps,
+  validation every 1,000, full official val, trainaug, and non-diagnostic mode.
+- GPU use was 1,523/8,188 MiB at 38%. No exit code, validation, checkpoint, or
+  terminal result existed. A later local log snapshot reached step 54 with
+  finite loss 2.086697 and gradient norm 4.833095.
