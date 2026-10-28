@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
 - State: **In progress — selected A2 trainaug configuration verified**
-- Last updated: 2026-10-28 12:52 +08:00
+- Last updated: 2026-10-28 12:57 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Commit the passed recovery preflight ledger, preserve the stopped console and
-exit-code artifacts in the interruption archive, and resume uniquely at step
-1,001 from the verified step-1,000 checkpoint.
+Monitor the active selected-A2 trainaug recovery through full official
+validation and checkpoint intervals. Do not treat the early step-1,000 metric
+as terminal model-selection evidence.
 
 ## One-step CUDA diagnostic
 
@@ -135,3 +135,21 @@ exit-code artifacts in the interruption archive, and resume uniquely at step
   recursively inspected tensors are finite. Active history is exactly train
   steps 1-1,000 plus validation 1,000; the 1,067-record stop archive retains
   steps 1-1,066. Recovery is eligible to continue at exactly step 1,001.
+
+## Step-1,000 recovery launch
+
+- Recovery preflight evidence was committed as clean source
+  `80555c803dae4baa1b3e6ff5b6e4378ff20fe1ca`. The stopped console, exit 143,
+  start/source markers, and original launch wrapper were preserved under
+  `interruption_archive/`; console, exit, and wrapper retained SHA-256 values
+  `91ece501...`, `9d9b1872...`, and `675914fe...`.
+- One ordinary final Docker inspection was denied by the Windows named pipe;
+  the approved retry passed and no job existed at that time. The resume wrapper
+  passed `sh -n`, has SHA-256 `0fcca8f8...`, and was launched exactly once at
+  2026-10-28 12:56:06 +08:00. Wrapper/trainer PIDs are 193/201.
+- The trainer reported `history_reconciliation kept=1001 dropped=0
+  archive=None`. Independent audit at step 1,032 found train steps 1-1,032
+  exactly once, first resumed step 1,001, the original step-1,000 validation,
+  and 32 finite CE-only resumed records. Archived stop hashes still match.
+- GPU use was 1,547/8,188 MiB at 5%. No new exit code or terminal result exists;
+  the selected-A2 40,000-step trainaug run is actively continuing.

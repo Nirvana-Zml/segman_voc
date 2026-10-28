@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 12:52 +08:00
+- Last updated: 2026-10-28 12:57 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Commit the passed recovery preflight ledger, preserve the stopped console and
-exit-code evidence, then resume from the verified step-1,000 `best.pt`. Require
-automatic history reconciliation and unique continuation from step 1,001.
+Monitor the active selected-A2 trainaug recovery through full official
+validation and checkpoint intervals; after its terminal audit, evaluate only
+validation-proven TTA or ensemble choices.
 
 ## Latest checks
 
@@ -1086,3 +1086,16 @@ automatic history reconciliation and unique continuation from step 1,001.
   exit 143 is preserved, `result.json` and `last.pt` are absent, all 1,036
   checkpoint tensors are finite, and active history is uniquely reconciled
   through step 1,000. The run is eligible to resume at step 1,001.
+- The passed preflight ledger was committed as clean source
+  `80555c803dae4baa1b3e6ff5b6e4378ff20fe1ca`. Original console, exit 143,
+  start/source markers, and launch wrapper were preserved in the interruption
+  archive with their registered hashes before creating new live artifacts.
+- One ordinary final Docker inspection was denied by the named pipe; its
+  approved retry passed. The resume wrapper passed shell syntax validation,
+  has SHA-256 `0fcca8f8...`, and launched exactly once at 2026-10-28 12:56:06
+  +08:00 with wrapper/trainer PIDs 193/201.
+- Built-in reconciliation kept 1,001 records, dropped none, and created no
+  extra archive. Independent audit at step 1,032 verified unique steps through
+  1,032, exact first continuation at 1,001, 32 finite CE-only resumed records,
+  and the retained step-1,000 validation. GPU was 1,547/8,188 MiB at 5%; no
+  exit code or terminal result exists, so training is active.

@@ -160,3 +160,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0168 — Reject selected A2 trainaug summary key assumption](steps/0168-reject-selected-a2-trainaug-summary-key-assumption.md) — Failed, 2026-10-28T12:52:12+08:00
 - [0169 — Reject selected A2 flat learning-rate assumption](steps/0169-reject-selected-a2-flat-learning-rate-assumption.md) — Failed, 2026-10-28T12:52:12+08:00
 - [0170 — Pass selected A2 step-1000 recovery preflight](steps/0170-pass-selected-a2-step-1000-recovery-preflight.md) — Passed, 2026-10-28T12:52:12+08:00
+- [0171 — Retry selected A2 resume Docker inspection](steps/0171-retry-selected-a2-resume-docker-inspection.md) — Failed, 2026-10-28T12:58:08+08:00
+- [0172 — Prepare selected A2 step-1000 recovery](steps/0172-prepare-selected-a2-step-1000-recovery.md) — Passed, 2026-10-28T12:58:08+08:00
+- [0173 — Resume selected A2 trainaug from step 1000](steps/0173-resume-selected-a2-trainaug-from-step-1000.md) — In progress, 2026-10-28T12:58:09+08:00
