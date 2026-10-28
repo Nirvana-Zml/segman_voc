@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
-- State: **In progress — selected A2 trainaug configuration verified**
-- Last updated: 2026-10-28 12:57 +08:00
+- State: **In progress — selected A2 trainaug paused at step 13,000**
+- Last updated: 2026-10-28 18:14 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Monitor the active selected-A2 trainaug recovery through full official
-validation and checkpoint intervals. Do not treat the early step-1,000 metric
-as terminal model-selection evidence.
+Await user direction. If continuation is requested, verify the saved pause
+manifest and resume only from `last.pt` at step 13,000, preserving the current
+console and exit evidence and continuing uniquely at step 13,001.
 
 ## One-step CUDA diagnostic
 
@@ -153,3 +153,34 @@ as terminal model-selection evidence.
   and 32 finite CE-only resumed records. Archived stop hashes still match.
 - GPU use was 1,547/8,188 MiB at 5%. No new exit code or terminal result exists;
   the selected-A2 40,000-step trainaug run is actively continuing.
+
+## User-requested pause at step 13,000
+
+- At the user's request, the unique trainer PID 201 received `SIGTERM` once.
+  It completed train step 13,478 before exit; the wrapper saved exit code 143,
+  no terminal `result.json` exists, no trainer remains, and the GPU returned to
+  0/8,188 MiB at 0% utilization.
+- The first save script archived and reconciled history successfully, then
+  stopped because it expected a `step` field in the validation JSON whose step
+  is encoded in its filename. It wrote no pause manifest. The corrected,
+  idempotent finalizer used the saved schema and completed without repeating or
+  overwriting the archive.
+- All 13,494 pre-pause records are preserved at
+  `history_archive/user_pause_step_013000_20261028T181049+0800.jsonl`:
+  13,478 unique train steps, 13 full validations, and three AMP-overflow
+  records. Its SHA-256 is `ca185957...`.
+- Active history is reconciled to 13,016 records through step 13,000: 13,000
+  unique train steps, validations at every 1,000 steps through 13,000, and
+  three retained overflow records. Its SHA-256 is `ecb18e96...`; 478
+  uncheckpointed train records were removed only from the active history.
+- The latest restart artifact is non-diagnostic `last.pt` at step 13,000,
+  SHA-256 `b227903d...`, with 1,036 finite tensors. Its full official-val mIoU
+  is 0.671776, foreground mIoU 0.658921, pixel accuracy 0.925984, and CE loss
+  0.268512 over 244,886,857 valid pixels.
+- Validation-selected `best.pt` remains step 12,000 at mIoU 0.692692, SHA-256
+  `fa3b628f...`, also with 1,036 finite tensors. Selection and restart roles
+  remain distinct: resume from `last.pt`, while `best.pt` remains the current
+  candidate for validation-based model selection.
+- The independently hash-verified pause manifest is
+  `user_pause_20261028T181049+0800.json`, SHA-256 `af8155e2...`. A future
+  recovery must continue uniquely at step 13,001.

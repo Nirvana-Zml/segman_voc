@@ -163,3 +163,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0171 — Retry selected A2 resume Docker inspection](steps/0171-retry-selected-a2-resume-docker-inspection.md) — Failed, 2026-10-28T12:58:08+08:00
 - [0172 — Prepare selected A2 step-1000 recovery](steps/0172-prepare-selected-a2-step-1000-recovery.md) — Passed, 2026-10-28T12:58:08+08:00
 - [0173 — Resume selected A2 trainaug from step 1000](steps/0173-resume-selected-a2-trainaug-from-step-1000.md) — In progress, 2026-10-28T12:58:09+08:00
+- [0174 — Pause selected A2 trainaug on user request](steps/0174-pause-selected-a2-trainaug-on-user-request.md) — Information, 2026-10-28T18:16:18+08:00
+- [0175 — Correct selected A2 pause validation schema](steps/0175-correct-selected-a2-pause-validation-schema.md) — Failed, 2026-10-28T18:16:18+08:00
+- [0176 — Save selected A2 pause at step 13000](steps/0176-save-selected-a2-pause-at-step-13000.md) — Passed, 2026-10-28T18:16:18+08:00

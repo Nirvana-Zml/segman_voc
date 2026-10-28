@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 12:57 +08:00
+- Last updated: 2026-10-28 18:14 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | A2 trainaug stopped by user; resumable from verified step 1,000 |
+| 06 | Formal training and selection | In progress | A2 trainaug paused by user; resumable from verified step 13,000 |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Monitor the active selected-A2 trainaug recovery through full official
-validation and checkpoint intervals; after its terminal audit, evaluate only
-validation-proven TTA or ensemble choices.
+Await user direction. If continuation is requested, verify the saved pause
+manifest and resume only from step-13,000 `last.pt`; preserve current
+console/exit evidence and require unique continuation at step 13,001.
 
 ## Latest checks
 
@@ -1099,3 +1099,22 @@ validation-proven TTA or ensemble choices.
   1,032, exact first continuation at 1,001, 32 finite CE-only resumed records,
   and the retained step-1,000 validation. GPU was 1,547/8,188 MiB at 5%; no
   exit code or terminal result exists, so training is active.
+- At the user's pause request, exact trainer PID 201 received one `SIGTERM` and
+  exited with wrapper code 143 after completing train step 13,478. No trainer
+  or GPU compute process remains; GPU is 0/8,188 MiB at 0%, and no terminal
+  result exists.
+- The first save finalizer successfully archived/reconciled history but then
+  rejected a nonexistent validation `step` key; it wrote no pause manifest.
+  The corrected idempotent finalizer completed using the actual validation
+  schema, and an independent verification passed all artifact hashes.
+- Full pre-pause history has 13,494 records through train step 13,478 and is
+  archived with SHA-256 `ca185957...`. Active history has 13,016 records
+  through restart step 13,000, SHA-256 `ecb18e96...`; it retains 13 complete
+  validations and three bounded AMP-overflow records.
+- Non-diagnostic `last.pt` at step 13,000 is the restart checkpoint, SHA-256
+  `b227903d...`, with 1,036 finite tensors. Its full-val mIoU is 0.671776.
+  Validation-selected `best.pt` remains step 12,000 at mIoU 0.692692,
+  SHA-256 `fa3b628f...`, also with 1,036 finite tensors.
+- Pause manifest `user_pause_20261028T181049+0800.json` has independently
+  verified SHA-256 `af8155e2...`. A future recovery must start from `last.pt`
+  at step 13,000 and continue uniquely at step 13,001.
