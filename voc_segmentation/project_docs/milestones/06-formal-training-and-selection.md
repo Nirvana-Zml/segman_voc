@@ -39,7 +39,35 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Commit this verified implementation, then run a clean-source one-step CUDA
-diagnostic and formal preflight. Launch the 40,000-step reportable job only
-after confirming no competing trainer, sufficient disk/GPU resources, exact
-hashes, and an absent output directory.
+Commit the passed diagnostic and formal preflight evidence, then launch the
+40,000-step reportable job from the resulting clean full commit and audit its
+first unique finite train records before handoff.
+
+## One-step CUDA diagnostic
+
+- A first ordinary Docker resource query was denied by the Windows named pipe;
+  approved retry showed no trainer, GPU 113/8,188 MiB at 0%, no compute process,
+  757 GB free, and absent diagnostic/formal output directories.
+- The real-trainaug diagnostic passed one effective-batch-8 optimizer step:
+  total=CE=3.193626, gradient norm 8.631807, encoder/decoder LR
+  0.00006/0.0006, and peak allocated CUDA memory 1,100,638,720 bytes. It
+  recorded 10,582 train samples and all locked SBD/VOC provenance fields.
+- Its two-image validation is explicitly non-reportable. Independent audit
+  verified exact CE-only composition, one unique train record, one validation,
+  TensorBoard points, and a diagnostic-only step-1 checkpoint with 1,036 finite
+  tensors. Result/history/checkpoint/event SHA-256 values are `0f75f5f2...`,
+  `5ae71a43...`, `c6ede983...`, and `8d8015f1...`.
+
+## Formal-run preflight
+
+- An ordinary final-preflight Docker batch was denied by the named pipe; the
+  approved retry passed every check. Clean source commit is
+  `2420f7890b2ced7bb1d4d47d95701d8b72ee1e57`.
+- No trainer or GPU compute process exists; the RTX 4060 reports 113/8,188 MiB
+  at 0%, `/workspace` has 757 GB free, and
+  `runs/gcb_selected_a2_trainaug` is absent.
+- Parsed source and runtime evidence match: selected A2 mIoU 0.755643; config
+  SHA `5fcbfa7c...`; selection summary `0011ddfd...`; manifest `7fa9f8f0...`;
+  SBD archive `6a5a2918...`; MiT-B1 weight `8944b871...`; official val split
+  `cdc1326d...`; trainaug count 10,582 and val overlap zero. The reportable
+  contract is eligible to launch for 40,000 steps with validation every 1,000.

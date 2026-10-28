@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 08:15 +08:00
+- Last updated: 2026-10-28 08:21 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | A2-derived trainaug config verified; clean-source CUDA diagnostic and run preflight next |
+| 06 | Formal training and selection | In progress | CUDA diagnostic and formal preflight passed; commit evidence and launch 40,000-step run next |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Commit the verified A2-derived trainaug configuration and trainer provenance
-checks, then run a clean-source one-step CUDA diagnostic and formal-run
-preflight. Do not launch the 40,000-step reportable job until both pass and the
-output directory is confirmed absent.
+Commit the passed diagnostic and formal preflight ledger, then launch the
+40,000-step reportable A2 trainaug job from that clean full commit. Immediately
+audit unique finite early history, exact provenance, active PIDs/GPU, and the
+absence of terminal artifacts.
 
 ## Latest checks
 
@@ -1005,3 +1005,31 @@ output directory is confirmed absent.
   10,582 unique samples (1,464 VOC and 9,118 SBD), found zero official-val
   overlap, and successfully decoded one VOC and one SBD image/mask with only
   labels 0-20/255.
+
+## Selected A2 trainaug CUDA diagnostic
+
+- The first ordinary Docker resource query was denied by the Windows named
+  pipe and started nothing; approved access confirmed no trainer, GPU
+  113/8,188 MiB at 0%, no compute PID, and 757 GB available.
+- The diagnostic completed one effective-batch-8 optimizer step on the real
+  10,582-sample trainaug dataset. Total/CE loss was 3.193626, gradient norm
+  8.631807, encoder/decoder LR 0.00006/0.0006, and peak allocated CUDA memory
+  1,100,638,720 bytes. Edge and auxiliary losses were zero as required by A2.
+- Independent audit verified one train and one two-image validation record,
+  exact CE-only weighting, complete provenance hashes, and a diagnostic-only
+  step-1 checkpoint containing 1,036 finite tensors. Checkpoint/result/history
+  SHA-256 values are `c6ede983...`, `0f75f5f2...`, and `5ae71a43...`.
+  The two-image mIoU is diagnostic and non-reportable.
+
+## Selected A2 trainaug formal-run preflight
+
+- The first ordinary final-preflight Docker batch was denied by the named pipe;
+  its approved retry passed. Source was clean at
+  `2420f7890b2ced7bb1d4d47d95701d8b72ee1e57`; no Python trainer or GPU compute
+  process existed, GPU was 113/8,188 MiB at 0%, and `/workspace` had 757 GB
+  available.
+- `runs/gcb_selected_a2_trainaug` is absent. Config, selection summary,
+  trainaug manifest, SBD archive, official val split, and MiT-B1 weight hashes
+  all match their registered values. The parsed contract selects A2, uses
+  10,582 leak-free trainaug samples, preserves official val, and specifies
+  40,000 steps with full validation every 1,000.

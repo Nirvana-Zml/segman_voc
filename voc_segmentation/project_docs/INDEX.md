@@ -149,3 +149,6 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0157 — Complete GCB diagnostics and ablation milestone](steps/0157-complete-gcb-diagnostics-and-ablation-milestone.md) — Passed, 2026-10-28T08:05:32+08:00
 - [0158 — Correct formal trainaug preflight import](steps/0158-correct-formal-trainaug-preflight-import.md) — Failed, 2026-10-28T08:15:29+08:00
 - [0159 — Implement and verify selected A2 trainaug configuration](steps/0159-implement-and-verify-selected-a2-trainaug-configuration.md) — Passed, 2026-10-28T08:15:29+08:00
+- [0160 — Retry selected A2 trainaug Docker preflight access](steps/0160-retry-selected-a2-trainaug-docker-preflight-access.md) — Failed, 2026-10-28T08:22:03+08:00
+- [0161 — Pass selected A2 trainaug CUDA diagnostic](steps/0161-pass-selected-a2-trainaug-cuda-diagnostic.md) — Passed, 2026-10-28T08:22:03+08:00
+- [0162 — Pass selected A2 trainaug formal-run preflight](steps/0162-pass-selected-a2-trainaug-formal-run-preflight.md) — Passed, 2026-10-28T08:22:03+08:00
