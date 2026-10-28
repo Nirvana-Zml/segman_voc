@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 18:14 +08:00
+- Last updated: 2026-10-28 18:44 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Await user direction. If continuation is requested, verify the saved pause
-manifest and resume only from step-13,000 `last.pt`; preserve current
-console/exit evidence and require unique continuation at step 13,001.
+Commit the passed step-13,000 recovery preflight, preserve current pause
+console/exit evidence, then resume from `last.pt` and require unique
+continuation at step 13,001.
 
 ## Latest checks
 
@@ -1118,3 +1118,16 @@ console/exit evidence and require unique continuation at step 13,001.
 - Pause manifest `user_pause_20261028T181049+0800.json` has independently
   verified SHA-256 `af8155e2...`. A future recovery must start from `last.pt`
   at step 13,000 and continue uniquely at step 13,001.
+- Two recovery audit attempts failed before container access because Docker
+  Desktop was not running. The first launch path checked was stale; the actual
+  per-user installation path was found from the uninstall registry, Docker
+  Desktop was started there, and server version 29.4.3 became ready. No trainer
+  started during these failures.
+- The corrected step-13,000 recovery preflight passed with GPU 0/8,188 MiB at
+  0%, no trainer or compute process, and 756 GB free. All registered pause,
+  checkpoint, history, validation, config, data, and weight hashes match.
+- Both non-diagnostic checkpoints contain 1,036 finite tensors. `last.pt` is
+  the step-13,000 restart point; `best.pt` remains step 12,000 at mIoU
+  0.692692. Active history is unique through step 13,000 and the full pause
+  archive remains intact through train step 13,478. Continuation is eligible
+  to begin exactly at step 13,001.

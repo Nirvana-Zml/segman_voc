@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
 - State: **In progress — selected A2 trainaug paused at step 13,000**
-- Last updated: 2026-10-28 18:14 +08:00
+- Last updated: 2026-10-28 18:44 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Await user direction. If continuation is requested, verify the saved pause
-manifest and resume only from `last.pt` at step 13,000, preserving the current
-console and exit evidence and continuing uniquely at step 13,001.
+Commit the passed step-13,000 recovery preflight, preserve the current pause
+console and exit evidence, then resume only from `last.pt` and require unique
+continuation at step 13,001.
 
 ## One-step CUDA diagnostic
 
@@ -184,3 +184,23 @@ console and exit evidence and continuing uniquely at step 13,001.
 - The independently hash-verified pause manifest is
   `user_pause_20261028T181049+0800.json`, SHA-256 `af8155e2...`. A future
   recovery must continue uniquely at step 13,001.
+
+## Step-13,000 recovery preflight
+
+- Two initial Docker calls, including an approved retry, failed because the
+  Docker Desktop engine was not running; no container command or trainer
+  started. The first attempted executable path was stale, then the installed
+  location was found from the Windows uninstall registry. Docker Desktop was
+  started from that exact path and server version 29.4.3 became ready.
+- The complete read-only audit then passed. The container has no trainer or GPU
+  compute process, the RTX 4060 reports 0/8,188 MiB at 0% utilization, and
+  `/workspace` has 756 GB available.
+- The pause manifest, restart/best checkpoints, active and archived histories,
+  restart validation, A2 config/selection summary, trainaug manifest/summary,
+  SBD provenance, MiT-B1 weight, and official validation split all retain their
+  registered SHA-256 values.
+- `last.pt` is non-diagnostic step 13,000 and `best.pt` is non-diagnostic step
+  12,000; both contain 1,036 finite tensors and record best mIoU 0.692692 at
+  step 12,000. Active history contains exactly train steps 1-13,000, all 13
+  expected validations, and three bounded overflows; the pause archive retains
+  all train steps through 13,478. Recovery is eligible to start at 13,001.

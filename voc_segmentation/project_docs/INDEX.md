@@ -166,3 +166,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0174 — Pause selected A2 trainaug on user request](steps/0174-pause-selected-a2-trainaug-on-user-request.md) — Information, 2026-10-28T18:16:18+08:00
 - [0175 — Correct selected A2 pause validation schema](steps/0175-correct-selected-a2-pause-validation-schema.md) — Failed, 2026-10-28T18:16:18+08:00
 - [0176 — Save selected A2 pause at step 13000](steps/0176-save-selected-a2-pause-at-step-13000.md) — Passed, 2026-10-28T18:16:18+08:00
+- [0177 — Record offline Docker recovery preflight](steps/0177-record-offline-docker-recovery-preflight.md) — Failed, 2026-10-28T18:45:40+08:00
+- [0178 — Correct Docker Desktop launch path](steps/0178-correct-docker-desktop-launch-path.md) — Failed, 2026-10-28T18:45:40+08:00
+- [0179 — Restore Docker engine for selected A2 recovery](steps/0179-restore-docker-engine-for-selected-a2-recovery.md) — Passed, 2026-10-28T18:45:40+08:00
+- [0180 — Pass selected A2 step-13000 recovery preflight](steps/0180-pass-selected-a2-step-13000-recovery-preflight.md) — Passed, 2026-10-28T18:45:40+08:00
