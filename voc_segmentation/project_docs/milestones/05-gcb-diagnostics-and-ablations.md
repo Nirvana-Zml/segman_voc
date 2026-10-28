@@ -1,7 +1,7 @@
 # Milestone 05: GCB-Seg diagnostics and ablations
 
-- State: **In progress — all diagnostics verified; ablations pending**
-- Last updated: 2026-10-26 18:48 +08:00
+- State: **Passed — diagnostics and A0-A4 ablations verified**
+- Last updated: 2026-10-28 08:03 +08:00
 
 Implement GCM, GFF, BAB, auxiliary head, and loss composition. Pass focused
 interface/loss tests, smoke, and overfit, then isolate each component in
@@ -556,3 +556,48 @@ the verified step-1,000 checkpoint, with unique history continuation.
   `result.json` exists. A later approved handoff snapshot confirmed PIDs
   125/132 still active at step 1,139, with finite logged values and no terminal
   artifacts. A4 recovery is active toward the 20,000-step contract.
+
+## A4 terminal result
+
+- A first ordinary Docker terminal query was denied by the Windows named pipe;
+  approved access then confirmed exit 0, no trainer, GPU 0 MiB / 0%, and the
+  terminal result. Two temporary audit assumptions were corrected without
+  changing evidence: AMP overflow fields are named `amp_scale_before/after`,
+  and the TensorBoard overflow tag stores one zero per train step plus an extra
+  event for each overflow.
+- The corrected independent audit passed 20,026 history records: 20,000 unique
+  train steps, 20 full validations at each 1,000-step boundary, and six bounded
+  AMP backoffs. Every completed value is finite, Lovasz and edge supervision
+  remain nonzero, and all totals reproduce
+  `CE + 0.5 * Lovasz + 0.2 * edge`.
+- All saved confusion matrices independently reproduce every metric. Best and
+  terminal step 20,000 has mIoU 0.739100, foreground mIoU 0.728806, pixel
+  accuracy 0.943025, and validation CE 0.319098.
+- A4 improves A3 by 0.012354 mIoU, A1 by 0.002474, and A0 by 0.005212, while
+  trailing A2 by 0.016543. Thus Lovasz recovers part of the A3 regression but
+  does not change the validation-selected winner: A2 remains the leading
+  ablation under this single seed and budget.
+- Terminal `best.pt` is non-diagnostic at step 20,000 with 1,068 finite tensors
+  and SHA-256
+  `feec1bc099d979f2dde054bab406c8ba62dd3834781dbf75618d0ec3b7e4bf26`.
+  Finite `last.pt` remains step 19,000 with SHA-256
+  `6822a3765523af5a8b82458b653dfd89cf2325a52164e58f1f2cbebc83eaf027`.
+- Result/history/terminal-validation hashes are `fda20e6a...`, `5a4c54e4...`,
+  and `e0fd2e4e...`. Initial and resumed TensorBoard hashes are `70cc6e6e...`
+  and `39d0c649...`; accepted initial steps stop at 1,000, and the resumed event
+  uniquely covers 1,001-20,000 plus six AMP points.
+- The resumed segment elapsed 28,090.259 seconds and peaked at 1,350,610,432
+  CUDA bytes. Its reportable provenance is clean commit
+  `f51af0720b3ebcad9a6cd9cda40f047cafc3d622`.
+
+## Ablation decision
+
+- The verified best mIoU table is A0 0.733889, A1 0.736626, A2 0.755643, A3
+  0.726746, and A4 0.739100. Incremental deltas are +0.002738, +0.019017,
+  -0.028897, and +0.012354 respectively.
+- `artifacts/gcb_diagnostics.json` consolidates hashes and metrics for all five
+  runs and selects A2 gated GFF for trainaug solely because it has the highest
+  saved official-validation mIoU. Its SHA-256 is
+  `0011ddfd4caeebaa6ede17a8a7e7b2da8fdee4fe379b26762a44af157ffd1874`.
+- Milestone 05 is passed. Next: create and verify the milestone-06 reportable
+  trainaug configuration from A2 without BAB, edge loss, or Lovasz.

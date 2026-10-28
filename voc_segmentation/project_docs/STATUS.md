@@ -1,11 +1,11 @@
 # Project status
 
-- Last updated: 2026-10-28 00:03 +08:00
+- Last updated: 2026-10-28 08:03 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
-- Highest verified active milestone: **04 — Transformer baseline**
-- Next milestone: **05 — GCB diagnostics and ablations**
+- Highest verified active milestone: **05 — GCB diagnostics and ablations**
+- Next milestone: **06 — Formal training and selection**
 - First hardware-safe model profile: MiT-B1, 384×384, batch 2, effective batch 8
 
 ## Milestone summary
@@ -17,7 +17,7 @@
 | 02 | VOC audit and SBD | Passed | Official audit plus provenance-verified, leak-free 10,582-image trainaug |
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
-| 05 | GCB diagnostics and ablations | In progress | A1 0.736626; A2 0.755643; A3 0.726746; A4 paused and resumable from step 1,000 |
+| 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
 | 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Allow the active A4 recovery to continue to its 20,000-step terminal result.
-Monitor the next full official validation at step 2,000; do not select or
-compare A4 until the reportable run finishes and all terminal artifacts pass
-independent audit.
+Prepare milestone 06 by deriving a reportable SBD `trainaug` configuration from
+validation-selected A2: gated GFF with no BAB, edge loss, or Lovasz. Pass the
+config/source tests and formal-run preflight before launching; keep official
+validation as the only model-selection split.
 
 ## Latest checks
 
@@ -949,3 +949,39 @@ independent audit.
   exists. A later approved handoff snapshot found the same PIDs active at step
   1,139 with finite values and still no terminal artifacts; A4 is actively
   continuing toward 20,000 steps.
+
+## A4 terminal result and ablation selection
+
+- The first ordinary terminal snapshot was denied by the Docker named pipe;
+  its approved retry confirmed exit code 0, no trainer, GPU 0/8,188 MiB at 0%,
+  and a terminal result. The first two temporary audit versions were also
+  rejected: one used the wrong AMP-overflow scale keys, and one assumed the
+  TensorBoard overflow tag contained only overflow events rather than the
+  regular per-step zero series plus six duplicate overflow points. Correcting
+  only those audit assumptions produced a complete pass.
+- A4 contains 20,000 unique sequential train records, 20 full 1,449-image
+  official validations, and six bounded AMP recoveries in 20,026 history
+  records. Every completed scalar is finite, every train record has nonzero
+  Lovasz and boundary terms, and every total matches
+  `CE + 0.5 * Lovasz + 0.2 * edge`.
+- Independent recomputation of all 20 saved 21x21 confusion matrices matched
+  every reported per-class IoU, mIoU, foreground mIoU, pixel accuracy, and
+  mean pixel accuracy. Best and terminal are step 20,000: mIoU 0.739100,
+  foreground mIoU 0.728806, pixel accuracy 0.943025, validation CE 0.319098.
+- A4 improves A3 by 0.012354 mIoU (+1.235 percentage points), A1 by 0.002474,
+  and A0 by 0.005212, but remains 0.016543 below A2 (-1.654 points). Under the
+  common single-seed protocol, A2 remains the validation-selected ablation for
+  milestone 06.
+- A4 `best.pt` is non-diagnostic at step 20,000, has 1,068 finite tensors, and
+  SHA-256 `feec1bc099d979f2dde054bab406c8ba62dd3834781dbf75618d0ec3b7e4bf26`.
+  `last.pt` is the finite step-19,000 checkpoint with SHA-256
+  `6822a3765523af5a8b82458b653dfd89cf2325a52164e58f1f2cbebc83eaf027`.
+- SHA-256 values: result `fda20e6a...`, history `5a4c54e4...`, terminal
+  validation `e0fd2e4e...`, initial/resumed TensorBoard events `70cc6e6e...`
+  and `39d0c649...`. The recovered segment elapsed 28,090.259 seconds and
+  peaked at 1,350,610,432 allocated CUDA bytes.
+- `artifacts/gcb_diagnostics.json` consolidates verified A0-A4 evidence,
+  selects A2 only by saved official-validation mIoU, and has SHA-256
+  `0011ddfd4caeebaa6ede17a8a7e7b2da8fdee4fe379b26762a44af157ffd1874`.
+  The project-status checker now reports milestone 05 complete and milestone
+  06 as the next stage.
