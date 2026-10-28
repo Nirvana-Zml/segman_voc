@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
-- State: **In progress — selected A2 trainaug paused at step 13,000**
-- Last updated: 2026-10-28 18:44 +08:00
+- State: **In progress — selected A2 trainaug active from step 13,001**
+- Last updated: 2026-10-28 18:49 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Commit the passed step-13,000 recovery preflight, preserve the current pause
-console and exit evidence, then resume only from `last.pt` and require unique
-continuation at step 13,001.
+Monitor the active selected-A2 trainaug recovery through full official
+validation and checkpoint intervals. Preserve validation-selected `best.pt`
+separately from the most recent restart checkpoint.
 
 ## One-step CUDA diagnostic
 
@@ -204,3 +204,20 @@ continuation at step 13,001.
   step 12,000. Active history contains exactly train steps 1-13,000, all 13
   expected validations, and three bounded overflows; the pause archive retains
   all train steps through 13,478. Recovery is eligible to start at 13,001.
+
+## Step-13,000 recovery launch
+
+- The passed recovery preflight was committed as clean source
+  `fd1f6d3096e048c53ea1c8b4f4e67080ba79e156`. The paused console, exit 143,
+  resume markers, and prior step-1,000 wrapper were preserved in the
+  interruption archive. Console, exit, and wrapper retained SHA-256 values
+  `02a004a5...`, `9d9b1872...`, and `0fcca8f8...`.
+- The new wrapper explicitly resumes from `last.pt`, passed `sh -n`, has
+  SHA-256 `8c42cd24...`, and launched exactly once at 2026-10-28 18:48:13
+  +08:00. Wrapper/trainer PIDs are 71/79.
+- Built-in reconciliation reported `kept=13016 dropped=0 archive=None`.
+  Independent audit at step 13,020 found train steps 1-13,020 exactly once,
+  first continuation at 13,001, all 13 prior validations and three prior AMP
+  events retained, and 20 finite CE-only resumed records.
+- GPU use was 1,547/8,188 MiB at 40%. No new exit code or terminal result
+  exists; the unchanged 40,000-step selected-A2 trainaug run is active.

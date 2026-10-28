@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 18:44 +08:00
+- Last updated: 2026-10-28 18:49 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | A2 trainaug paused by user; resumable from verified step 13,000 |
+| 06 | Formal training and selection | In progress | A2 trainaug active after verified continuation at step 13,001 |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Commit the passed step-13,000 recovery preflight, preserve current pause
-console/exit evidence, then resume from `last.pt` and require unique
-continuation at step 13,001.
+Monitor the active selected-A2 trainaug recovery through full official
+validation and checkpoint intervals; keep best-model selection separate from
+the most recent restart checkpoint.
 
 ## Latest checks
 
@@ -1131,3 +1131,15 @@ continuation at step 13,001.
   0.692692. Active history is unique through step 13,000 and the full pause
   archive remains intact through train step 13,478. Continuation is eligible
   to begin exactly at step 13,001.
+- The preflight ledger was committed as clean source
+  `fd1f6d3096e048c53ea1c8b4f4e67080ba79e156`. Pause console/exit evidence and
+  the prior resume wrapper were archived with unchanged SHA-256 values before
+  creating new live artifacts.
+- The step-13,000 resume wrapper explicitly uses `last.pt`, passed shell syntax
+  validation, has SHA-256 `8c42cd24...`, and launched once at 2026-10-28
+  18:48:13 +08:00 with wrapper/trainer PIDs 71/79.
+- Automatic reconciliation kept 13,016 records, dropped none, and created no
+  archive. Independent audit through step 13,020 verified exact first
+  continuation at 13,001, unique train steps, retained 13 validations and
+  three prior overflow events, and 20 finite CE-only new records. GPU use was
+  1,547/8,188 MiB at 40%; no exit code or terminal result exists.
