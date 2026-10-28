@@ -104,6 +104,95 @@ def resolve_app_path(path: Path) -> Path:
     return path.resolve() if path.is_absolute() else (APP_ROOT / path).resolve()
 
 
+def resolve_training_data(
+    config: dict[str, Any], voc_root: Path
+) -> tuple[dict[str, Path], Path, dict[str, Any]]:
+    """Resolve and verify official-train or provenance-locked trainaug inputs."""
+
+    data = config["data"]
+    split = str(data["train_split"])
+    if split != "trainaug":
+        split_path = voc_root / "ImageSets/Segmentation" / f"{split}.txt"
+        if not split_path.is_file():
+            raise FileNotFoundError(f"training split file is missing: {split_path}")
+        return {}, split_path, {"kind": "official_voc", "split": split}
+
+    required = (
+        "trainaug_manifest",
+        "trainaug_manifest_sha256",
+        "trainaug_summary",
+        "trainaug_summary_sha256",
+        "sbd_provenance",
+        "sbd_provenance_sha256",
+        "sbd_root",
+        "sbd_mask_root",
+    )
+    missing = [key for key in required if not data.get(key)]
+    if missing:
+        raise ValueError(f"trainaug configuration is missing: {', '.join(missing)}")
+
+    manifest = resolve_app_path(Path(data["trainaug_manifest"]))
+    summary_path = resolve_app_path(Path(data["trainaug_summary"]))
+    provenance_path = resolve_app_path(Path(data["sbd_provenance"]))
+    sbd_root = resolve_app_path(Path(data["sbd_root"]))
+    sbd_mask_root = resolve_app_path(Path(data["sbd_mask_root"]))
+    for path in (manifest, summary_path, provenance_path):
+        if not path.is_file():
+            raise FileNotFoundError(f"trainaug evidence file is missing: {path}")
+    for path in (sbd_root, sbd_mask_root):
+        if not path.is_dir():
+            raise FileNotFoundError(f"trainaug data directory is missing: {path}")
+
+    expected_hashes = {
+        manifest: str(data["trainaug_manifest_sha256"]),
+        summary_path: str(data["trainaug_summary_sha256"]),
+        provenance_path: str(data["sbd_provenance_sha256"]),
+    }
+    actual_hashes = {path: file_sha256(path) for path in expected_hashes}
+    for path, expected in expected_hashes.items():
+        if actual_hashes[path] != expected:
+            raise RuntimeError(f"trainaug evidence SHA-256 mismatch: {path}")
+
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    if not (
+        summary.get("ok") is True
+        and summary.get("train_aug_count") == 10582
+        and summary.get("train_val_overlap") == 0
+        and summary.get("duplicate_count") == 0
+        and summary.get("invalid_label_count") == 0
+        and summary.get("dimension_mismatch_count") == 0
+        and summary.get("error_count") == 0
+    ):
+        raise RuntimeError("trainaug audit summary does not satisfy the formal contract")
+    if not provenance.get("ok") or not provenance.get("sha256"):
+        raise RuntimeError("SBD provenance is not verified")
+
+    dataset_kwargs = {
+        "trainaug_manifest": manifest,
+        "sbd_root": sbd_root,
+        "sbd_mask_root": sbd_mask_root,
+    }
+    metadata = {
+        "kind": "voc_sbd_trainaug",
+        "manifest": str(manifest),
+        "manifest_sha256": actual_hashes[manifest],
+        "summary": str(summary_path),
+        "summary_sha256": actual_hashes[summary_path],
+        "train_aug_count": int(summary["train_aug_count"]),
+        "train_aug_ids_sha256": summary["train_aug_ids_sha256"],
+        "train_val_overlap": int(summary["train_val_overlap"]),
+        "sbd_provenance": str(provenance_path),
+        "sbd_provenance_sha256": actual_hashes[provenance_path],
+        "sbd_archive_sha256": provenance["sha256"],
+        "sbd_source_url": provenance["source_url"],
+        "sbd_license_note": provenance["license_note"],
+        "sbd_root": str(sbd_root),
+        "sbd_mask_root": str(sbd_mask_root),
+    }
+    return dataset_kwargs, manifest, metadata
+
+
 def verify_pretrained_weight(config: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
     weight_path = resolve_app_path(Path(config["model"]["encoder_weights_path"]))
     provenance_path = weight_path.parent / "provenance.json"
@@ -326,6 +415,9 @@ def main(
     weight_path, weight_provenance = verify_pretrained_weight(config)
     crop_size = tuple(int(value) for value in config["data"]["crop_size"])
     scale_range = tuple(float(value) for value in config["data"]["scale_range"])
+    train_dataset_kwargs, train_split_path, train_data_provenance = (
+        resolve_training_data(config, args.voc_root)
+    )
     train_dataset = VOCSegmentationDataset(
         args.voc_root,
         config["data"]["train_split"],
@@ -336,16 +428,12 @@ def main(
                 config["data"]["horizontal_flip_probability"]
             ),
         ),
+        **train_dataset_kwargs,
     )
     val_dataset = VOCSegmentationDataset(
         args.voc_root,
         config["data"]["val_split"],
         SegmentationEvalTransform(),
-    )
-    train_split_path = (
-        args.voc_root
-        / "ImageSets/Segmentation"
-        / f"{config['data']['train_split']}.txt"
     )
     val_split_path = (
         args.voc_root / "ImageSets/Segmentation" / f"{config['data']['val_split']}.txt"
@@ -701,6 +789,7 @@ def main(
         "train_samples": len(train_dataset),
         "train_split_file": str(train_split_path.resolve()),
         "train_split_sha256": file_sha256(train_split_path),
+        "train_data_provenance": train_data_provenance,
         "val_split": config["data"]["val_split"],
         "val_samples": len(val_dataset),
         "val_split_file": str(val_split_path.resolve()),

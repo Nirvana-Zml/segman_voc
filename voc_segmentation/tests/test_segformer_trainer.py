@@ -79,6 +79,70 @@ class SegFormerTrainerTest(unittest.TestCase):
                 with self.assertRaises(RuntimeError):
                     train_segformer.verify_pretrained_weight(config)
 
+    def test_trainaug_inputs_are_hash_locked_and_leak_free(self) -> None:
+        with tempfile.TemporaryDirectory(dir=TEST_TMP_ROOT) as temporary:
+            root = Path(temporary)
+            manifest = root / "train_aug.jsonl"
+            summary_path = root / "trainaug_summary.json"
+            provenance_path = root / "provenance.json"
+            sbd_root = root / "sbd"
+            mask_root = root / "masks"
+            sbd_root.mkdir()
+            mask_root.mkdir()
+            manifest.write_text("{}\n", encoding="utf-8")
+            summary_path.write_text(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "train_aug_count": 10582,
+                        "train_val_overlap": 0,
+                        "duplicate_count": 0,
+                        "invalid_label_count": 0,
+                        "dimension_mismatch_count": 0,
+                        "error_count": 0,
+                        "train_aug_ids_sha256": "ids-sha256",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            provenance_path.write_text(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "sha256": "archive-sha256",
+                        "source_url": "https://example.invalid/sbd.tgz",
+                        "license_note": "citation required",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            config = {
+                "data": {
+                    "train_split": "trainaug",
+                    "trainaug_manifest": str(manifest),
+                    "trainaug_manifest_sha256": file_sha256(manifest),
+                    "trainaug_summary": str(summary_path),
+                    "trainaug_summary_sha256": file_sha256(summary_path),
+                    "sbd_provenance": str(provenance_path),
+                    "sbd_provenance_sha256": file_sha256(provenance_path),
+                    "sbd_root": str(sbd_root),
+                    "sbd_mask_root": str(mask_root),
+                }
+            }
+
+            kwargs, evidence_path, metadata = train_segformer.resolve_training_data(
+                config, root / "voc"
+            )
+
+            self.assertEqual(evidence_path, manifest.resolve())
+            self.assertEqual(kwargs["trainaug_manifest"], manifest.resolve())
+            self.assertEqual(metadata["kind"], "voc_sbd_trainaug")
+            self.assertEqual(metadata["train_aug_count"], 10582)
+            self.assertEqual(metadata["train_val_overlap"], 0)
+            manifest.write_text("changed\n", encoding="utf-8")
+            with self.assertRaises(RuntimeError):
+                train_segformer.resolve_training_data(config, root / "voc")
+
 
 if __name__ == "__main__":
     unittest.main()

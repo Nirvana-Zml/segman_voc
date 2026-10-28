@@ -147,3 +147,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0155 — Correct A4 terminal audit queries](steps/0155-correct-a4-terminal-audit-queries.md) — Failed, 2026-10-28T08:05:32+08:00
 - [0156 — Verify completed recovered A4 ablation run](steps/0156-verify-completed-recovered-a4-ablation-run.md) — Passed, 2026-10-28T08:05:32+08:00
 - [0157 — Complete GCB diagnostics and ablation milestone](steps/0157-complete-gcb-diagnostics-and-ablation-milestone.md) — Passed, 2026-10-28T08:05:32+08:00
+- [0158 — Correct formal trainaug preflight import](steps/0158-correct-formal-trainaug-preflight-import.md) — Failed, 2026-10-28T08:15:29+08:00
+- [0159 — Implement and verify selected A2 trainaug configuration](steps/0159-implement-and-verify-selected-a2-trainaug-configuration.md) — Passed, 2026-10-28T08:15:29+08:00

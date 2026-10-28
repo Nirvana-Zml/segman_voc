@@ -319,6 +319,24 @@ the full host Git commit plus `--git-worktree-clean` after verifying a clean
 host worktree. The shared trainer records every active loss component, bounded
 AMP recovery, full-resolution validation, checkpoints, JSONL, and TensorBoard.
 
+After A0-A4 validation selects A2, the formal SBD run uses the provenance-
+locked `configs/gcb_selected_a2_trainaug.yaml` configuration. It keeps gated
+GFF while disabling BAB, edge loss, and Lovasz, trains for the plan's initial
+40,000 iterations, and continues to select only on the untouched official val
+split. After a clean-source preflight, launch it with:
+
+```powershell
+$vocCommit = git rev-parse HEAD
+docker exec voc2012-gcb python tools/train_gcb_seg.py `
+  --config configs/gcb_selected_a2_trainaug.yaml `
+  --output-dir runs/gcb_selected_a2_trainaug `
+  --git-commit $vocCommit --git-worktree-clean
+```
+
+The trainer verifies the configured trainaug manifest, audit summary, and SBD
+provenance hashes before loading any sample. Its result records those hashes,
+the SBD source/license note, and the independent official-val split evidence.
+
 ## Project layout
 
 ```text

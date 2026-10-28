@@ -1,0 +1,68 @@
+experiment:
+  name: gcb_selected_a2_gff_b1_384_trainaug
+  stage: formal_training_selection
+  selection_source: artifacts/gcb_diagnostics.json
+  selected_ablation: A2
+  reference_voc_train_run: runs/gcb_ablation_a2_gff_voc_train
+model:
+  name: gcb_seg
+  encoder: mit_b1
+  encoder_pretrained: imagenet1k
+  encoder_weights_path: artifacts/weights/mit_b1_imagenet1k/mit_b1.pth
+  decoder_channels: 256
+  context_branch_channels: 64
+  boundary_channels: 64
+  num_classes: 21
+  global_context_dilations: [1, 3, 6]
+  use_global_pooling: true
+  feature_fusion_mode: gated
+  use_gated_fusion: true
+  use_boundary_branch: false
+  auxiliary_head: false
+  dropout: 0.1
+loss:
+  ce_weight: 1.0
+  lovasz_weight: 0.0
+  edge_weight: 0.0
+  aux_weight: 0.0
+  label_smoothing: 0.0
+data:
+  train_split: trainaug
+  trainaug_manifest: artifacts/sbd/train_aug.jsonl
+  trainaug_manifest_sha256: 7fa9f8f0f0a8ce1cc202310c62603e9fd7500a9d2a665e409b1a6674540a080e
+  trainaug_summary: artifacts/sbd/trainaug_summary.json
+  trainaug_summary_sha256: de37b98a241132abe45d2313822cb149bf97a106aa704a882a0a40ef01b4fb20
+  sbd_provenance: artifacts/sbd/provenance.json
+  sbd_provenance_sha256: 5c2444d87caa3e056d227f4cecd072871295bae631d258686c7d3ca9666a66d1
+  sbd_root: /data/sbd/benchmark_RELEASE/dataset
+  sbd_mask_root: artifacts/sbd/SegmentationClassAug
+  val_split: val
+  crop_size: [384, 384]
+  scale_range: [0.5, 2.0]
+  horizontal_flip_probability: 0.5
+  ignore_index: 255
+  reduce_zero_label: false
+training:
+  physical_batch_size: 2
+  effective_batch_size: 8
+  gradient_accumulation_steps: 4
+  optimizer: adamw
+  encoder_lr: 0.00006
+  decoder_lr: 0.00060
+  weight_decay: 0.01
+  gradient_clip_norm: 1.0
+  amp: true
+  max_consecutive_amp_overflows: 4
+  max_total_amp_overflows: 32
+  seed: 42
+  max_iterations: 40000
+  validate_every: 1000
+  warmup_iterations: 1500
+  poly_power: 0.9
+  num_workers: 0
+  save_best_metric: miou
+inference:
+  scales: [1.0]
+  horizontal_flip: false
+  output_mode: L
+  output_dtype: uint8

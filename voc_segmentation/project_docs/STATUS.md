@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 08:03 +08:00
+- Last updated: 2026-10-28 08:15 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | Not started | trainaug run and validation-selected checkpoint |
+| 06 | Formal training and selection | In progress | A2-derived trainaug config verified; clean-source CUDA diagnostic and run preflight next |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Prepare milestone 06 by deriving a reportable SBD `trainaug` configuration from
-validation-selected A2: gated GFF with no BAB, edge loss, or Lovasz. Pass the
-config/source tests and formal-run preflight before launching; keep official
-validation as the only model-selection split.
+Commit the verified A2-derived trainaug configuration and trainer provenance
+checks, then run a clean-source one-step CUDA diagnostic and formal-run
+preflight. Do not launch the 40,000-step reportable job until both pass and the
+output directory is confirmed absent.
 
 ## Latest checks
 
@@ -985,3 +985,23 @@ validation as the only model-selection split.
   `0011ddfd4caeebaa6ede17a8a7e7b2da8fdee4fe379b26762a44af157ffd1874`.
   The project-status checker now reports milestone 05 complete and milestone
   06 as the next stage.
+
+## Selected A2 trainaug configuration
+
+- Added `configs/gcb_selected_a2_trainaug.yaml`, SHA-256
+  `5fcbfa7cfdc9250dc744509e4fe58caa18d8c11864b7b5a0595c6d3f6b7a114c`.
+  Its model and loss sections exactly equal A2: MiT-B1/384, gated GFF, no BAB,
+  auxiliary head, edge loss, or Lovasz. It uses the plan's initial 40,000-step
+  trainaug budget and validates the untouched official val every 1,000 steps.
+- The shared SegFormer/GCB trainer now resolves trainaug inputs, verifies the
+  configured manifest, conversion summary, and SBD provenance SHA-256 values
+  before constructing the dataset, rejects a failed/leaking audit, and records
+  source, license, hashes, and trainaug identity evidence in `result.json`.
+- Focused config/trainer/dataset tests passed 13/13 in 0.965 seconds. The full
+  required container suite passed 50/50 in 5.058 seconds.
+- The first actual-data preflight failed before reading data because its
+  temporary script did not add the application root to `sys.path`; no training
+  process or output was created. The corrected read-only preflight loaded all
+  10,582 unique samples (1,464 VOC and 9,118 SBD), found zero official-val
+  overlap, and successfully decoded one VOC and one SBD image/mask with only
+  labels 0-20/255.

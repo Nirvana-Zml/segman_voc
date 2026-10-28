@@ -173,6 +173,30 @@ class ConfigContractTest(unittest.TestCase):
         self.assertEqual(configs["A4"]["loss"]["lovasz_weight"], 0.5)
         self.assertEqual(configs["A4"]["loss"]["edge_weight"], 0.2)
 
+    def test_selected_a2_trainaug_config_preserves_selection_and_provenance(self) -> None:
+        selected = yaml.safe_load(
+            (CONFIG_DIR / "gcb_selected_a2_trainaug.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        a2 = yaml.safe_load(
+            (CONFIG_DIR / "gcb_ablation_a2_gff.yaml").read_text(encoding="utf-8")
+        )
+        self.assertEqual(selected["experiment"]["stage"], "formal_training_selection")
+        self.assertEqual(selected["experiment"]["selected_ablation"], "A2")
+        self.assertEqual(selected["model"], a2["model"])
+        self.assertEqual(selected["loss"], a2["loss"])
+        self.assertEqual(selected["data"]["train_split"], "trainaug")
+        self.assertEqual(selected["data"]["val_split"], "val")
+        self.assertEqual(selected["training"]["max_iterations"], 40000)
+        self.assertEqual(selected["training"]["validate_every"], 1000)
+        for key in (
+            "trainaug_manifest_sha256",
+            "trainaug_summary_sha256",
+            "sbd_provenance_sha256",
+        ):
+            self.assertRegex(selected["data"][key], r"^[0-9a-f]{64}$")
+
 
 if __name__ == "__main__":
     unittest.main()
