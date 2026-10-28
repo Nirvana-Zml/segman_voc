@@ -39,9 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Monitor the active reportable job through its first full official validation
-at step 1,000, then independently audit validation metrics, history,
-checkpoint, TensorBoard, process/GPU state, and provenance.
+Await user direction. Before any continuation, verify the saved step-1,000
+checkpoint, manifest, histories, source/config hashes, idle GPU, and absent
+trainer; then resume uniquely at step 1,001 while preserving stop evidence.
 
 ## One-step CUDA diagnostic
 
@@ -89,3 +89,27 @@ checkpoint, TensorBoard, process/GPU state, and provenance.
 - GPU use was 1,523/8,188 MiB at 38%. A subsequent local console snapshot had
   reached step 54 with finite loss 2.086697 and gradient norm 4.833095. The
   first reportable acceptance point is the complete step-1,000 validation.
+
+## User-requested stop at step 1,000
+
+- Three ordinary Docker status batches were denied by the Windows named pipe
+  and passed on approved retry. Exact PID 792 was sent SIGTERM once; exit code
+  143 is saved, no trainer remains, no terminal result exists, and there is no
+  GPU compute PID.
+- The process completed train step 1,066 before termination. All 1,067 records
+  were preserved in
+  `history_archive/user_stop_20261028T085659+0800.jsonl` (SHA-256
+  `ced177181b46a9f58218ac958b1d66ea68dd107680445e8902c474c24cba397d`).
+  Active history was atomically reconciled to 1,001 records through checkpoint
+  step 1,000 (SHA-256 `abb2bc8c...`), dropping 66 post-checkpoint steps only
+  from the active ledger.
+- Step 1,000 completed the full 1,449-image official validation: mIoU 0.154537,
+  foreground mIoU 0.118020, pixel accuracy 0.809402, CE 0.715655, and
+  244,886,857 valid pixels. It is an early recovery checkpoint and not an
+  accepted final selection result.
+- `best.pt` is non-diagnostic step 1,000 with 1,036 finite tensors and SHA-256
+  `8005ad74e9c42153d4eaa938967fb951034a5e8a6dec166f3454a4463e67f98d`.
+  Validation SHA-256 is `08bf2323...`; `last.pt` is absent.
+- The hash-verified stop manifest
+  `user_stop_20261028T085659+0800.json` has SHA-256 `cf208b9a...`. A recovery
+  must use this checkpoint and continue uniquely from step 1,001.

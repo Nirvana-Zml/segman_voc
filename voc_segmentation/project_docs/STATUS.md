@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 08:25 +08:00
+- Last updated: 2026-10-28 08:57 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | A2 trainaug 40,000-step run active; first full validation due at step 1,000 |
+| 06 | Formal training and selection | In progress | A2 trainaug stopped by user; resumable from verified step 1,000 |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,10 +41,10 @@
 
 ## Next action
 
-Allow the active A2 trainaug job to continue. At step 1,000, independently
-audit the complete 1,449-image official validation, checkpoint metadata and
-hash, history continuity, TensorBoard points, active PIDs/GPU, and absence of
-terminal artifacts.
+Await user direction. If continuation is requested, pass a recovery preflight
+and resume only from the verified step-1,000 `best.pt`; preserve the stopped
+console/exit evidence and require automatic history reconciliation with unique
+continuation from step 1,001.
 
 ## Latest checks
 
@@ -1051,3 +1051,29 @@ terminal artifacts.
 - GPU use was 1,523/8,188 MiB at 38%. No exit code, validation, checkpoint, or
   terminal result existed. A later local log snapshot reached step 54 with
   finite loss 2.086697 and gradient norm 4.833095.
+
+## Selected A2 trainaug user-requested stop
+
+- Three ordinary Docker observation batches around the stop were denied by the
+  Windows named pipe; approved retries succeeded. Exact trainer PID 792 then
+  received SIGTERM once. Wrapper/trainer processes exited, exit code 143 was
+  saved, no terminal result exists, and no GPU compute process remains.
+- Training reached step 1,066. The complete 1,067-record pre-stop history was
+  archived at `history_archive/user_stop_20261028T085659+0800.jsonl`, SHA-256
+  `ced177181b46a9f58218ac958b1d66ea68dd107680445e8902c474c24cba397d`.
+  It contains train steps 1-1,066 plus validation step 1,000.
+- Active history was reconciled to exactly 1,001 records through the saved
+  checkpoint: train steps 1-1,000 and the step-1,000 validation. Its SHA-256 is
+  `abb2bc8cfa362db3875ed0b3ef67cec1c4deb1ac9f6a23230f302626d47892ee`;
+  66 uncheckpointed train records remain only in the full archive.
+- The complete 1,449-image step-1,000 validation reports mIoU 0.154537,
+  foreground mIoU 0.118020, pixel accuracy 0.809402, and CE 0.715655. This is
+  an early restart point, not a terminal model-selection result.
+- Non-diagnostic `best.pt` is step 1,000, contains 1,036 finite tensors, and
+  has SHA-256
+  `8005ad74e9c42153d4eaa938967fb951034a5e8a6dec166f3454a4463e67f98d`.
+  Validation SHA-256 is `08bf2323...`; no `last.pt` exists.
+- The machine-readable stop manifest is
+  `user_stop_20261028T085659+0800.json`, SHA-256
+  `cf208b9ac441dc1228fc3ce8a67125e46047f92ab146a554193587a97f056deb`.
+  A future run must resume from step 1,000 and continue uniquely at 1,001.
