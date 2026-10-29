@@ -1182,3 +1182,13 @@ over single-scale mIoU 0.776017.
   validation split `cdc1326d...`. The evaluator CLI also passed its container
   import/help check; the next action is to commit this preflight ledger and
   launch exactly one full 1,449-image official-validation TTA evaluation.
+- The preflight ledger was committed as clean source
+  `f4f01e8cb4eb1c462a74d78c2b3f964a27997e06`. The launch wrapper passed
+  `sh -n`, has SHA-256 `b959918a...`, and injects that full commit plus the
+  clean-worktree assertion into the reportable evaluator.
+- The first detached launch call was denied at the Docker named pipe and
+  created no process or output. The approved retry launched exactly one full
+  TTA job: wrapper/evaluator PIDs 345/353. Its first of 1,449 samples completed
+  all six predictions; GPU use was 813/8,188 MiB at 17% and peak allocated
+  CUDA memory was 577,077,248 bytes. No terminal result or exit code exists
+  yet, so validation-only TTA evaluation is actively running.

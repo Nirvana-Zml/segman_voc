@@ -180,3 +180,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0188 — Pass selected A2 TTA CUDA diagnostic](steps/0188-pass-selected-a2-tta-cuda-diagnostic.md) — Passed, 2026-10-29T08:10:28+08:00
 - [0189 — Retry TTA Docker preflight access](steps/0189-retry-tta-docker-preflight-access.md) — Failed, 2026-10-29T08:20:52+08:00
 - [0190 — Pass reportable selected A2 TTA preflight](steps/0190-pass-reportable-selected-a2-tta-preflight.md) — Passed, 2026-10-29T08:20:54+08:00
+- [0191 — Retry selected A2 TTA detached launch](steps/0191-retry-selected-a2-tta-detached-launch.md) — Failed, 2026-10-29T08:23:06+08:00
+- [0192 — Launch selected A2 full validation TTA](steps/0192-launch-selected-a2-full-validation-tta.md) — In progress, 2026-10-29T08:23:09+08:00

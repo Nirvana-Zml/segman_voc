@@ -294,3 +294,19 @@ full-validation mIoU exceeds the verified 0.776017 single-scale result.
 - The evaluator's container `--help` import check passed. The full 1,449-image
   validation job is eligible to launch exactly once after this preflight
   ledger is committed, preserving the clean-source provenance gate.
+
+## Full official-validation TTA launch
+
+- The preflight ledger was committed at clean source
+  `f4f01e8cb4eb1c462a74d78c2b3f964a27997e06`. The ignored launch wrapper
+  passed `sh -n`, has SHA-256 `b959918a...`, records its start/source markers,
+  injects the full commit and clean-worktree assertion, and preserves console
+  and exit-code evidence.
+- The first detached Docker launch was denied at the Windows named pipe before
+  container access; it created no process and no output directory. The
+  approved retry launched exactly one wrapper/evaluator pair with PIDs
+  345/353.
+- The evaluator completed sample 1/1,449 with all six TTA logits in 0.984
+  seconds and 577,077,248 peak allocated CUDA bytes. The concurrent snapshot
+  showed 813/8,188 MiB GPU memory at 17% utilization. No exit code or terminal
+  `result.json` exists yet; the full official-val evaluation is active.
