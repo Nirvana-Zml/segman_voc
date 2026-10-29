@@ -182,3 +182,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0190 — Pass reportable selected A2 TTA preflight](steps/0190-pass-reportable-selected-a2-tta-preflight.md) — Passed, 2026-10-29T08:20:54+08:00
 - [0191 — Retry selected A2 TTA detached launch](steps/0191-retry-selected-a2-tta-detached-launch.md) — Failed, 2026-10-29T08:23:06+08:00
 - [0192 — Launch selected A2 full validation TTA](steps/0192-launch-selected-a2-full-validation-tta.md) — In progress, 2026-10-29T08:23:09+08:00
+- [0193 — Retry TTA terminal Docker inspection](steps/0193-retry-tta-terminal-docker-inspection.md) — Failed, 2026-10-29T08:37:59+08:00
+- [0194 — Verify completed selected A2 TTA evaluation](steps/0194-verify-completed-selected-a2-tta-evaluation.md) — Passed, 2026-10-29T08:38:02+08:00
+- [0195 — Correct TTA selection artifact hash check](steps/0195-correct-tta-selection-artifact-hash-check.md) — Failed, 2026-10-29T08:38:04+08:00
+- [0196 — Complete formal model and inference selection](steps/0196-complete-formal-model-and-inference-selection.md) — Passed, 2026-10-29T08:38:07+08:00

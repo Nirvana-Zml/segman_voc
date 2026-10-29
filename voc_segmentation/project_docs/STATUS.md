@@ -1,11 +1,11 @@
 # Project status
 
-- Last updated: 2026-10-29 08:10 +08:00
+- Last updated: 2026-10-29 08:34 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
-- Highest verified active milestone: **05 — GCB diagnostics and ablations**
-- Next milestone: **06 — Formal training and selection**
+- Highest verified active milestone: **06 — Formal training and selection**
+- Next milestone: **07 — test400 inference**
 - First hardware-safe model profile: MiT-B1, 384×384, batch 2, effective batch 8
 
 ## Milestone summary
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | A2 trainaug complete: best val mIoU 0.776017 at step 39,000; TTA/ensemble pending |
+| 06 | Formal training and selection | Passed | A2 step-39,000 selected; six-pass TTA raises val mIoU from 0.776017 to 0.786179 |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -1190,5 +1190,18 @@ over single-scale mIoU 0.776017.
   created no process or output. The approved retry launched exactly one full
   TTA job: wrapper/evaluator PIDs 345/353. Its first of 1,449 samples completed
   all six predictions; GPU use was 813/8,188 MiB at 17% and peak allocated
-  CUDA memory was 577,077,248 bytes. No terminal result or exit code exists
-  yet, so validation-only TTA evaluation is actively running.
+  CUDA memory was 577,077,248 bytes.
+- The full TTA evaluator exited 0 after 592.572 seconds and released the GPU.
+  It covered all 1,449 official-val samples and 244,886,857 valid pixels;
+  terminal peak CUDA allocation was 646,150,144 bytes. Result/resolved-config/
+  console SHA-256 values are `0f371a4f...`, `7d892498...`, and `c9598702...`.
+- Independent 21x21 confusion-matrix recomputation gives mIoU 0.786179,
+  foreground mIoU 0.778064, and pixel accuracy 0.952511. TTA improves the
+  locked single-scale mIoU 0.776017 by 0.010162, so the validation-only rule
+  accepts the six-pass method. The terminal audit SHA-256 is `09dc0100...`.
+- `artifacts/model_selection.json` (SHA-256 `67e40e95...`) selects the
+  non-diagnostic step-39,000 checkpoint plus 0.75/1.0/1.25-scale horizontal-
+  flip mean-logit TTA. Ensemble is explicitly not selected because no second
+  matched formal trainaug candidate exists; train-only ablations are not used
+  as unsupported ensemble members. The status helper now marks formal
+  training/selection complete and advances to test400 prediction generation.

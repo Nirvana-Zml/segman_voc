@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
-- State: **In progress — selected A2 trainaug complete; TTA/ensemble selection pending**
-- Last updated: 2026-10-29 08:10 +08:00
+- State: **Passed — selected A2 trainaug checkpoint and validation-proven TTA fixed**
+- Last updated: 2026-10-29 08:34 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,10 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Commit the verified TTA evaluator, then pass a clean-source/resource preflight
-and run the complete 1,449-image official validation. Retain TTA only if its
-full-validation mIoU exceeds the verified 0.776017 single-scale result.
+Use the fixed step-39,000 selected-A2 checkpoint and accepted six-pass TTA to
+generate test400 predictions, then verify exactly 400 original-size,
+single-channel `uint8` PNG masks containing only class IDs 0..20. Do not use
+test400 to revise the model or inference selection.
 
 ## One-step CUDA diagnostic
 
@@ -310,3 +311,37 @@ full-validation mIoU exceeds the verified 0.776017 single-scale result.
   seconds and 577,077,248 peak allocated CUDA bytes. The concurrent snapshot
   showed 813/8,188 MiB GPU memory at 17% utilization. No exit code or terminal
   `result.json` exists yet; the full official-val evaluation is active.
+
+## Full official-validation TTA terminal selection
+
+- The evaluator completed naturally with exit code 0 after 592.572 seconds.
+  It processed all 1,449 official-val images, six predictions per image, and
+  244,886,857 valid pixels. Terminal peak allocated CUDA memory was
+  646,150,144 bytes; no evaluator remained and the GPU returned to 0/8,188
+  MiB at 0% utilization.
+- Result, resolved-config, and console SHA-256 values are `0f371a4f...`,
+  `7d892498...`, and `c9598702...`. The result retains clean evaluation source
+  commit `f4f01e8c...` plus the locked config, checkpoint, baseline, weight,
+  and official split hashes.
+- An ordinary final Docker inspection was denied by the Windows named pipe;
+  the approved read-only retry verified exit 0, no process, idle GPU, and the
+  same container-side hashes. A first local JSON/hash checker also failed only
+  because its inline Python quoting was malformed; the corrected PowerShell
+  parser verified both generated JSON artifacts.
+- Independent recomputation from the saved 21x21 confusion matrix reproduced
+  mIoU 0.7861791234314227, foreground mIoU 0.7780640888941136, pixel accuracy
+  0.9525110855581768, and every per-class IoU. The saved mIoU differs only by
+  `1.11e-16` floating-point rounding and all metrics are finite.
+- Against the locked single-scale mIoU 0.7760166572511324, TTA gains
+  0.010162466180290153 (about 1.016 percentage points), so the strict
+  validation-only acceptance rule selects 0.75/1.0/1.25-scale horizontal-flip
+  mean-logit TTA for test inference.
+- Terminal audit `artifacts/selected_a2_tta_terminal_audit.json` has SHA-256
+  `09dc0100...`. Formal selection artifact `artifacts/model_selection.json`
+  has SHA-256 `67e40e95...` and fixes non-diagnostic step-39,000 `best.pt`
+  (`d2e6fb31...`) plus the accepted TTA.
+- Ensemble is not selected: only selected A2 has a completed formal trainaug
+  run, while the train-only ablation checkpoints are architecture-selection
+  evidence rather than matched formal ensemble candidates. The optional
+  enhancement is omitted instead of adding an unvalidated member. test400 was
+  not used for any choice, and the status helper advances to milestone 07.
