@@ -277,3 +277,20 @@ full-validation mIoU exceeds the verified 0.776017 single-scale result.
   mIoU 0.946756 is explicitly non-reportable and selection remained false
   because the official validation was incomplete. Diagnostic result SHA-256
   is `da8fafd0...`.
+
+## Full official-validation TTA preflight
+
+- The first ordinary Docker preflight was denied before container access by
+  the Windows named pipe. It launched no trainer or evaluator and created no
+  output artifact. The approved retry completed the same read-only checks.
+- Source commit `b641874e0858fd2591fd81c901b5dcd08645c480` was clean. The
+  container had no trainer or GPU compute process, the RTX 4060 reported
+  0/8,188 MiB at 0% utilization, and `/workspace` had 756 GB available.
+- The reportable output directory `runs/gcb_selected_a2_tta_val` did not
+  exist. Registered SHA-256 values matched for TTA config `064aa5da...`,
+  source training config `5fcbfa7c...`, selected step-39,000 checkpoint
+  `d2e6fb31...`, single-scale validation `2ce5a40d...`, and official val split
+  `cdc1326d...`.
+- The evaluator's container `--help` import check passed. The full 1,449-image
+  validation job is eligible to launch exactly once after this preflight
+  ledger is committed, preserving the clean-source provenance gate.

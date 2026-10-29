@@ -178,3 +178,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0186 — Reject implicit VOC fields in TTA config](steps/0186-reject-implicit-voc-fields-in-tta-config.md) — Failed, 2026-10-29T08:10:28+08:00
 - [0187 — Pass corrected TTA regression suite](steps/0187-pass-corrected-tta-regression-suite.md) — Passed, 2026-10-29T08:10:28+08:00
 - [0188 — Pass selected A2 TTA CUDA diagnostic](steps/0188-pass-selected-a2-tta-cuda-diagnostic.md) — Passed, 2026-10-29T08:10:28+08:00
+- [0189 — Retry TTA Docker preflight access](steps/0189-retry-tta-docker-preflight-access.md) — Failed, 2026-10-29T08:20:52+08:00
+- [0190 — Pass reportable selected A2 TTA preflight](steps/0190-pass-reportable-selected-a2-tta-preflight.md) — Passed, 2026-10-29T08:20:54+08:00

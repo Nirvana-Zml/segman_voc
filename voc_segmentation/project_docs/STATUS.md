@@ -1172,3 +1172,13 @@ over single-scale mIoU 0.776017.
   1.811 seconds with 577,077,248 peak allocated bytes. Its subset mIoU is
   non-reportable and `accepted=false`. Config/result SHA-256 values are
   `064aa5da...` and `da8fafd0...`.
+- The first reportable TTA preflight could not reach the Docker named pipe;
+  it started no process and changed no run artifact. The approved retry passed
+  from clean source commit `b641874e...` with no trainer or GPU process,
+  0/8,188 MiB GPU memory at 0% utilization, and 756 GB free in `/workspace`.
+- The full TTA output directory is absent and all locked input hashes match:
+  TTA config `064aa5da...`, selected source config `5fcbfa7c...`, step-39,000
+  checkpoint `d2e6fb31...`, baseline validation `2ce5a40d...`, and official
+  validation split `cdc1326d...`. The evaluator CLI also passed its container
+  import/help check; the next action is to commit this preflight ledger and
+  launch exactly one full 1,449-image official-validation TTA evaluation.
