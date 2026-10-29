@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
 - State: **In progress — selected A2 trainaug complete; TTA/ensemble selection pending**
-- Last updated: 2026-10-29 08:00 +08:00
+- Last updated: 2026-10-29 08:10 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,10 +39,9 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Evaluate the validation-selected step-39,000 `best.pt` first with single-scale
-inference and then with the plan's 0.75/1.0/1.25-scale plus horizontal-flip
-logit-averaging TTA. Retain TTA or any later ensemble only if official-val
-mIoU improves over the verified 0.776017 single-scale result.
+Commit the verified TTA evaluator, then pass a clean-source/resource preflight
+and run the complete 1,449-image official validation. Retain TTA only if its
+full-validation mIoU exceeds the verified 0.776017 single-scale result.
 
 ## One-step CUDA diagnostic
 
@@ -255,3 +254,26 @@ mIoU improves over the verified 0.776017 single-scale result.
   `artifacts/selected_a2_trainaug_terminal_audit.json` has SHA-256
   `14545e48...`. Formal base training is complete, but milestone 06 remains in
   progress until validation-based TTA/ensemble selection is recorded.
+
+## TTA evaluator implementation and diagnostic
+
+- Added a shared native-resolution TTA evaluator and a reportable tool/config
+  locked to step-39,000 `best.pt`. For each image it runs scales 0.75, 1.0,
+  and 1.25 with original and horizontal-flipped inputs, flips logits back,
+  bilinearly restores every logit tensor to source size, averages six float32
+  logit tensors, and only then computes argmax/global-confusion metrics.
+- Focused evaluation tests passed 5/5. The first complete suite rejected the
+  new reference-style evaluation YAML because every file under `configs/` must
+  explicitly expose the VOC/model-selection contract. No evaluation job
+  started. Adding 21 classes, ignore 255, no label reduction, independent
+  train/val, and mIoU selection fields corrected the config without weakening
+  the common test; the full suite then passed 53/53.
+- TTA config SHA-256 is `064aa5da...`; evaluator tool and shared engine hashes
+  are `0f4d3b70...` and `c34b2fb5...`. The config locks source config
+  `5fcbfa7c...`, best checkpoint `d2e6fb31...`, baseline validation
+  `2ce5a40d...`, and official val split `cdc1326d...`.
+- A two-image CUDA diagnostic exercised all six predictions per image, used
+  577,077,248 peak allocated bytes, and completed in 1.811 seconds. Its subset
+  mIoU 0.946756 is explicitly non-reportable and selection remained false
+  because the official validation was incomplete. Diagnostic result SHA-256
+  is `da8fafd0...`.

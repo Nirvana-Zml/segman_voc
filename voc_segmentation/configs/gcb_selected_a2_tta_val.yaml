@@ -1,0 +1,41 @@
+experiment:
+  name: gcb_selected_a2_trainaug_tta_val
+  stage: formal_training_selection
+  source_run: runs/gcb_selected_a2_trainaug
+model:
+  num_classes: 21
+source_config:
+  path: configs/gcb_selected_a2_trainaug.yaml
+  sha256: 5fcbfa7cfdc9250dc744509e4fe58caa18d8c11864b7b5a0595c6d3f6b7a114c
+checkpoint:
+  path: runs/gcb_selected_a2_trainaug/best.pt
+  sha256: d2e6fb31e6c9758bbdc30ff0d98c27de77b12be0791fccaccd9fc5478e66a180
+  step: 39000
+  diagnostic_only: false
+baseline:
+  validation: runs/gcb_selected_a2_trainaug/validation/step_039000.json
+  validation_sha256: 2ce5a40d423cc188459f2aa9f31fcdc840942597cd94057a06849629da77939a
+  miou: 0.7760166572511324
+data:
+  train_split: trainaug
+  val_split: val
+  split: val
+  samples: 1449
+  split_sha256: cdc1326d12f69ce5153aa5da04a4d8783e146868d42d19f82f44e74b97ac907d
+  ignore_index: 255
+  reduce_zero_label: false
+inference:
+  scales: [0.75, 1.0, 1.25]
+  horizontal_flip: true
+  aggregation: mean_logits
+  resize_mode: bilinear
+  align_corners: false
+runtime:
+  amp: true
+  num_workers: 0
+  progress_every: 25
+training:
+  save_best_metric: miou
+selection:
+  metric: miou
+  minimum_improvement: 0.0

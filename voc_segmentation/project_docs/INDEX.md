@@ -174,3 +174,7 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0182 — Resume selected A2 trainaug from step 13000](steps/0182-resume-selected-a2-trainaug-from-step-13000.md) — In progress, 2026-10-28T18:50:26+08:00
 - [0183 — Observe selected A2 trainaug terminal exit](steps/0183-observe-selected-a2-trainaug-terminal-exit.md) — Passed, 2026-10-29T08:01:14+08:00
 - [0184 — Verify completed selected A2 trainaug run](steps/0184-verify-completed-selected-a2-trainaug-run.md) — Passed, 2026-10-29T08:01:14+08:00
+- [0185 — Implement selected A2 TTA evaluation](steps/0185-implement-selected-a2-tta-evaluation.md) — Passed, 2026-10-29T08:10:28+08:00
+- [0186 — Reject implicit VOC fields in TTA config](steps/0186-reject-implicit-voc-fields-in-tta-config.md) — Failed, 2026-10-29T08:10:28+08:00
+- [0187 — Pass corrected TTA regression suite](steps/0187-pass-corrected-tta-regression-suite.md) — Passed, 2026-10-29T08:10:28+08:00
+- [0188 — Pass selected A2 TTA CUDA diagnostic](steps/0188-pass-selected-a2-tta-cuda-diagnostic.md) — Passed, 2026-10-29T08:10:28+08:00

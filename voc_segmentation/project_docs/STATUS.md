@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-29 08:00 +08:00
+- Last updated: 2026-10-29 08:10 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Evaluate step-39,000 `best.pt` on official val with the plan's
-0.75/1.0/1.25-scale plus horizontal-flip logit-averaging TTA. Retain TTA or a
-later ensemble only if it improves over single-scale mIoU 0.776017.
+Commit the verified TTA evaluator, pass a clean-source/resource preflight, and
+run the full 1,449-image official validation. Retain TTA only if it improves
+over single-scale mIoU 0.776017.
 
 ## Latest checks
 
@@ -1160,3 +1160,15 @@ later ensemble only if it improves over single-scale mIoU 0.776017.
   `artifacts/selected_a2_trainaug_terminal_audit.json` has SHA-256
   `14545e48...`. Base formal training is verified complete; milestone 06 stays
   open for validation-proven TTA and optional ensemble selection.
+- Implemented native-resolution 0.75/1.0/1.25-scale plus horizontal-flip TTA
+  that averages six restored float32 logit tensors before argmax. The reportable
+  config locks the selected checkpoint, source config, single-scale baseline,
+  and official validation split hashes.
+- Five focused tests passed. The first 53-test suite rejected the new YAML for
+  missing explicit top-level VOC contract fields; no evaluation ran. Adding
+  those fields corrected the configuration while retaining the common test,
+  and the complete suite passed 53/53.
+- A two-image CUDA TTA diagnostic completed all six predictions per image in
+  1.811 seconds with 577,077,248 peak allocated bytes. Its subset mIoU is
+  non-reportable and `accepted=false`. Config/result SHA-256 values are
+  `064aa5da...` and `da8fafd0...`.
