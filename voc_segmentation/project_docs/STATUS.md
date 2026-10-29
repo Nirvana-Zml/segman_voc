@@ -1,6 +1,6 @@
 # Project status
 
-- Last updated: 2026-10-28 18:49 +08:00
+- Last updated: 2026-10-29 08:00 +08:00
 - Overall state: **In progress**
 - Active application root: `voc_segmentation/`
 - Design authority: `VOC2012_Semantic_Segmentation_Project_Plan.md` V1.0
@@ -18,7 +18,7 @@
 | 03 | CNN baseline | Passed | 20,000-step formal run complete; best val mIoU 0.562094 at step 9,000 |
 | 04 | Transformer baseline | Passed | 20,000-step run complete; best val mIoU 0.733889 at step 19,000 |
 | 05 | GCB diagnostics and ablations | Passed | A1 0.736626; A2 0.755643; A3 0.726746; A4 0.739100; A2 selected |
-| 06 | Formal training and selection | In progress | A2 trainaug active after verified continuation at step 13,001 |
+| 06 | Formal training and selection | In progress | A2 trainaug complete: best val mIoU 0.776017 at step 39,000; TTA/ensemble pending |
 | 07 | test400 inference | Not started | Exactly 400 validated masks |
 | 08 | Report and package | Not started | Evidence-backed report and final archives |
 
@@ -41,9 +41,9 @@
 
 ## Next action
 
-Monitor the active selected-A2 trainaug recovery through full official
-validation and checkpoint intervals; keep best-model selection separate from
-the most recent restart checkpoint.
+Evaluate step-39,000 `best.pt` on official val with the plan's
+0.75/1.0/1.25-scale plus horizontal-flip logit-averaging TTA. Retain TTA or a
+later ensemble only if it improves over single-scale mIoU 0.776017.
 
 ## Latest checks
 
@@ -1143,3 +1143,20 @@ the most recent restart checkpoint.
   continuation at 13,001, unique train steps, retained 13 validations and
   three prior overflow events, and 20 finite CE-only new records. GPU use was
   1,547/8,188 MiB at 40%; no exit code or terminal result exists.
+- The selected-A2 trainaug run completed with exit code 0 and a non-diagnostic
+  terminal result. No trainer remains and GPU is 0/8,188 MiB at 0%.
+- Reconciled history contains 40,000 unique train steps, 40 complete
+  1,449-image official validations, and 14 bounded AMP overflow records in
+  40,054 total records. All scalars are finite and all train totals equal CE.
+- Independent recomputation from every 21x21 global confusion matrix matched
+  all saved metrics. The best is step 39,000: mIoU 0.776017, foreground mIoU
+  0.767576, pixel accuracy 0.949276, and CE 0.200152. Terminal step 40,000 has
+  mIoU 0.773067, so it is not the selected checkpoint.
+- `best.pt` at step 39,000 has SHA-256 `d2e6fb31...`; `last.pt` at step 40,000
+  has SHA-256 `06ddc3f8...`. Both are non-diagnostic and contain 1,036 finite
+  tensors. Result/history/terminal-validation hashes are `79065492...`,
+  `2be3ea7a...`, and `5c89d3fe...`.
+- Independent terminal audit artifact
+  `artifacts/selected_a2_trainaug_terminal_audit.json` has SHA-256
+  `14545e48...`. Base formal training is verified complete; milestone 06 stays
+  open for validation-proven TTA and optional ensemble selection.

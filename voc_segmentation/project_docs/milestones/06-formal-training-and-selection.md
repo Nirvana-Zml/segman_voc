@@ -1,7 +1,7 @@
 # Milestone 06: Formal training and model selection
 
-- State: **In progress — selected A2 trainaug active from step 13,001**
-- Last updated: 2026-10-28 18:49 +08:00
+- State: **In progress — selected A2 trainaug complete; TTA/ensemble selection pending**
+- Last updated: 2026-10-29 08:00 +08:00
 
 Train validated candidates on leak-free trainaug, select only by official val
 mIoU, and preserve resolved configs, provenance, logs, checkpoints, curves,
@@ -39,9 +39,10 @@ per-class IoU, timing, and peak memory. Validate TTA/ensemble choices on val.
 
 ## Next action
 
-Monitor the active selected-A2 trainaug recovery through full official
-validation and checkpoint intervals. Preserve validation-selected `best.pt`
-separately from the most recent restart checkpoint.
+Evaluate the validation-selected step-39,000 `best.pt` first with single-scale
+inference and then with the plan's 0.75/1.0/1.25-scale plus horizontal-flip
+logit-averaging TTA. Retain TTA or any later ensemble only if official-val
+mIoU improves over the verified 0.776017 single-scale result.
 
 ## One-step CUDA diagnostic
 
@@ -221,3 +222,36 @@ separately from the most recent restart checkpoint.
   events retained, and 20 finite CE-only resumed records.
 - GPU use was 1,547/8,188 MiB at 40%. No new exit code or terminal result
   exists; the unchanged 40,000-step selected-A2 trainaug run is active.
+
+## Selected-A2 trainaug terminal result
+
+- The recovered wrapper exited 0 and `result.json` reports `ok=true` and
+  `diagnostic_only=false`. No trainer or GPU compute process remains; the GPU
+  terminal snapshot was 0/8,188 MiB at 0% utilization.
+- History contains exactly 40,054 records: train steps 1-40,000 exactly once,
+  40 full official validations at every 1,000 steps, and 14 bounded AMP
+  overflow events. Every completed scalar is finite and every train record
+  satisfies the selected A2 CE-only loss contract.
+- Independent recomputation from every saved 21x21 global confusion matrix
+  reproduced all per-class IoU, mIoU, foreground mIoU, pixel accuracy, and
+  mean pixel accuracy values. Every validation covers 1,449 samples and
+  244,886,857 valid pixels.
+- The validation-selected best is step 39,000: mIoU 0.776017, foreground mIoU
+  0.767576, pixel accuracy 0.949276, and CE loss 0.200152. Terminal step 40,000
+  has mIoU 0.773067, foreground mIoU 0.764470, pixel accuracy 0.948734, and CE
+  loss 0.202265; therefore `best.pt`, not the terminal checkpoint, remains the
+  single-scale selection candidate.
+- Non-diagnostic `best.pt` is step 39,000 with SHA-256 `d2e6fb31...`;
+  non-diagnostic `last.pt` is step 40,000 with SHA-256 `06ddc3f8...`. Each
+  contains 1,036 recursively inspected tensors and all floating tensors are
+  finite. The best validation JSON SHA-256 is `2ce5a40d...`.
+- Result/history/terminal-validation SHA-256 values are `79065492...`,
+  `2be3ea7a...`, and `5c89d3fe...`. The three TensorBoard event SHA-256 values
+  are `329dc372...`, `e25838d2...`, and `6b5768fe...`.
+- The terminal recovery segment ran 47,897.169 seconds and peaked at
+  1,283,440,128 allocated CUDA bytes. Its clean injected source commit is
+  `fd1f6d3096e048c53ea1c8b4f4e67080ba79e156`.
+- Machine-readable independent audit
+  `artifacts/selected_a2_trainaug_terminal_audit.json` has SHA-256
+  `14545e48...`. Formal base training is complete, but milestone 06 remains in
+  progress until validation-based TTA/ensemble selection is recorded.

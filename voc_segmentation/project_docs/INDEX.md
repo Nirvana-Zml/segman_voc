@@ -172,3 +172,5 @@ Steps 0001–0017 are preserved in Git commit `111f8a0` under
 - [0180 — Pass selected A2 step-13000 recovery preflight](steps/0180-pass-selected-a2-step-13000-recovery-preflight.md) — Passed, 2026-10-28T18:45:40+08:00
 - [0181 — Prepare selected A2 step-13000 recovery](steps/0181-prepare-selected-a2-step-13000-recovery.md) — Passed, 2026-10-28T18:50:26+08:00
 - [0182 — Resume selected A2 trainaug from step 13000](steps/0182-resume-selected-a2-trainaug-from-step-13000.md) — In progress, 2026-10-28T18:50:26+08:00
+- [0183 — Observe selected A2 trainaug terminal exit](steps/0183-observe-selected-a2-trainaug-terminal-exit.md) — Passed, 2026-10-29T08:01:14+08:00
+- [0184 — Verify completed selected A2 trainaug run](steps/0184-verify-completed-selected-a2-trainaug-run.md) — Passed, 2026-10-29T08:01:14+08:00
